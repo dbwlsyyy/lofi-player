@@ -4,11 +4,14 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { fetchMe } from '@/lib/spotify';
 import styles from './Home.module.css';
+import ProfileHeader from './components/ProfileHeader';
 
 export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
     const [me, setMe] = useState(null);
+    const [error, setError] = useState('');
+    const [isRelaxMode, setIsRelaxMode] = useState(false);
 
     useEffect(() => {
         if (!accessToken) return;
@@ -28,34 +31,33 @@ export default function HomePage() {
     if (status === 'loading') {
         return <main className={styles.loading}>로딩 중...</main>;
     }
-    console.log(me);
+
     return (
         <main className={styles.container}>
-            <header className={styles.header}>
-                <h2 className={styles.greeting}>
-                    {me?.display_name
-                        ? `안녕하세요, ${me.display_name}님`
-                        : '로그인이 필요합니다 🎧'}
-                </h2>
+            <div
+                className={`${styles.background} ${
+                    isRelaxMode ? styles.blurOff : styles.blurOn
+                }`}
+            ></div>
 
-                {accessToken ? (
-                    <button
-                        className={styles.logoutBtn}
-                        onClick={() => signOut()}
-                    >
-                        로그아웃
-                    </button>
-                ) : (
-                    <button
-                        className={styles.loginBtn}
-                        onClick={() =>
-                            signIn('spotify', { callbackUrl: '/home' })
-                        }
-                    >
-                        로그인
-                    </button>
-                )}
-            </header>
+            {me ? (
+                <ProfileHeader profile={me} onLogout={() => signOut()} />
+            ) : (
+                <button
+                    className={styles.loginBtn}
+                    onClick={() => signIn('spotify', { callbackUrl: '/home' })}
+                >
+                    로그인
+                </button>
+            )}
+
+            {/* 👇 여기에 앞으로 플레이리스트/추천영역 붙일 예정 */}
+            <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>내 플레이리스트</h3>
+                <p className={styles.sectionDesc}>
+                    로그인된 Spotify 계정의 플레이리스트를 불러옵니다.
+                </p>
+            </section>
         </main>
     );
 }
