@@ -9,6 +9,7 @@ const handler = NextAuth({
             authorization: { params: { scope: process.env.SPOTIFY_SCOPE } },
         }),
     ],
+    session: { strategy: 'jwt' },
 });
 
 export { handler as GET, handler as POST };
