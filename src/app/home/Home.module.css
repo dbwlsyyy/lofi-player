@@ -1,0 +1,143 @@
+.container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 40px 80px;
+    color: #fff;
+    overflow: hidden;
+}
+
+.background {
+    position: fixed;
+    inset: 0;
+    background: url('/room_background.png') center/cover no-repeat;
+    transition:
+        filter 0.6s ease,
+        opacity 0.6s ease;
+    z-index: -1;
+}
+
+/* 흐릿한 상태 (일반 모드) */
+.blurOn {
+    filter: blur(8px) brightness(0.7);
+    opacity: 0.9;
+}
+
+/* 선명한 상태 (휴식 모드) */
+.blurOff {
+    filter: blur(0px) brightness(1);
+    opacity: 1;
+}
+
+/* 로그인 버튼 중앙정렬 */
+.centerContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.loginBtn {
+    background: #1db954;
+    color: white;
+    font-size: 16px;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.loginBtn:hover {
+    background: #1ed760;
+}
+
+/* 플레이리스트 영역 */
+
+.section {
+    text-align: center;
+
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.sectionTitle {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.sectionDesc {
+    color: #ccc;
+    margin-top: 10px;
+}
+.toggleBtn {
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.toggleBtn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* 하단 재생바 */
+.playerBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    padding: 16px 0;
+    text-align: center;
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.exitRelaxBtn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.exitRelaxBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.loading {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    background: #0b1120;
+    color: #fff;
+    font-size: 18px;
+}
+
+.error {
+    background: rgba(255, 71, 87, 0.12);
+    border: 1px solid rgba(255, 71, 87, 0.4);
+    color: #ff6b6b;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
