@@ -19,7 +19,6 @@ export default function HomePage() {
             try {
                 const profile = await fetchMe(accessToken);
                 setMe(profile);
-                console.log('profile', profile);
             } catch (e) {
                 setError('프로필 정보를 가져오지 못했습니다.');
                 console.error(e);
@@ -27,7 +26,6 @@ export default function HomePage() {
         })();
     }, [accessToken]);
 
-    // 로그인 중/확인 중일 때 로딩 처리
     if (status === 'loading') {
         return <main className={styles.loading}>로딩 중...</main>;
     }
@@ -38,26 +36,65 @@ export default function HomePage() {
                 className={`${styles.background} ${
                     isRelaxMode ? styles.blurOff : styles.blurOn
                 }`}
-            ></div>
+            />
 
-            {me ? (
-                <ProfileHeader profile={me} onLogout={() => signOut()} />
-            ) : (
-                <button
-                    className={styles.loginBtn}
-                    onClick={() => signIn('spotify', { callbackUrl: '/home' })}
-                >
-                    로그인
-                </button>
+            {/* 로그인 안 한 상태 */}
+            {!me && (
+                <div className={styles.centerContent}>
+                    <button
+                        className={styles.loginBtn}
+                        onClick={() =>
+                            signIn('spotify', { callbackUrl: '/home' })
+                        }
+                    >
+                        Spotify 로그인
+                    </button>
+                </div>
             )}
 
-            {/* 👇 여기에 앞으로 플레이리스트/추천영역 붙일 예정 */}
-            <section className={styles.section}>
-                <h3 className={styles.sectionTitle}>내 플레이리스트</h3>
-                <p className={styles.sectionDesc}>
-                    로그인된 Spotify 계정의 플레이리스트를 불러옵니다.
-                </p>
-            </section>
+            {/* 로그인한 상태 */}
+            {me && (
+                <>
+                    {/* 일반 모드일 때만 보이게 */}
+                    {!isRelaxMode && (
+                        <>
+                            <ProfileHeader
+                                profile={me}
+                                onLogout={() => signOut()}
+                            />
+
+                            <section className={styles.section}>
+                                <h3 className={styles.sectionTitle}>
+                                    내 플레이리스트
+                                </h3>
+                                <p className={styles.sectionDesc}>
+                                    로그인된 Spotify 계정의 플레이리스트를
+                                    불러옵니다.
+                                </p>
+                                <button
+                                    className={styles.toggleBtn}
+                                    onClick={() => setIsRelaxMode(true)}
+                                >
+                                    🌙 휴식모드로 전환
+                                </button>
+                            </section>
+                        </>
+                    )}
+
+                    {/* 하단 재생바는 항상 표시 */}
+                    <footer className={styles.playerBar}>
+                        🎧 Now Playing: Chill Vibes
+                        {isRelaxMode && (
+                            <button
+                                className={styles.exitRelaxBtn}
+                                onClick={() => setIsRelaxMode(false)}
+                            >
+                                ⏫ 일반모드 복귀
+                            </button>
+                        )}
+                    </footer>
+                </>
+            )}
         </main>
     );
 }
