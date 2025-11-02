@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+    - name: 💡 Feature / Task Issue
+      url: https://github.com/dbwlsyyy/lofi-player/issues/new?template=feature_task.yml
+      about: 새 기능이나 작업을 위한 이슈 생성

@@ -1,0 +1,25 @@
+name: ✨ Feature / Task
+description: 새로운 기능 개발 또는 작업 이슈를 등록하세요.
+title: '[#번호] 작업명 입력'
+labels: ['feature']
+body:
+    - type: input
+      id: summary
+      attributes:
+          label: 🧾 간단한 설명
+          description: 무엇을 구현할지 간단히 요약하세요.
+          placeholder: 예) Spotify 로그인 기능 구현
+      validations:
+          required: true
+
+    - type: textarea
+      id: todo
+      attributes:
+          label: ✅ 해야 할 작업
+          description: 구현해야 하는 구체적인 항목들을 적어주세요.
+          placeholder: |
+              - [ ] NextAuth 설치 및 Spotify Provider 추가
+              - [ ] .env 설정
+              - [ ] 로그인 페이지 구현
+      validations:
+          required: true
