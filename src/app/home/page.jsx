@@ -16,6 +16,7 @@ export default function HomePage() {
             try {
                 const profile = await fetchMe(accessToken);
                 setMe(profile);
+                console.log('profile', profile);
             } catch (e) {
                 setError('프로필 정보를 가져오지 못했습니다.');
                 console.error(e);
@@ -27,7 +28,7 @@ export default function HomePage() {
     if (status === 'loading') {
         return <main className={styles.loading}>로딩 중...</main>;
     }
-
+    console.log(me);
     return (
         <main className={styles.container}>
             <header className={styles.header}>

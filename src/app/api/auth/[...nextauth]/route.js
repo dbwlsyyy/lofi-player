@@ -10,6 +10,20 @@ const handler = NextAuth({
         }),
     ],
     session: { strategy: 'jwt' },
+    callbacks: {
+        async jwt({ token, account }) {
+            if (account) {
+                token.accessToken = account.access_token;
+            }
+            return token;
+        },
+
+        async session({ session, token }) {
+            session.accessToken = token.accessToken;
+            return session;
+        },
+    },
+    debug: true,
 });
 
 export { handler as GET, handler as POST };
