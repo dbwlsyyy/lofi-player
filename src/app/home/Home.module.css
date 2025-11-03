@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding: 40px 80px;
+    padding: 4rem 8rem;
     color: #fff;
     overflow: hidden;
 }
@@ -21,13 +21,13 @@
 
 /* 흐릿한 상태 (일반 모드) */
 .blurOn {
-    filter: blur(8px) brightness(0.7);
+    filter: blur(0.8rem) brightness(0.7);
     opacity: 0.9;
 }
 
 /* 선명한 상태 (휴식 모드) */
 .blurOff {
-    filter: blur(0px) brightness(1);
+    filter: blur(0rem) brightness(1);
     opacity: 1;
 }
 
@@ -42,10 +42,10 @@
 .loginBtn {
     background: #1db954;
     color: white;
-    font-size: 16px;
-    padding: 14px 24px;
+    font-size: 1.6rem;
+    padding: 1.4rem 2.4rem;
     border: none;
-    border-radius: 30px;
+    border-radius: 3rem;
     cursor: pointer;
     transition: background 0.2s ease;
 }
@@ -55,30 +55,29 @@
 }
 
 /* 플레이리스트 영역 */
-
 .section {
     text-align: center;
-
-    padding: 20px;
+    padding: 2rem;
 }
 
 .sectionTitle {
-    font-size: 22px;
+    font-size: 2.2rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 0.8rem;
 }
 
 .sectionDesc {
     color: #ccc;
-    margin-top: 10px;
+    margin-top: 1rem;
 }
+
 .toggleBtn {
-    margin-top: 30px;
+    margin-top: 3rem;
     background: rgba(255, 255, 255, 0.1);
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 10px 18px;
+    border-radius: 0.8rem;
+    padding: 1rem 1.8rem;
     cursor: pointer;
     transition: background 0.2s ease;
 }
@@ -89,25 +88,25 @@
 
 /* 플레이리스트 */
 .playlistGrid {
-    margin-top: 30px;
+    margin-top: 3rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: 2.4rem;
     width: 100%;
-    max-width: 900px;
+    max-width: 90rem;
     margin-inline: auto;
 }
 
 .playlistCard {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 1.2rem;
+    padding: 1.2rem;
     text-align: center;
     cursor: pointer;
     transition:
         transform 0.2s,
         background 0.2s;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(1rem);
 }
 
 .playlistCard:hover {
@@ -117,20 +116,20 @@
 
 .playlistCard img {
     width: 100%;
-    height: 160px;
+    height: 16rem;
     object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    border-radius: 0.8rem;
+    margin-bottom: 1rem;
 }
 
 .playlistCard h4 {
-    font-size: 16px;
+    font-size: 1.6rem;
     font-weight: 600;
-    margin: 4px 0;
+    margin: 0.4rem 0;
 }
 
 .playlistCard p {
-    font-size: 13px;
+    font-size: 1.3rem;
     color: #bbb;
 }
 
@@ -141,24 +140,24 @@
     left: 0;
     width: 100%;
     background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(10px);
-    padding: 16px 0;
+    backdrop-filter: blur(1rem);
+    padding: 1.6rem 0;
     text-align: center;
-    font-size: 15px;
+    font-size: 1.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 1rem;
+    border-top: 0.1rem solid rgba(255, 255, 255, 0.1);
 }
 
 .exitRelaxBtn {
     background: rgba(255, 255, 255, 0.1);
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 12px;
+    border-radius: 0.8rem;
+    padding: 0.6rem 1rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -173,14 +172,14 @@
     height: 100vh;
     background: #0b1120;
     color: #fff;
-    font-size: 18px;
+    font-size: 1.8rem;
 }
 
 .error {
     background: rgba(255, 71, 87, 0.12);
-    border: 1px solid rgba(255, 71, 87, 0.4);
+    border: 0.1rem solid rgba(255, 71, 87, 0.4);
     color: #ff6b6b;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-bottom: 16px;
+    padding: 1rem 1.4rem;
+    border-radius: 0.8rem;
+    margin-bottom: 1.6rem;
 }
