@@ -12,7 +12,9 @@
 .background {
     position: fixed;
     inset: 0;
-    background: url('/room_background.png') center/cover no-repeat;
+    width: 100%; /* 비디오 태그는 크기 명시 필요 */
+    height: 100%; /* 비디오 태그는 크기 명시 필요 */
+    object-fit: cover; /* 'background-size: cover'의 비디오 버전 */
     transition:
         filter 0.6s ease,
         opacity 0.6s ease;

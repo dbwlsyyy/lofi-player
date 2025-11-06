@@ -37,11 +37,16 @@ export default function HomePage() {
 
     return (
         <main className={styles.container}>
-            <div
+            <video
                 className={`${styles.background} ${
                     isRelaxMode ? styles.blurOff : styles.blurOn
                 }`}
-            ></div>
+                src="/a.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+            ></video>
 
             {!me && (
                 <div className={styles.centerContent}>
@@ -104,14 +109,13 @@ export default function HomePage() {
                         </>
                     )}
 
-                    <footer className={styles.playerBar}>
-                        🎧 Now Playing: Chill Vibes
+                    <footer>
                         {isRelaxMode && (
                             <button
                                 className={styles.exitRelaxBtn}
                                 onClick={() => setIsRelaxMode(false)}
                             >
-                                ⏫ 일반모드 복귀
+                                플레이리스트 열기
                             </button>
                         )}
                     </footer>
