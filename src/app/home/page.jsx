@@ -2,7 +2,7 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { fetchMe } from '@/lib/spotify';
+import { fetchMe, fetchPlaylists } from '@/lib/spotify';
 import styles from './Home.module.css';
 import ProfileHeader from './components/ProfileHeader';
 
@@ -10,18 +10,23 @@ export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
     const [me, setMe] = useState(null);
+    const [playlists, setPlaylists] = useState([]);
     const [error, setError] = useState('');
     const [isRelaxMode, setIsRelaxMode] = useState(false);
 
     useEffect(() => {
         if (!accessToken) return;
+
         (async () => {
             try {
                 const profile = await fetchMe(accessToken);
                 setMe(profile);
+
+                const list = await fetchPlaylists(accessToken);
+                setPlaylists(list);
             } catch (e) {
-                setError('프로필 정보를 가져오지 못했습니다.');
                 console.error(e);
+                setError('Spotify API 호출 실패');
             }
         })();
     }, [accessToken]);
@@ -32,13 +37,17 @@ export default function HomePage() {
 
     return (
         <main className={styles.container}>
-            <div
+            <video
                 className={`${styles.background} ${
                     isRelaxMode ? styles.blurOff : styles.blurOn
                 }`}
-            />
+                src="/a.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+            ></video>
 
-            {/* 로그인 안 한 상태 */}
             {!me && (
                 <div className={styles.centerContent}>
                     <button
@@ -52,10 +61,8 @@ export default function HomePage() {
                 </div>
             )}
 
-            {/* 로그인한 상태 */}
             {me && (
                 <>
-                    {/* 일반 모드일 때만 보이게 */}
                     {!isRelaxMode && (
                         <>
                             <ProfileHeader
@@ -67,29 +74,48 @@ export default function HomePage() {
                                 <h3 className={styles.sectionTitle}>
                                     내 플레이리스트
                                 </h3>
-                                <p className={styles.sectionDesc}>
-                                    로그인된 Spotify 계정의 플레이리스트를
-                                    불러옵니다.
-                                </p>
+
+                                {error && (
+                                    <p className={styles.error}>{error}</p>
+                                )}
+
+                                <div className={styles.playlistGrid}>
+                                    {playlists.map((pl) => (
+                                        <div
+                                            key={pl.id}
+                                            className={styles.playlistCard}
+                                            onClick={() => console.log(pl.name)}
+                                        >
+                                            <img
+                                                src={
+                                                    pl.images?.[0]?.url ||
+                                                    '/default_playlist.png'
+                                                }
+                                                alt={pl.name}
+                                            />
+                                            <h4>{pl.name}</h4>
+                                            <p>{pl.tracks.total}곡</p>
+                                        </div>
+                                    ))}
+                                </div>
+
                                 <button
                                     className={styles.toggleBtn}
                                     onClick={() => setIsRelaxMode(true)}
                                 >
-                                    🌙 휴식모드로 전환
+                                    휴식모드로 전환
                                 </button>
                             </section>
                         </>
                     )}
 
-                    {/* 하단 재생바는 항상 표시 */}
-                    <footer className={styles.playerBar}>
-                        🎧 Now Playing: Chill Vibes
+                    <footer>
                         {isRelaxMode && (
                             <button
                                 className={styles.exitRelaxBtn}
                                 onClick={() => setIsRelaxMode(false)}
                             >
-                                ⏫ 일반모드 복귀
+                                플레이리스트 열기
                             </button>
                         )}
                     </footer>
