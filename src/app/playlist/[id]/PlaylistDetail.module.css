@@ -1,0 +1,115 @@
+.container {
+    padding: 5rem 8rem;
+    background: radial-gradient(circle at top left, #0b0f1a, #000);
+    color: #e6ebff;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+/* 제목 */
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
+    background: linear-gradient(90deg, #4f7df3, #00c6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 모두 재생 버튼 */
+.playAllBtn {
+    padding: 1rem 1.8rem;
+    border: none;
+    background: linear-gradient(135deg, #4f7df3, #00c6ff);
+    color: #fff;
+    border-radius: 2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 3rem;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.3s ease;
+}
+
+.playAllBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(79, 125, 243, 0.4);
+}
+
+/* 트랙 리스트 영역 */
+.trackList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 트랙 아이템 */
+.trackItem {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 1rem;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border-radius: 0.3rem;
+}
+
+.trackItem:hover {
+    background: rgba(62, 99, 192, 0.213);
+    transform: translateY(-2px);
+    box-shadow: 0 0 12px rgba(79, 125, 243, 0.25);
+}
+
+/* 앨범 이미지 */
+.albumArt {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
+    border-radius: 0.3rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 트랙 정보 */
+.trackInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 곡명 */
+.trackName {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #dbe5ff;
+    margin-bottom: 0.4rem;
+}
+
+/* 아티스트명 */
+.trackArtist {
+    font-size: 1.6rem;
+    color: #9db3e5;
+}
+
+/* 반응형 대응 */
+@media (max-width: 768px) {
+    .container {
+        padding: 4rem 3rem;
+    }
+
+    .albumArt {
+        width: 6rem;
+        height: 6rem;
+    }
+
+    .trackName {
+        font-size: 1.6rem;
+    }
+
+    .trackArtist {
+        font-size: 1.4rem;
+    }
+}
