@@ -1,5 +1,5 @@
+import PlayerBar from './components/PlayerBar/PlayerBar';
 import './globals.css';
-import PlayerBar from './home/components/PlayerBar/PlayerBar';
 import { NextAuthProvider } from './providers';
 import { ReactNode } from 'react';
 
