@@ -2,15 +2,23 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { fetchMe, fetchPlaylists } from '@/lib/spotify';
+import {
+    fetchMe,
+    fetchPlaylists,
+    type SpotifyPlaylistItem,
+    type SpotifyUser,
+} from '@/lib/spotify';
 import styles from './Home.module.css';
 import ProfileHeader from './components/ProfileHeader';
+import Image from 'next/image';
 
 export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
-    const [me, setMe] = useState(null);
-    const [playlists, setPlaylists] = useState([]);
+    console.log('token', session?.accessToken);
+
+    const [me, setMe] = useState<SpotifyUser | null>(null);
+    const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
     const [error, setError] = useState('');
     const [isRelaxMode, setIsRelaxMode] = useState(false);
 
@@ -24,9 +32,10 @@ export default function HomePage() {
 
                 const list = await fetchPlaylists(accessToken);
                 setPlaylists(list);
-            } catch (e) {
-                console.error(e);
-                setError('Spotify API 호출 실패');
+            } catch (e: any) {
+                if (e.response?.status === 401)
+                    signIn('spotify'); // 만료 시 자동 로그인
+                else setError('Spotify API 호출 실패');
             }
         })();
     }, [accessToken]);
@@ -86,12 +95,15 @@ export default function HomePage() {
                                             className={styles.playlistCard}
                                             onClick={() => console.log(pl.name)}
                                         >
-                                            <img
+                                            <Image
                                                 src={
                                                     pl.images?.[0]?.url ||
                                                     '/default_playlist.png'
                                                 }
                                                 alt={pl.name}
+                                                width={200}
+                                                height={200}
+                                                className={styles.playlistImage}
                                             />
                                             <h4>{pl.name}</h4>
                                             <p>{pl.tracks.total}곡</p>
