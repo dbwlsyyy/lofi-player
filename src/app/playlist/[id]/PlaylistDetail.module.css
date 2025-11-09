@@ -50,9 +50,10 @@
 /* 트랙 아이템 */
 .trackItem {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 2rem;
-    padding: 1rem 1rem;
+    padding: 0.5rem 1rem;
     transition: all 0.25s ease;
     cursor: pointer;
     border-radius: 0.3rem;
@@ -61,13 +62,13 @@
 .trackItem:hover {
     background: rgba(62, 99, 192, 0.213);
     transform: translateY(-2px);
-    box-shadow: 0 0 12px rgba(79, 125, 243, 0.25);
+    box-shadow: 0 0 10px rgba(79, 125, 243, 0.25);
 }
 
 /* 앨범 이미지 */
 .albumArt {
-    width: 8rem;
-    height: 8rem;
+    width: 6rem;
+    height: 6rem;
     object-fit: cover;
     border-radius: 0.3rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -82,7 +83,7 @@
 
 /* 곡명 */
 .trackName {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #dbe5ff;
     margin-bottom: 0.4rem;
@@ -90,26 +91,18 @@
 
 /* 아티스트명 */
 .trackArtist {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     color: #9db3e5;
+}
+
+.hamburger {
+    color: #fff;
+    align-items: center;
 }
 
 /* 반응형 대응 */
 @media (max-width: 768px) {
     .container {
         padding: 4rem 3rem;
-    }
-
-    .albumArt {
-        width: 6rem;
-        height: 6rem;
-    }
-
-    .trackName {
-        font-size: 1.6rem;
-    }
-
-    .trackArtist {
-        font-size: 1.4rem;
     }
 }
