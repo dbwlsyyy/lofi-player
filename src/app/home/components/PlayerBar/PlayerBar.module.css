@@ -1,0 +1,54 @@
+.playerBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    z-index: 1000;
+}
+
+.trackInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.albumArt {
+    width: 5rem;
+    height: 5rem;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.trackTitle {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0;
+    margin-bottom: 0.5rem;
+}
+
+.trackArtist {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.controls svg:hover {
+    color: #1db954;
+}
