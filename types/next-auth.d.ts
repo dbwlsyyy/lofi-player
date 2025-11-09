@@ -1,11 +1,11 @@
-declare module 'next-auth' {
+export declare module 'next-auth' {
     interface Session {
         user?: DefaultSession['user'];
         accessToken?: string;
     }
 }
 
-declare module 'next-auth/jwt' {
+export declare module 'next-auth/jwt' {
     interface JWT {
         accessToken?: string;
     }

@@ -9,7 +9,6 @@ import { useSession } from 'next-auth/react';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
-
     const { id } = useParams(); // URL에서 [id] 부분 가져옴
     const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState(true);
@@ -17,14 +16,13 @@ export default function PlaylistDetailPage() {
     const { enqueue, play } = usePlayerStore();
 
     useEffect(() => {
-        if (!session?.accessToken || !id) return;
+        const token = session?.accessToken;
+        if (!token || !id) return;
 
         const loadTracks = async () => {
             try {
-                const list = await fetchPlaylistTracks(
-                    session.accessToken,
-                    id as string
-                );
+                const list = await fetchPlaylistTracks(token, id as string);
+
                 setTracks(list);
             } catch (err) {
                 console.error('플레이리스트 로드 실패:', err);
