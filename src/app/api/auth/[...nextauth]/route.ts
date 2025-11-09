@@ -1,8 +1,9 @@
-// app/api/auth/[...nextauth]/route.ts
 import NextAuth from 'next-auth/next';
 import Spotify from 'next-auth/providers/spotify';
-import type { JWT } from 'next-auth/jwt';
-import type { Session } from 'next-auth';
+
+if (!process.env.NEXTAUTH_SECRET) {
+    throw new Error('NEXTAUTH_SECRET is not defined');
+}
 
 const handler = NextAuth({
     providers: [
@@ -18,25 +19,19 @@ const handler = NextAuth({
     session: { strategy: 'jwt' },
 
     callbacks: {
-        async jwt({
-            token,
-            account,
-        }: {
-            token: JWT;
-            account?: Record<string, unknown> | null;
-        }) {
-            if (account && (account as any).access_token) {
-                (token as any).accessToken = (account as any)
-                    .access_token as string;
+        async jwt({ token, account }) {
+            if (account && account.access_token) {
+                token.accessToken = account.access_token as string;
             }
             return token;
         },
 
-        async session({ session, token }: { session: Session; token: JWT }) {
-            (session as any).accessToken = (token as any).accessToken;
-            return session;
+        async session({ session, token }) {
+            return { ...session, accessToken: token.accessToken };
         },
     },
+
+    secret: process.env.NEXTAUTH_SECRET,
 
     debug: process.env.NODE_ENV === 'development',
 });

@@ -10,10 +10,12 @@ import {
 } from '@/lib/spotify';
 import styles from './Home.module.css';
 import ProfileHeader from './components/ProfileHeader';
+import Image from 'next/image';
 
 export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
+    console.log('token', session?.accessToken);
 
     const [me, setMe] = useState<SpotifyUser | null>(null);
     const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
@@ -87,29 +89,26 @@ export default function HomePage() {
                                 )}
 
                                 <div className={styles.playlistGrid}>
-                                    {playlists.map(
-                                        (
-                                            pl // 근데 타입 맞춰주니까 여기서 오류 하나도 안 나네?
-                                        ) => (
-                                            <div
-                                                key={pl.id}
-                                                className={styles.playlistCard}
-                                                onClick={() =>
-                                                    console.log(pl.name)
+                                    {playlists.map((pl) => (
+                                        <div
+                                            key={pl.id}
+                                            className={styles.playlistCard}
+                                            onClick={() => console.log(pl.name)}
+                                        >
+                                            <Image
+                                                src={
+                                                    pl.images?.[0]?.url ||
+                                                    '/default_playlist.png'
                                                 }
-                                            >
-                                                <img
-                                                    src={
-                                                        pl.images?.[0]?.url ||
-                                                        '/default_playlist.png'
-                                                    }
-                                                    alt={pl.name}
-                                                />
-                                                <h4>{pl.name}</h4>
-                                                <p>{pl.tracks.total}곡</p>
-                                            </div>
-                                        )
-                                    )}
+                                                alt={pl.name}
+                                                width={200}
+                                                height={200}
+                                                className={styles.playlistImage}
+                                            />
+                                            <h4>{pl.name}</h4>
+                                            <p>{pl.tracks.total}곡</p>
+                                        </div>
+                                    ))}
                                 </div>
 
                                 <button
