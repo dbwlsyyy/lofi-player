@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
-    const { id } = useParams(); // URL에서 [id] 부분 가져옴
+    const { id } = useParams();
     const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState(true);
 

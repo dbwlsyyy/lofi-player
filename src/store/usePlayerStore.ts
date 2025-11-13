@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 
-// 한 곡(트랙) 타입
 export type Track = {
     id: string;
     name: string;
@@ -9,13 +8,11 @@ export type Track = {
     previewUrl?: string;
 };
 
-// 플레이어 전체 상태 타입
 type PlayerState = {
     currentTrack: Track | undefined;
     queue: Track[];
     isPlaying: boolean;
 
-    // 조작 함수들
     play: (track: Track) => void;
     pause: () => void;
     enqueue: (tracks: Track[]) => void;
@@ -25,7 +22,7 @@ type PlayerState = {
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
     currentTrack: undefined, // 시작 시 재생 중인 곡 없음
-    queue: [],
+    queue: [], // 시작 시 재생 목록 비움
     isPlaying: false,
 
     play: (track) => set({ currentTrack: track, isPlaying: true }),
@@ -33,7 +30,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     pause: () => set({ isPlaying: false }),
 
     enqueue: (tracks) => {
-        if (tracks.length === 0) return; // 비어 있으면 무시
+        if (tracks.length === 0) return;
 
         set({
             queue: tracks,
@@ -44,7 +41,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
     next: () => {
         const { queue, currentTrack } = get();
-        if (!currentTrack) return; // 곡이 없으면 무시
+        if (!currentTrack) return;
 
         const idx = queue.findIndex((t) => t.id === currentTrack.id);
         if (idx >= 0 && idx < queue.length - 1) {
