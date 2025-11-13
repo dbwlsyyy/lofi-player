@@ -1,3 +1,4 @@
+import { Track } from '@/store/usePlayerStore';
 import axios from 'axios';
 
 const BASE_URL = 'https://api.spotify.com/v1';
@@ -31,6 +32,36 @@ export async function fetchPlaylists(
     } catch (e: any) {
         console.error(
             'fetchPlaylist API error:',
+            e.response?.status,
+            e.message
+        );
+        throw e;
+    }
+}
+
+// 특정 플레이리스트의 트랙 목록 불러오기
+export async function fetchPlaylistTracks(
+    accessToken: string,
+    playlistId: string
+): Promise<Track[]> {
+    try {
+        const api = spotifyClient(accessToken);
+        const { data } = await api.get(`/playlists/${playlistId}/tracks`);
+
+        // Spotify API의 응답 구조는 { items: [{ track: { ... } }] } 형태
+        return data.items
+            .filter((item: any) => !!item.track) // null 트랙 방지
+            .map((item: any) => ({
+                id: item.track.id,
+                name: item.track.name,
+                artists: item.track.artists.map((a: any) => a.name),
+                image:
+                    item.track.album.images?.[0]?.url ?? '/default_album.png',
+                previewUrl: item.track.preview_url ?? undefined,
+            }));
+    } catch (e: any) {
+        console.error(
+            `fetchPlaylistTracks(${playlistId}) error:`,
             e.response?.status,
             e.message
         );

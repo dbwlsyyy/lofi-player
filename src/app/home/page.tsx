@@ -11,11 +11,13 @@ import {
 import styles from './Home.module.css';
 import ProfileHeader from './components/ProfileHeader';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
     console.log('token', session?.accessToken);
+    const router = useRouter();
 
     const [me, setMe] = useState<SpotifyUser | null>(null);
     const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
@@ -79,7 +81,7 @@ export default function HomePage() {
                                 onLogout={() => signOut()}
                             />
 
-                            <section className={styles.section}>
+                            <div className={styles.section}>
                                 <h3 className={styles.sectionTitle}>
                                     내 플레이리스트
                                 </h3>
@@ -93,7 +95,11 @@ export default function HomePage() {
                                         <div
                                             key={pl.id}
                                             className={styles.playlistCard}
-                                            onClick={() => console.log(pl.name)}
+                                            onClick={() =>
+                                                router.push(
+                                                    `/playlist/${pl.id}`
+                                                )
+                                            }
                                         >
                                             <Image
                                                 src={
@@ -117,7 +123,7 @@ export default function HomePage() {
                                 >
                                     휴식모드로 전환
                                 </button>
-                            </section>
+                            </div>
                         </>
                     )}
 
