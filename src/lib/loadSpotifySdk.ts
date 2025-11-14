@@ -1,10 +1,3 @@
-declare global {
-    interface Window {
-        onSpotifyWebPlaybackSDKReady?: () => void;
-        Spotify?: any;
-    }
-}
-
 let sdkLoadPromise: Promise<void> | null = null;
 
 export function loadSpotifySdk(): Promise<void> {
