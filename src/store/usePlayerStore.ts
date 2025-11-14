@@ -9,21 +9,33 @@ export type Track = {
 };
 
 type PlayerState = {
-    currentTrack: Track | undefined;
+    currentTrack: Track | null;
     queue: Track[];
+    deviceId: string | null;
+    isReady: boolean;
     isPlaying: boolean;
+    currentIndex: number;
 
     play: (track: Track) => void;
     pause: () => void;
     enqueue: (tracks: Track[]) => void;
     next: () => void;
     prev: () => void;
+
+    setDeviceId: (id: string | null) => void;
+    setIsReady: (ready: boolean) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
-    currentTrack: undefined, // 시작 시 재생 중인 곡 없음
+    currentTrack: null, // 시작 시 재생 중인 곡 없음
     queue: [], // 시작 시 재생 목록 비움
+    currentIndex: 0,
+    deviceId: null,
+    isReady: false,
     isPlaying: false,
+
+    setDeviceId: (id) => set({ deviceId: id }),
+    setIsReady: (ready) => set({ isReady: ready }),
 
     play: (track) => set({ currentTrack: track, isPlaying: true }),
 
@@ -34,7 +46,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
         set({
             queue: tracks,
-            currentTrack: tracks[0],
+            currentTrack: tracks[0] ?? null,
+            currentIndex: 0,
             isPlaying: true,
         });
     },
@@ -45,7 +58,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
         const idx = queue.findIndex((t) => t.id === currentTrack.id);
         if (idx >= 0 && idx < queue.length - 1) {
-            set({ currentTrack: queue[idx + 1], isPlaying: true });
+            set({
+                currentTrack: queue[idx + 1] ?? null,
+                currentIndex: idx + 1,
+                isPlaying: true,
+            });
         }
     },
 
@@ -55,7 +72,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
         const idx = queue.findIndex((t) => t.id === currentTrack.id);
         if (idx > 0) {
-            set({ currentTrack: queue[idx - 1], isPlaying: true });
+            set({
+                currentTrack: queue[idx - 1] ?? null,
+                currentIndex: idx - 1,
+                isPlaying: true,
+            });
         }
     },
 }));
