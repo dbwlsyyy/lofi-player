@@ -5,10 +5,61 @@ import styles from './PlayerBar.module.css';
 import Image from 'next/image';
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from 'next-auth/react';
+import {
+    transferToDevice,
+    playTrack,
+    pauseTrack,
+    nextTrack,
+} from '@/apis/spotifyPlayerApi';
 
 export default function PlayerBar() {
-    const { currentTrack, isPlaying, pause, play, next, prev } =
+    const { deviceId, currentTrack, isPlaying, pause, play, next, prev } =
         usePlayerStore();
+    const { data: session } = useSession();
+    const accessToken = (session as any)?.accessToken;
+
+    async function handlePlayClick() {
+        if (!currentTrack || !deviceId || !accessToken) return;
+
+        const uri = `spotify:track:${currentTrack.id}`;
+
+        try {
+            await transferToDevice(deviceId, accessToken);
+
+            await playTrack([uri], deviceId, accessToken);
+
+            play(currentTrack);
+        } catch (err) {
+            console.error('재생 오류:', err);
+        }
+    }
+
+    async function handlePauseClick() {
+        if (!deviceId || !accessToken) return;
+
+        try {
+            await pauseTrack(deviceId, accessToken);
+            pause();
+        } catch (err) {
+            console.error('일시정지 오류:', err);
+        }
+    }
+
+    async function handleNextClick() {
+        if (!deviceId || !accessToken) return;
+
+        try {
+            await nextTrack(deviceId, accessToken);
+            next();
+        } catch (err) {
+            console.error('다음 곡 오류:', err);
+        }
+    }
+
+    async function handlePrevClick() {
+        prev();
+    }
 
     return (
         <footer className={styles.playerBar}>
@@ -48,23 +99,23 @@ export default function PlayerBar() {
                         <div className={styles.centerArea}>
                             <div className={styles.controls}>
                                 <button
-                                    onClick={prev}
+                                    onClick={handlePrevClick}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepBackward />
                                 </button>
                                 <button
-                                    onClick={() =>
+                                    onClick={
                                         isPlaying
-                                            ? pause()
-                                            : currentTrack && play(currentTrack)
+                                            ? handlePauseClick
+                                            : handlePlayClick
                                     }
                                     className={styles.controlBtn}
                                 >
                                     {isPlaying ? <FaPause /> : <FaPlay />}
                                 </button>
                                 <button
-                                    onClick={next}
+                                    onClick={handleNextClick}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepForward />

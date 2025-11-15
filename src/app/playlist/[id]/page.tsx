@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './PlaylistDetail.module.css';
 import { Track, usePlayerStore } from '@/store/usePlayerStore';
-import { fetchPlaylistTracks } from '@/lib/spotify';
+import { fetchPlaylistTracks } from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
 
 export default function PlaylistDetailPage() {
