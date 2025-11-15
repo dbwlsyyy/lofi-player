@@ -3,7 +3,8 @@
 import { usePlayerStore } from '@/store/usePlayerStore';
 
 export default function DebugPlayerState() {
-    const { deviceId, isReady, currentTrack, isPlaying } = usePlayerStore();
+    const { deviceId, isReady, currentTrack, isPlaying, queue } =
+        usePlayerStore();
 
     return (
         <div
@@ -29,6 +30,9 @@ export default function DebugPlayerState() {
             </p>
             <p>
                 <b>곡 제목:</b> {currentTrack?.name || '없음'}
+            </p>
+            <p>
+                <b>재생 목록:</b> {queue.map((t) => t.name) || '큐 비워짐'}
             </p>
         </div>
     );

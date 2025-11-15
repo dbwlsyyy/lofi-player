@@ -7,7 +7,7 @@ import {
     fetchPlaylists,
     type SpotifyPlaylistItem,
     type SpotifyUser,
-} from '@/lib/spotify';
+} from '@/apis/spotifyUserApi';
 import styles from './Home.module.css';
 import ProfileHeader from './components/ProfileHeader';
 import Image from 'next/image';

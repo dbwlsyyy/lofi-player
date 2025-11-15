@@ -3,26 +3,27 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './PlaylistDetail.module.css';
-import { Track, usePlayerStore } from '@/store/usePlayerStore';
-import { fetchPlaylistTracks } from '@/lib/spotify';
+import { Track } from '@/store/usePlayerStore';
+import { fetchPlaylistTracks } from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
+import { usePlaylistPlayer } from '@/hooks/usePlaylistPlayer';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
+    const token = session?.accessToken;
     const { id } = useParams();
+
     const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const { enqueue, play } = usePlayerStore();
+    const { playFromPlaylist } = usePlaylistPlayer();
 
     useEffect(() => {
-        const token = session?.accessToken;
         if (!token || !id) return;
 
-        const loadTracks = async () => {
+        const load = async () => {
             try {
                 const list = await fetchPlaylistTracks(token, id as string);
-
                 setTracks(list);
             } catch (err) {
                 console.error('플레이리스트 로드 실패:', err);
@@ -30,8 +31,8 @@ export default function PlaylistDetailPage() {
                 setLoading(false);
             }
         };
-        loadTracks();
-    }, [id]);
+        load();
+    }, [id, token]);
 
     if (loading) return <div className={styles.loading}>불러오는 중...</div>;
 
@@ -41,18 +42,18 @@ export default function PlaylistDetailPage() {
 
             <button
                 className={styles.playAllBtn}
-                onClick={() => enqueue(tracks)}
+                onClick={() => playFromPlaylist(tracks, 0, token!)}
                 disabled={tracks.length === 0}
             >
                 ▶ 전체 재생
             </button>
 
             <ul className={styles.trackList}>
-                {tracks.map((t) => (
+                {tracks.map((t, i) => (
                     <li
                         key={t.id}
                         className={styles.trackItem}
-                        onClick={() => play(t)}
+                        onClick={() => playFromPlaylist(tracks, i, token!)}
                     >
                         <img
                             src={t.image}
