@@ -1,5 +1,7 @@
+import DebugPlayerState from './components/PlayerBar/DebugPlayerState';
 import PlayerBar from './components/PlayerBar/PlayerBar';
 import './globals.css';
+import PlayerInitializer from './PlayerInitializer';
 import { NextAuthProvider } from './providers';
 import { ReactNode } from 'react';
 
@@ -13,6 +15,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <html lang="ko">
             <body>
                 <NextAuthProvider>
+                    <PlayerInitializer />
+                    <DebugPlayerState />
+
                     {children}
                     <PlayerBar />
                 </NextAuthProvider>
