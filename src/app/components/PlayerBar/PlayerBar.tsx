@@ -11,6 +11,7 @@ import {
     playTrack,
     pauseTrack,
     nextTrack,
+    prevTrack,
 } from '@/apis/spotifyPlayerApi';
 
 export default function PlayerBar() {
@@ -60,7 +61,22 @@ export default function PlayerBar() {
     }
 
     async function handlePrevClick() {
-        prev();
+        if (!deviceId || !accessToken) return;
+
+        const { queue, currentIndex } = usePlayerStore.getState();
+        if (currentIndex <= 0) return;
+
+        const uris = queue.map((t) => `spotify:track:${t.id}`);
+        const prevIndex = currentIndex - 1;
+
+        try {
+            await transferToDevice(deviceId, accessToken);
+            await prevTrack(uris, deviceId, accessToken, prevIndex);
+
+            prev();
+        } catch (err) {
+            console.error('이전 곡 오류:', err);
+        }
     }
 
     return (

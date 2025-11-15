@@ -57,3 +57,22 @@ export async function nextTrack(deviceId: string, accessToken: string) {
         }
     );
 }
+
+// spotify web playback SDK는 공식적으로 prev API를 지원하지 않기 때문에 직접 구현
+export async function prevTrack(
+    uris: string[],
+    deviceId: string,
+    accessToken: string,
+    offsetIndex: number
+) {
+    return spotifyApi.put(
+        `me/player/play?device_id=${deviceId}`,
+        {
+            uris,
+            offset: { position: offsetIndex },
+        },
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        }
+    );
+}
