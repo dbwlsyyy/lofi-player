@@ -3,51 +3,36 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './PlaylistDetail.module.css';
-import { Track, usePlayerStore } from '@/store/usePlayerStore';
+import { Track } from '@/store/usePlayerStore';
 import { fetchPlaylistTracks } from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
-import { transferToDevice, playTrack } from '@/apis/spotifyPlayerApi';
+import { usePlaylistPlayer } from '@/hooks/usePlaylistPlayer';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
+    const token = session?.accessToken;
     const { id } = useParams();
+
     const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const { setQueue, playAtIndex, deviceId } = usePlayerStore();
+    const { playFromPlaylist } = usePlaylistPlayer();
 
     useEffect(() => {
-        const token = session?.accessToken;
         if (!token || !id) return;
 
-        const loadTracks = async () => {
+        const load = async () => {
             try {
                 const list = await fetchPlaylistTracks(token, id as string);
-
-                setTracks(list); //?
-                setQueue(list);
+                setTracks(list);
             } catch (err) {
                 console.error('플레이리스트 로드 실패:', err);
             } finally {
                 setLoading(false);
             }
         };
-        loadTracks();
-    }, [id, session, setQueue]);
-
-    async function handlePlayAll() {
-        const token = session?.accessToken;
-        if (!deviceId || !token) return;
-
-        const uris = tracks.map((t) => `spotify:track:${t.id}`);
-
-        // Spotify 내부 queue 설정
-        await transferToDevice(deviceId, token);
-        await playTrack(uris, deviceId, token);
-
-        // UI queue는 이미 setQueue로 들어있으니 UI만 첫곡으로 이동
-        playAtIndex(0);
-    }
+        load();
+    }, [id, token]);
 
     if (loading) return <div className={styles.loading}>불러오는 중...</div>;
 
@@ -57,7 +42,7 @@ export default function PlaylistDetailPage() {
 
             <button
                 className={styles.playAllBtn}
-                onClick={handlePlayAll}
+                onClick={() => playFromPlaylist(tracks, 0, token!)}
                 disabled={tracks.length === 0}
             >
                 ▶ 전체 재생
@@ -68,7 +53,7 @@ export default function PlaylistDetailPage() {
                     <li
                         key={t.id}
                         className={styles.trackItem}
-                        onClick={() => playAtIndex(i)}
+                        onClick={() => playFromPlaylist(tracks, i, token!)}
                     >
                         <img
                             src={t.image}
