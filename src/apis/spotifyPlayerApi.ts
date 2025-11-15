@@ -18,11 +18,14 @@ export async function transferToDevice(deviceId: string, accessToken: string) {
 export async function playTrack(
     uris: string[],
     deviceId: string,
-    accessToken: string
+    accessToken: string,
+    offsetIndex?: number
 ) {
     return spotifyApi.put(
         `me/player/play?device_id=${deviceId}`,
-        { uris },
+        offsetIndex !== undefined
+            ? { uris, offset: { position: offsetIndex } }
+            : { uris },
         {
             headers: {
                 Authorization: `Bearer ${accessToken}`,

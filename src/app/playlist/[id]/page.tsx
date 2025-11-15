@@ -6,6 +6,7 @@ import styles from './PlaylistDetail.module.css';
 import { Track, usePlayerStore } from '@/store/usePlayerStore';
 import { fetchPlaylistTracks } from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
+import { transferToDevice, playTrack } from '@/apis/spotifyPlayerApi';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
@@ -13,7 +14,7 @@ export default function PlaylistDetailPage() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const { enqueue, play } = usePlayerStore();
+    const { setQueue, playAtIndex, deviceId } = usePlayerStore();
 
     useEffect(() => {
         const token = session?.accessToken;
@@ -23,7 +24,8 @@ export default function PlaylistDetailPage() {
             try {
                 const list = await fetchPlaylistTracks(token, id as string);
 
-                setTracks(list);
+                setTracks(list); //?
+                setQueue(list);
             } catch (err) {
                 console.error('플레이리스트 로드 실패:', err);
             } finally {
@@ -31,7 +33,21 @@ export default function PlaylistDetailPage() {
             }
         };
         loadTracks();
-    }, [id]);
+    }, [id, session, setQueue]);
+
+    async function handlePlayAll() {
+        const token = session?.accessToken;
+        if (!deviceId || !token) return;
+
+        const uris = tracks.map((t) => `spotify:track:${t.id}`);
+
+        // Spotify 내부 queue 설정
+        await transferToDevice(deviceId, token);
+        await playTrack(uris, deviceId, token);
+
+        // UI queue는 이미 setQueue로 들어있으니 UI만 첫곡으로 이동
+        playAtIndex(0);
+    }
 
     if (loading) return <div className={styles.loading}>불러오는 중...</div>;
 
@@ -41,18 +57,18 @@ export default function PlaylistDetailPage() {
 
             <button
                 className={styles.playAllBtn}
-                onClick={() => enqueue(tracks)}
+                onClick={handlePlayAll}
                 disabled={tracks.length === 0}
             >
                 ▶ 전체 재생
             </button>
 
             <ul className={styles.trackList}>
-                {tracks.map((t) => (
+                {tracks.map((t, i) => (
                     <li
                         key={t.id}
                         className={styles.trackItem}
-                        onClick={() => play(t)}
+                        onClick={() => playAtIndex(i)}
                     >
                         <img
                             src={t.image}

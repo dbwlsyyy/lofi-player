@@ -16,18 +16,20 @@ import {
 export default function PlayerBar() {
     const { deviceId, currentTrack, isPlaying, pause, play, next, prev } =
         usePlayerStore();
+
     const { data: session } = useSession();
     const accessToken = (session as any)?.accessToken;
 
     async function handlePlayClick() {
         if (!currentTrack || !deviceId || !accessToken) return;
 
-        const uri = `spotify:track:${currentTrack.id}`;
+        const { queue, currentIndex } = usePlayerStore.getState();
+        const uris = queue.map((t) => `spotify:track:${t.id}`);
 
         try {
             await transferToDevice(deviceId, accessToken);
 
-            await playTrack([uri], deviceId, accessToken);
+            await playTrack(uris, deviceId, accessToken, currentIndex);
 
             play(currentTrack);
         } catch (err) {
