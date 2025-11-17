@@ -15,11 +15,21 @@ import {
 } from '@/apis/spotifyPlayerApi';
 
 export default function PlayerBar() {
-    const { deviceId, currentTrack, isPlaying, pause, play, next, prev } =
-        usePlayerStore();
+    const {
+        deviceId,
+        currentTrack,
+        isPlaying,
+        pause,
+        play,
+        next,
+        prev,
+        position,
+        duration,
+    } = usePlayerStore();
 
     const { data: session } = useSession();
     const accessToken = (session as any)?.accessToken;
+    const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
 
     async function handlePlayClick() {
         if (!currentTrack || !deviceId || !accessToken) return;
@@ -141,7 +151,10 @@ export default function PlayerBar() {
                             </div>
 
                             <div className={styles.progress}>
-                                <div className={styles.progressFill}></div>
+                                <div
+                                    className={styles.progressFill}
+                                    style={{ width: `${progressPercent}%` }}
+                                ></div>
                             </div>
                         </div>
 

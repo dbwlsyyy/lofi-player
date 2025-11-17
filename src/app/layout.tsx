@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <body>
                 <NextAuthProvider>
                     <PlayerInitializer />
-                    <DebugPlayerState />
+                    {/* <DebugPlayerState /> */}
 
                     {children}
                     <PlayerBar />

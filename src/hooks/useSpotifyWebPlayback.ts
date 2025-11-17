@@ -22,6 +22,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         if (!accessToken) return;
 
         let cancelled = false;
+        let positionTick: ReturnType<typeof setInterval> | null = null;
 
         const init = async () => {
             try {
@@ -67,6 +68,14 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                     updatePosition(state.position);
                 });
 
+                positionTick = setInterval(async () => {
+                    const state = await player.getCurrentState();
+                    if (!state) return;
+                    if (state.paused) return;
+                    if (state.position < 100) return;
+                    updatePosition(state.position);
+                }, 500);
+
                 // 연결 시작
                 player.connect();
             } catch (err) {
@@ -78,6 +87,8 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
 
         return () => {
             cancelled = true;
+            if (positionTick) clearInterval(positionTick);
+
             if (playerRef.current) {
                 playerRef.current.disconnect();
                 playerRef.current = null;
