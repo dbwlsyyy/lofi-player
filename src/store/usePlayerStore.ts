@@ -106,7 +106,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         set({
             currentIndex: idx >= 0 ? idx : 0,
             currentTrack: track,
-            isPlaying: true,
             position: 0,
         });
     },
