@@ -15,6 +15,8 @@ type PlayerState = {
     isReady: boolean;
     isPlaying: boolean;
     currentIndex: number;
+    duration: number;
+    position: number;
 
     play: (track: Track) => void;
     pause: () => void;
@@ -25,6 +27,10 @@ type PlayerState = {
     setIsReady: (ready: boolean) => void;
     setQueue: (tracks: Track[]) => void;
     playAtIndex: (index: number) => void;
+
+    updatePosition: (pos: number) => void;
+    updateDuration: (dur: number) => void;
+    syncTrackFromSdk: (track: Track) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -34,6 +40,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     deviceId: null,
     isReady: false,
     isPlaying: false,
+    duration: 0,
+    position: 0,
 
     setDeviceId: (id) => set({ deviceId: id }),
     setIsReady: (ready) => set({ isReady: ready }),
@@ -87,5 +95,19 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
                 isPlaying: true,
             });
         }
+    },
+
+    updatePosition: (pos) => set({ position: pos }),
+    updateDuration: (dur) => set({ duration: dur }),
+
+    syncTrackFromSdk: (track: Track) => {
+        const { queue } = get();
+        const idx = queue.findIndex((t) => t.id === track.id);
+        set({
+            currentIndex: idx >= 0 ? idx : 0,
+            currentTrack: track,
+            isPlaying: true,
+            position: 0,
+        });
     },
 }));
