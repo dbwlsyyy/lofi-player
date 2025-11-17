@@ -39,10 +39,7 @@ export default function PlayerBar() {
 
         try {
             await transferToDevice(deviceId, accessToken);
-
             await playTrack(uris, deviceId, accessToken, currentIndex);
-
-            play(currentTrack);
         } catch (err) {
             console.error('재생 오류:', err);
         }
@@ -53,7 +50,6 @@ export default function PlayerBar() {
 
         try {
             await pauseTrack(deviceId, accessToken);
-            pause();
         } catch (err) {
             console.error('일시정지 오류:', err);
         }
@@ -64,7 +60,6 @@ export default function PlayerBar() {
 
         try {
             await nextTrack(deviceId, accessToken);
-            next();
         } catch (err) {
             console.error('다음 곡 오류:', err);
         }
@@ -73,17 +68,9 @@ export default function PlayerBar() {
     async function handlePrevClick() {
         if (!deviceId || !accessToken) return;
 
-        const { queue, currentIndex } = usePlayerStore.getState();
-        if (currentIndex <= 0) return;
-
-        const uris = queue.map((t) => `spotify:track:${t.id}`);
-        const prevIndex = currentIndex - 1;
-
         try {
             await transferToDevice(deviceId, accessToken);
-            await prevTrack(uris, deviceId, accessToken, prevIndex);
-
-            prev();
+            await prevTrack(deviceId, accessToken);
         } catch (err) {
             console.error('이전 곡 오류:', err);
         }

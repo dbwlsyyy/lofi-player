@@ -11,18 +11,42 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         pause,
         setDeviceId,
         setIsReady,
-        updatePosition,
-        updateDuration,
+        setPosition,
+        setDuration,
         syncTrackFromSdk,
     } = usePlayerStore();
 
     const playerRef = useRef<Spotify.Player | null>(null);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (!accessToken) return;
 
         let cancelled = false;
-        let positionTick: ReturnType<typeof setInterval> | null = null;
+
+        const stopPolling = () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        };
+
+        const startPolling = () => {
+            stopPolling();
+
+            intervalRef.current = setInterval(async () => {
+                const player = playerRef.current;
+                if (!player) return;
+
+                try {
+                    const state = await player.getCurrentState();
+                    if (state && !state.loading) {
+                        setPosition(state.position);
+                        setDuration(state.duration);
+                    }
+                } catch (err) {
+                    console.error('Error getting current state:', err);
+                }
+            }, 500);
+        };
 
         const init = async () => {
             try {
@@ -47,34 +71,32 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                 });
 
                 player.addListener('player_state_changed', (state) => {
-                    if (!state) return;
+                    if (!state) {
+                        stopPolling();
+                        setPosition(0);
+                        pause();
+                        return;
+                    }
+
+                    // 곡 길이, 재생 위치 동기화 (ms)
+                    setDuration(state.duration);
+                    setPosition(state.position);
 
                     // 재생 여부 동기화
                     const isPlaying = !state.paused;
                     const sdkTrack = state.track_window.current_track;
 
-                    if (isPlaying) {
-                        play(mapSdkTrackToLocalTrack(sdkTrack));
-                    } else {
-                        pause();
-                    }
-                    // 현재 재생 중인 트랙 정보 동기화
-                    if (sdkTrack && sdkTrack.id) {
-                        syncTrackFromSdk(mapSdkTrackToLocalTrack(sdkTrack));
+                    if (sdkTrack?.id) {
+                        const mapped = mapSdkTrackToLocalTrack(sdkTrack);
+                        syncTrackFromSdk(mapped); // 현재 재생 중인 트랙 정보 동기화
+
+                        if (isPlaying) play(mapped);
+                        else pause();
                     }
 
-                    // 곡 길이, 재생 위치 동기화 (ms)
-                    updateDuration(state.duration);
-                    updatePosition(state.position);
+                    if (isPlaying) startPolling();
+                    else stopPolling();
                 });
-
-                positionTick = setInterval(async () => {
-                    const state = await player.getCurrentState();
-                    if (!state) return;
-                    if (state.paused) return;
-                    if (state.position < 100) return;
-                    updatePosition(state.position);
-                }, 500);
 
                 // 연결 시작
                 player.connect();
@@ -87,8 +109,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
 
         return () => {
             cancelled = true;
-            if (positionTick) clearInterval(positionTick);
-
+            stopPolling();
             if (playerRef.current) {
                 playerRef.current.disconnect();
                 playerRef.current = null;
@@ -100,8 +121,8 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         pause,
         setDeviceId,
         setIsReady,
-        updateDuration,
-        updatePosition,
+        setDuration,
+        setPosition,
         syncTrackFromSdk,
     ]);
 }

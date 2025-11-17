@@ -28,8 +28,8 @@ type PlayerState = {
     setQueue: (tracks: Track[]) => void;
     playAtIndex: (index: number) => void;
 
-    updatePosition: (pos: number) => void;
-    updateDuration: (dur: number) => void;
+    setPosition: (pos: number) => void;
+    setDuration: (dur: number) => void;
     syncTrackFromSdk: (track: Track) => void;
 };
 
@@ -97,10 +97,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         }
     },
 
-    updatePosition: (pos) => set({ position: pos }),
-    updateDuration: (dur) => set({ duration: dur }),
+    setPosition: (pos) => set({ position: pos }),
+    setDuration: (dur) => set({ duration: dur }),
 
     syncTrackFromSdk: (track: Track) => {
+        //?
         const { queue } = get();
         const idx = queue.findIndex((t) => t.id === track.id);
         set({
