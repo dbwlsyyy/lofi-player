@@ -58,24 +58,31 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
 
                 setSdkTogglePlay(() => {
                     if (playerRef.current) {
-                        playerRef.current.togglePlay().catch(console.error);
-                        // stopPolling();
+                        playerRef.current.togglePlay().catch((error) => {
+                            console.error('Toggle Play 실패:', error);
+                        });
                     }
                 });
 
                 setSdkNextTrack(() => {
                     if (playerRef.current)
-                        playerRef.current.nextTrack().catch(console.error);
+                        playerRef.current.nextTrack().catch((error) => {
+                            console.error('Next Track 실패:', error);
+                        });
                 });
 
                 setSdkPrevTrack(() => {
                     if (playerRef.current)
-                        playerRef.current.previousTrack().catch(console.error);
+                        playerRef.current.previousTrack().catch((error) => {
+                            console.error('Previous Track 실패:', error);
+                        });
                 });
 
                 setSdkSeek((pos: number) => {
                     if (playerRef.current) {
-                        playerRef.current.seek(pos).catch(console.error);
+                        playerRef.current.seek(pos).catch((error) => {
+                            console.error('Seek 실패:', error);
+                        });
                     }
                 });
 

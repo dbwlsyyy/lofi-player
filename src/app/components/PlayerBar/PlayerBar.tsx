@@ -14,7 +14,7 @@ export default function PlayerBar() {
         duration,
         sdkTogglePlay,
         sdkNextTrack,
-        sdkPrevTrack,
+        prev,
         sdkSeek,
     } = usePlayerStore();
 
@@ -71,7 +71,7 @@ export default function PlayerBar() {
                         <div className={styles.centerArea}>
                             <div className={styles.controls}>
                                 <button
-                                    onClick={sdkPrevTrack}
+                                    onClick={prev}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepBackward />

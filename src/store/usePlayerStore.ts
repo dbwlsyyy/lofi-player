@@ -18,6 +18,8 @@ type PlayerState = {
     duration: number;
     position: number;
 
+    prev: () => void;
+
     sdkTogglePlay: () => void;
     sdkNextTrack: () => void;
     sdkPrevTrack: () => void;
@@ -47,6 +49,16 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     isPlaying: false,
     duration: 0,
     position: 0,
+
+    prev: () => {
+        const { position, sdkPrevTrack, sdkSeek } = get();
+
+        if (position < 5000) {
+            sdkPrevTrack();
+        } else {
+            sdkSeek(0);
+        }
+    },
 
     sdkTogglePlay: () => {},
     sdkNextTrack: () => {},
