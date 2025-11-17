@@ -5,11 +5,9 @@ import styles from './PlayerBar.module.css';
 import Image from 'next/image';
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSession } from 'next-auth/react';
 
 export default function PlayerBar() {
     const {
-        deviceId,
         currentTrack,
         isPlaying,
         position,
@@ -17,11 +15,23 @@ export default function PlayerBar() {
         sdkTogglePlay,
         sdkNextTrack,
         sdkPrevTrack,
+        sdkSeek,
     } = usePlayerStore();
 
-    const { data: session } = useSession();
-    const accessToken = (session as any)?.accessToken;
     const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
+
+    const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!duration || duration === 0) return;
+
+        const progressBar = e.currentTarget;
+        const clickX = e.nativeEvent.offsetX;
+        const width = progressBar.clientWidth;
+
+        const seekPercent = clickX / width;
+        const seekMs = Math.floor(seekPercent * duration);
+
+        sdkSeek(seekMs);
+    };
 
     return (
         <footer className={styles.playerBar}>
@@ -82,7 +92,10 @@ export default function PlayerBar() {
                                 </button>
                             </div>
 
-                            <div className={styles.progress}>
+                            <div
+                                className={styles.progress}
+                                onClick={handleSeek}
+                            >
                                 <div
                                     className={styles.progressFill}
                                     style={{ width: `${progressPercent}%` }}

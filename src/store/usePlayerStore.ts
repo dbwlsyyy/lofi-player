@@ -21,6 +21,7 @@ type PlayerState = {
     sdkTogglePlay: () => void;
     sdkNextTrack: () => void;
     sdkPrevTrack: () => void;
+    sdkSeek: (pos: number) => void;
 
     setIsPlaying: (state: boolean) => void;
     setDeviceId: (id: string | null) => void;
@@ -34,6 +35,7 @@ type PlayerState = {
     setSdkTogglePlay: (toggleFn: () => void) => void;
     setSdkNextTrack: (nextFn: () => void) => void;
     setSdkPrevTrack: (prevFn: () => void) => void;
+    setSdkSeek: (seekFn: (pos: number) => void) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -49,6 +51,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     sdkTogglePlay: () => {},
     sdkNextTrack: () => {},
     sdkPrevTrack: () => {},
+    sdkSeek: (pos) => {},
 
     setDeviceId: (id) => set({ deviceId: id }),
     setIsReady: (ready) => set({ isReady: ready }),
@@ -75,4 +78,5 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     setSdkTogglePlay: (toggleFn) => set({ sdkTogglePlay: toggleFn }),
     setSdkNextTrack: (nextFn) => set({ sdkNextTrack: nextFn }),
     setSdkPrevTrack: (prevFn) => set({ sdkPrevTrack: prevFn }),
+    setSdkSeek: (seekFn) => set({ sdkSeek: seekFn }),
 }));
