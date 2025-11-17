@@ -105,9 +105,9 @@
 
 .progressFill {
     height: 100%;
-    background: #1db954;
+    background: #4f7df3;
     width: 0%;
-    transition: width 0.2s linear;
+    /* transition: width 0.2s linear; */
 }
 
 .rightArea {

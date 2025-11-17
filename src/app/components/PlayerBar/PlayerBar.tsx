@@ -15,8 +15,14 @@ import {
 } from '@/apis/spotifyPlayerApi';
 
 export default function PlayerBar() {
-    const { deviceId, currentTrack, isPlaying, position, duration } =
-        usePlayerStore();
+    const {
+        deviceId,
+        currentTrack,
+        isPlaying,
+        position,
+        duration,
+        sdkTogglePlay,
+    } = usePlayerStore();
 
     const { data: session } = useSession();
     const accessToken = (session as any)?.accessToken;
@@ -111,11 +117,9 @@ export default function PlayerBar() {
                                     <FaStepBackward />
                                 </button>
                                 <button
-                                    onClick={
-                                        isPlaying
-                                            ? handlePauseClick
-                                            : handlePlayClick
-                                    }
+                                    onClick={() => {
+                                        if (currentTrack) sdkTogglePlay();
+                                    }}
                                     className={styles.controlBtn}
                                 >
                                     {isPlaying ? <FaPause /> : <FaPlay />}

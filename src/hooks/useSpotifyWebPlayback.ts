@@ -13,6 +13,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         setPosition,
         setDuration,
         syncTrackFromSdk,
+        setSdkTogglePlay,
     } = usePlayerStore();
 
     const playerRef = useRef<Spotify.Player | null>(null);
@@ -37,7 +38,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
 
                 try {
                     const state = await player.getCurrentState();
-                    if (state && !state.loading) {
+                    if (state && !state.loading && !state.paused) {
                         setPosition(state.position);
                         setDuration(state.duration);
                     }
@@ -51,6 +52,13 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
             try {
                 await loadSpotifySdk();
                 if (cancelled) return;
+
+                setSdkTogglePlay(() => {
+                    if (playerRef.current) {
+                        playerRef.current.togglePlay().catch(console.error);
+                        // stopPolling();
+                    }
+                });
 
                 const player = new window.Spotify.Player({
                     name: 'Lofi Web Player',
@@ -74,8 +82,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
 
                     if (!state) {
                         stopPolling();
-                        setPosition(0);
-                        // setIsPlaying(false); 최적화 이후 고민
+                        setIsPlaying(false);
                         return;
                     }
 
@@ -109,6 +116,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         return () => {
             cancelled = true;
             stopPolling();
+            setSdkTogglePlay(() => {});
             if (playerRef.current) {
                 playerRef.current.disconnect();
                 playerRef.current = null;
@@ -122,5 +130,6 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         setDuration,
         setPosition,
         syncTrackFromSdk,
+        setSdkTogglePlay,
     ]);
 }

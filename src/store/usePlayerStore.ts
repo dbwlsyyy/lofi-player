@@ -17,6 +17,7 @@ type PlayerState = {
     currentIndex: number;
     duration: number;
     position: number;
+    sdkTogglePlay: () => void;
 
     setIsPlaying: (state: boolean) => void;
 
@@ -27,6 +28,7 @@ type PlayerState = {
     setPosition: (pos: number) => void;
     setDuration: (dur: number) => void;
     syncTrackFromSdk: (track: Track) => void;
+    setSdkTogglePlay: (toggleFn: () => void) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -38,7 +40,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     isPlaying: false,
     duration: 0,
     position: 0,
+    sdkTogglePlay: () => {},
 
+    setSdkTogglePlay: (toggleFn) => set({ sdkTogglePlay: toggleFn }),
     setDeviceId: (id) => set({ deviceId: id }),
     setIsReady: (ready) => set({ isReady: ready }),
     setIsPlaying: (isPlaying) => set({ isPlaying }),
@@ -48,10 +52,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             currentIndex: 0,
         });
     },
-
-    play: () => set({ isPlaying: true }),
-
-    pause: () => set({ isPlaying: false }),
 
     setPosition: (pos) => set({ position: pos }),
     setDuration: (dur) => set({ duration: dur }),
@@ -63,7 +63,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         set({
             currentIndex: idx >= 0 ? idx : 0,
             currentTrack: track,
-            position: 0,
         });
     },
 }));
