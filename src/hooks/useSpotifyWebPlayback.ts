@@ -3,27 +3,93 @@
 import { useEffect, useRef } from 'react';
 import { loadSpotifySdk } from '@/lib/loadSpotifySdk';
 import { usePlayerStore } from '@/store/usePlayerStore';
+import { mapSdkTrackToLocalTrack } from '@/lib/spotifyMapper';
 
 export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
-    // 왜 토큰의 타입은 string이 아닌 string | null | undefined로 하는지?
-    const { play, pause, setDeviceId, setIsReady } = usePlayerStore();
+    const {
+        setIsPlaying,
+        setDeviceId,
+        setIsReady,
+        setPosition,
+        setDuration,
+        syncTrackFromSdk,
+        setSdkTogglePlay,
+        setSdkNextTrack,
+        setSdkPrevTrack,
+        setSdkSeek,
+    } = usePlayerStore();
 
     const playerRef = useRef<Spotify.Player | null>(null);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (!accessToken) return;
 
         let cancelled = false;
 
+        const stopPolling = () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        };
+
+        const startPolling = () => {
+            stopPolling();
+
+            intervalRef.current = setInterval(async () => {
+                const player = playerRef.current;
+                if (!player) return;
+
+                try {
+                    const state = await player.getCurrentState();
+                    if (state && !state.loading && !state.paused) {
+                        setPosition(state.position);
+                        setDuration(state.duration);
+                    }
+                } catch (err) {
+                    console.error('Error getting current state:', err);
+                }
+            }, 300);
+        };
+
         const init = async () => {
             try {
                 await loadSpotifySdk();
                 if (cancelled) return;
 
+                setSdkTogglePlay(() => {
+                    if (playerRef.current) {
+                        playerRef.current.togglePlay().catch((error) => {
+                            console.error('Toggle Play 실패:', error);
+                        });
+                    }
+                });
+
+                setSdkNextTrack(() => {
+                    if (playerRef.current)
+                        playerRef.current.nextTrack().catch((error) => {
+                            console.error('Next Track 실패:', error);
+                        });
+                });
+
+                setSdkPrevTrack(() => {
+                    if (playerRef.current)
+                        playerRef.current.previousTrack().catch((error) => {
+                            console.error('Previous Track 실패:', error);
+                        });
+                });
+
+                setSdkSeek((pos: number) => {
+                    if (playerRef.current) {
+                        playerRef.current.seek(pos).catch((error) => {
+                            console.error('Seek 실패:', error);
+                        });
+                    }
+                });
+
                 const player = new window.Spotify.Player({
                     name: 'Lofi Web Player',
                     getOAuthToken: (cb) => cb(accessToken),
-                    volume: 0.5,
+                    volume: 0.1,
                 });
 
                 playerRef.current = player;
@@ -38,24 +104,33 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                 });
 
                 player.addListener('player_state_changed', (state) => {
-                    if (!state) return;
+                    console.log(state.track_window.current_track.name);
 
-                    const isPlaying = !state.paused;
-
-                    const t = state.track_window.current_track;
-
-                    if (isPlaying && t && t.id) {
-                        play({
-                            id: t.id,
-                            name: t.name,
-                            artists: t.artists.map((a) => a.name),
-                            image: t.album.images[0]?.url ?? '',
-                        });
-                    } else {
-                        pause();
+                    if (!state) {
+                        stopPolling();
+                        setIsPlaying(false);
+                        return;
                     }
+
+                    // 곡 길이, 재생 위치 동기화 (ms)
+                    setDuration(state.duration);
+                    setPosition(state.position);
+
+                    // 재생 여부 동기화
+                    const isPlaying = !state.paused;
+                    const sdkTrack = state.track_window.current_track;
+
+                    if (sdkTrack?.id && !state.loading) {
+                        const mapped = mapSdkTrackToLocalTrack(sdkTrack);
+                        syncTrackFromSdk(mapped); // 현재 재생 중인 트랙 정보 동기화
+                        setIsPlaying(isPlaying);
+                    }
+
+                    if (isPlaying) startPolling();
+                    else stopPolling();
                 });
 
+                // 연결 시작
                 player.connect();
             } catch (err) {
                 console.error('Spotify Player Init Error:', err);
@@ -66,10 +141,27 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
 
         return () => {
             cancelled = true;
+            stopPolling();
+            setSdkTogglePlay(() => {});
+            setSdkNextTrack(() => {});
+            setSdkPrevTrack(() => {});
+            setSdkSeek(() => {}); //??
             if (playerRef.current) {
                 playerRef.current.disconnect();
                 playerRef.current = null;
             }
         };
-    }, [accessToken, play, pause, setDeviceId, setIsReady]);
+    }, [
+        accessToken,
+        setIsPlaying,
+        setDeviceId,
+        setIsReady,
+        setDuration,
+        setPosition,
+        syncTrackFromSdk,
+        setSdkTogglePlay,
+        setSdkNextTrack,
+        setSdkPrevTrack,
+        setSdkSeek,
+    ]);
 }

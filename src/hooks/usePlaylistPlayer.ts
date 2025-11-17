@@ -4,7 +4,7 @@ import { Track, usePlayerStore } from '@/store/usePlayerStore';
 import { transferToDevice, playTrack } from '@/apis/spotifyPlayerApi';
 
 export function usePlaylistPlayer() {
-    const { deviceId, setQueue, playAtIndex } = usePlayerStore();
+    const { deviceId, setQueue } = usePlayerStore();
 
     const playFromPlaylist = async (
         tracks: Track[],
@@ -19,8 +19,6 @@ export function usePlaylistPlayer() {
 
         await transferToDevice(deviceId, token);
         await playTrack(uris, deviceId, token, startIndex);
-
-        playAtIndex(startIndex);
     };
 
     return { playFromPlaylist };

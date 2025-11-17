@@ -5,79 +5,33 @@ import styles from './PlayerBar.module.css';
 import Image from 'next/image';
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSession } from 'next-auth/react';
-import {
-    transferToDevice,
-    playTrack,
-    pauseTrack,
-    nextTrack,
-    prevTrack,
-} from '@/apis/spotifyPlayerApi';
 
 export default function PlayerBar() {
-    const { deviceId, currentTrack, isPlaying, pause, play, next, prev } =
-        usePlayerStore();
+    const {
+        currentTrack,
+        isPlaying,
+        position,
+        duration,
+        sdkTogglePlay,
+        sdkNextTrack,
+        prev,
+        sdkSeek,
+    } = usePlayerStore();
 
-    const { data: session } = useSession();
-    const accessToken = (session as any)?.accessToken;
+    const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
 
-    async function handlePlayClick() {
-        if (!currentTrack || !deviceId || !accessToken) return;
+    const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!duration || duration === 0) return;
 
-        const { queue, currentIndex } = usePlayerStore.getState();
-        const uris = queue.map((t) => `spotify:track:${t.id}`);
+        const progressBar = e.currentTarget;
+        const clickX = e.nativeEvent.offsetX;
+        const width = progressBar.clientWidth;
 
-        try {
-            await transferToDevice(deviceId, accessToken);
+        const seekPercent = clickX / width;
+        const seekMs = Math.floor(seekPercent * duration);
 
-            await playTrack(uris, deviceId, accessToken, currentIndex);
-
-            play(currentTrack);
-        } catch (err) {
-            console.error('재생 오류:', err);
-        }
-    }
-
-    async function handlePauseClick() {
-        if (!deviceId || !accessToken) return;
-
-        try {
-            await pauseTrack(deviceId, accessToken);
-            pause();
-        } catch (err) {
-            console.error('일시정지 오류:', err);
-        }
-    }
-
-    async function handleNextClick() {
-        if (!deviceId || !accessToken) return;
-
-        try {
-            await nextTrack(deviceId, accessToken);
-            next();
-        } catch (err) {
-            console.error('다음 곡 오류:', err);
-        }
-    }
-
-    async function handlePrevClick() {
-        if (!deviceId || !accessToken) return;
-
-        const { queue, currentIndex } = usePlayerStore.getState();
-        if (currentIndex <= 0) return;
-
-        const uris = queue.map((t) => `spotify:track:${t.id}`);
-        const prevIndex = currentIndex - 1;
-
-        try {
-            await transferToDevice(deviceId, accessToken);
-            await prevTrack(uris, deviceId, accessToken, prevIndex);
-
-            prev();
-        } catch (err) {
-            console.error('이전 곡 오류:', err);
-        }
-    }
+        sdkSeek(seekMs);
+    };
 
     return (
         <footer className={styles.playerBar}>
@@ -117,31 +71,35 @@ export default function PlayerBar() {
                         <div className={styles.centerArea}>
                             <div className={styles.controls}>
                                 <button
-                                    onClick={handlePrevClick}
+                                    onClick={prev}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepBackward />
                                 </button>
                                 <button
-                                    onClick={
-                                        isPlaying
-                                            ? handlePauseClick
-                                            : handlePlayClick
-                                    }
+                                    onClick={() => {
+                                        if (currentTrack) sdkTogglePlay();
+                                    }}
                                     className={styles.controlBtn}
                                 >
                                     {isPlaying ? <FaPause /> : <FaPlay />}
                                 </button>
                                 <button
-                                    onClick={handleNextClick}
+                                    onClick={sdkNextTrack}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepForward />
                                 </button>
                             </div>
 
-                            <div className={styles.progress}>
-                                <div className={styles.progressFill}></div>
+                            <div
+                                className={styles.progress}
+                                onClick={handleSeek}
+                            >
+                                <div
+                                    className={styles.progressFill}
+                                    style={{ width: `${progressPercent}%` }}
+                                ></div>
                             </div>
                         </div>
 

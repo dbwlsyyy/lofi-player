@@ -15,16 +15,29 @@ type PlayerState = {
     isReady: boolean;
     isPlaying: boolean;
     currentIndex: number;
+    duration: number;
+    position: number;
 
-    play: (track: Track) => void;
-    pause: () => void;
-    next: () => void;
     prev: () => void;
 
+    sdkTogglePlay: () => void;
+    sdkNextTrack: () => void;
+    sdkPrevTrack: () => void;
+    sdkSeek: (pos: number) => void;
+
+    setIsPlaying: (state: boolean) => void;
     setDeviceId: (id: string | null) => void;
     setIsReady: (ready: boolean) => void;
     setQueue: (tracks: Track[]) => void;
-    playAtIndex: (index: number) => void;
+
+    setPosition: (pos: number) => void;
+    setDuration: (dur: number) => void;
+
+    syncTrackFromSdk: (track: Track) => void;
+    setSdkTogglePlay: (toggleFn: () => void) => void;
+    setSdkNextTrack: (nextFn: () => void) => void;
+    setSdkPrevTrack: (prevFn: () => void) => void;
+    setSdkSeek: (seekFn: (pos: number) => void) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -34,9 +47,27 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     deviceId: null,
     isReady: false,
     isPlaying: false,
+    duration: 0,
+    position: 0,
+
+    prev: () => {
+        const { position, sdkPrevTrack, sdkSeek } = get();
+
+        if (position < 5000) {
+            sdkPrevTrack();
+        } else {
+            sdkSeek(0);
+        }
+    },
+
+    sdkTogglePlay: () => {},
+    sdkNextTrack: () => {},
+    sdkPrevTrack: () => {},
+    sdkSeek: (pos) => {},
 
     setDeviceId: (id) => set({ deviceId: id }),
     setIsReady: (ready) => set({ isReady: ready }),
+    setIsPlaying: (isPlaying) => set({ isPlaying }),
     setQueue: (tracks) => {
         set({
             queue: tracks,
@@ -44,48 +75,20 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         });
     },
 
-    playAtIndex: (index) => {
+    setPosition: (pos) => set({ position: pos }),
+    setDuration: (dur) => set({ duration: dur }),
+
+    syncTrackFromSdk: (track: Track) => {
         const { queue } = get();
-        if (index < 0 || index >= queue.length) return;
-
-        const track = queue[index];
-
+        const idx = queue.findIndex((t) => t.id === track.id);
         set({
-            currentTrack: track ?? null,
-            currentIndex: index,
-            isPlaying: true,
+            currentIndex: idx >= 0 ? idx : 0,
+            currentTrack: track,
         });
     },
 
-    play: (track) => set({ currentTrack: track, isPlaying: true }),
-
-    pause: () => set({ isPlaying: false }),
-
-    next: () => {
-        const { queue, currentTrack } = get();
-        if (!currentTrack) return;
-
-        const idx = queue.findIndex((t) => t.id === currentTrack.id);
-        if (idx >= 0 && idx < queue.length - 1) {
-            set({
-                currentTrack: queue[idx + 1] ?? null,
-                currentIndex: idx + 1,
-                isPlaying: true,
-            });
-        }
-    },
-
-    prev: () => {
-        const { queue, currentTrack } = get();
-        if (!currentTrack) return;
-
-        const idx = queue.findIndex((t) => t.id === currentTrack.id);
-        if (idx > 0) {
-            set({
-                currentTrack: queue[idx - 1] ?? null,
-                currentIndex: idx - 1,
-                isPlaying: true,
-            });
-        }
-    },
+    setSdkTogglePlay: (toggleFn) => set({ sdkTogglePlay: toggleFn }),
+    setSdkNextTrack: (nextFn) => set({ sdkNextTrack: nextFn }),
+    setSdkPrevTrack: (prevFn) => set({ sdkPrevTrack: prevFn }),
+    setSdkSeek: (seekFn) => set({ sdkSeek: seekFn }),
 }));
