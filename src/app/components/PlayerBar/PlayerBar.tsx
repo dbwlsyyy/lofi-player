@@ -15,17 +15,8 @@ import {
 } from '@/apis/spotifyPlayerApi';
 
 export default function PlayerBar() {
-    const {
-        deviceId,
-        currentTrack,
-        isPlaying,
-        pause,
-        play,
-        next,
-        prev,
-        position,
-        duration,
-    } = usePlayerStore();
+    const { deviceId, currentTrack, isPlaying, position, duration } =
+        usePlayerStore();
 
     const { data: session } = useSession();
     const accessToken = (session as any)?.accessToken;

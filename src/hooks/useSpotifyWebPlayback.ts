@@ -7,8 +7,7 @@ import { mapSdkTrackToLocalTrack } from '@/lib/spotifyMapper';
 
 export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
     const {
-        play,
-        pause,
+        setIsPlaying,
         setDeviceId,
         setIsReady,
         setPosition,
@@ -45,7 +44,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                 } catch (err) {
                     console.error('Error getting current state:', err);
                 }
-            }, 500);
+            }, 300);
         };
 
         const init = async () => {
@@ -56,7 +55,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                 const player = new window.Spotify.Player({
                     name: 'Lofi Web Player',
                     getOAuthToken: (cb) => cb(accessToken),
-                    volume: 0.5,
+                    volume: 0.1,
                 });
 
                 playerRef.current = player;
@@ -71,10 +70,12 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                 });
 
                 player.addListener('player_state_changed', (state) => {
+                    console.log(state.track_window.current_track.name);
+
                     if (!state) {
                         stopPolling();
                         setPosition(0);
-                        pause();
+                        // setIsPlaying(false); 최적화 이후 고민
                         return;
                     }
 
@@ -86,12 +87,10 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                     const isPlaying = !state.paused;
                     const sdkTrack = state.track_window.current_track;
 
-                    if (sdkTrack?.id) {
+                    if (sdkTrack?.id && !state.loading) {
                         const mapped = mapSdkTrackToLocalTrack(sdkTrack);
                         syncTrackFromSdk(mapped); // 현재 재생 중인 트랙 정보 동기화
-
-                        if (isPlaying) play(mapped);
-                        else pause();
+                        setIsPlaying(isPlaying);
                     }
 
                     if (isPlaying) startPolling();
@@ -117,8 +116,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         };
     }, [
         accessToken,
-        play,
-        pause,
+        setIsPlaying,
         setDeviceId,
         setIsReady,
         setDuration,
