@@ -6,13 +6,6 @@ import Image from 'next/image';
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from 'next-auth/react';
-import {
-    transferToDevice,
-    playTrack,
-    pauseTrack,
-    nextTrack,
-    prevTrack,
-} from '@/apis/spotifyPlayerApi';
 
 export default function PlayerBar() {
     const {
@@ -22,56 +15,13 @@ export default function PlayerBar() {
         position,
         duration,
         sdkTogglePlay,
+        sdkNextTrack,
+        sdkPrevTrack,
     } = usePlayerStore();
 
     const { data: session } = useSession();
     const accessToken = (session as any)?.accessToken;
     const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
-
-    async function handlePlayClick() {
-        if (!currentTrack || !deviceId || !accessToken) return;
-
-        const { queue, currentIndex } = usePlayerStore.getState();
-        const uris = queue.map((t) => `spotify:track:${t.id}`);
-
-        try {
-            await transferToDevice(deviceId, accessToken);
-            await playTrack(uris, deviceId, accessToken, currentIndex);
-        } catch (err) {
-            console.error('재생 오류:', err);
-        }
-    }
-
-    async function handlePauseClick() {
-        if (!deviceId || !accessToken) return;
-
-        try {
-            await pauseTrack(deviceId, accessToken);
-        } catch (err) {
-            console.error('일시정지 오류:', err);
-        }
-    }
-
-    async function handleNextClick() {
-        if (!deviceId || !accessToken) return;
-
-        try {
-            await nextTrack(deviceId, accessToken);
-        } catch (err) {
-            console.error('다음 곡 오류:', err);
-        }
-    }
-
-    async function handlePrevClick() {
-        if (!deviceId || !accessToken) return;
-
-        try {
-            await transferToDevice(deviceId, accessToken);
-            await prevTrack(deviceId, accessToken);
-        } catch (err) {
-            console.error('이전 곡 오류:', err);
-        }
-    }
 
     return (
         <footer className={styles.playerBar}>
@@ -111,7 +61,7 @@ export default function PlayerBar() {
                         <div className={styles.centerArea}>
                             <div className={styles.controls}>
                                 <button
-                                    onClick={handlePrevClick}
+                                    onClick={sdkPrevTrack}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepBackward />
@@ -125,7 +75,7 @@ export default function PlayerBar() {
                                     {isPlaying ? <FaPause /> : <FaPlay />}
                                 </button>
                                 <button
-                                    onClick={handleNextClick}
+                                    onClick={sdkNextTrack}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepForward />

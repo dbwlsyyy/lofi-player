@@ -14,6 +14,8 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         setDuration,
         syncTrackFromSdk,
         setSdkTogglePlay,
+        setSdkNextTrack,
+        setSdkPrevTrack,
     } = usePlayerStore();
 
     const playerRef = useRef<Spotify.Player | null>(null);
@@ -58,6 +60,16 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
                         playerRef.current.togglePlay().catch(console.error);
                         // stopPolling();
                     }
+                });
+
+                setSdkNextTrack(() => {
+                    if (playerRef.current)
+                        playerRef.current.nextTrack().catch(console.error);
+                });
+
+                setSdkPrevTrack(() => {
+                    if (playerRef.current)
+                        playerRef.current.previousTrack().catch(console.error);
                 });
 
                 const player = new window.Spotify.Player({
@@ -117,6 +129,8 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
             cancelled = true;
             stopPolling();
             setSdkTogglePlay(() => {});
+            setSdkNextTrack(() => {});
+            setSdkPrevTrack(() => {});
             if (playerRef.current) {
                 playerRef.current.disconnect();
                 playerRef.current = null;
@@ -131,5 +145,7 @@ export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
         setPosition,
         syncTrackFromSdk,
         setSdkTogglePlay,
+        setSdkNextTrack,
+        setSdkPrevTrack,
     ]);
 }

@@ -17,18 +17,23 @@ type PlayerState = {
     currentIndex: number;
     duration: number;
     position: number;
+
     sdkTogglePlay: () => void;
+    sdkNextTrack: () => void;
+    sdkPrevTrack: () => void;
 
     setIsPlaying: (state: boolean) => void;
-
     setDeviceId: (id: string | null) => void;
     setIsReady: (ready: boolean) => void;
     setQueue: (tracks: Track[]) => void;
 
     setPosition: (pos: number) => void;
     setDuration: (dur: number) => void;
+
     syncTrackFromSdk: (track: Track) => void;
     setSdkTogglePlay: (toggleFn: () => void) => void;
+    setSdkNextTrack: (nextFn: () => void) => void;
+    setSdkPrevTrack: (prevFn: () => void) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -40,9 +45,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     isPlaying: false,
     duration: 0,
     position: 0,
-    sdkTogglePlay: () => {},
 
-    setSdkTogglePlay: (toggleFn) => set({ sdkTogglePlay: toggleFn }),
+    sdkTogglePlay: () => {},
+    sdkNextTrack: () => {},
+    sdkPrevTrack: () => {},
+
     setDeviceId: (id) => set({ deviceId: id }),
     setIsReady: (ready) => set({ isReady: ready }),
     setIsPlaying: (isPlaying) => set({ isPlaying }),
@@ -57,7 +64,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     setDuration: (dur) => set({ duration: dur }),
 
     syncTrackFromSdk: (track: Track) => {
-        //?
         const { queue } = get();
         const idx = queue.findIndex((t) => t.id === track.id);
         set({
@@ -65,4 +71,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             currentTrack: track,
         });
     },
+
+    setSdkTogglePlay: (toggleFn) => set({ sdkTogglePlay: toggleFn }),
+    setSdkNextTrack: (nextFn) => set({ sdkNextTrack: nextFn }),
+    setSdkPrevTrack: (prevFn) => set({ sdkPrevTrack: prevFn }),
 }));
