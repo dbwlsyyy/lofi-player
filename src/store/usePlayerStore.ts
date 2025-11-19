@@ -50,7 +50,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     deviceId: null,
     isReady: false,
     isPlaying: false,
-    isQueueOpen: false,
+    isQueueOpen: true,
     duration: 0,
     position: 0,
 
