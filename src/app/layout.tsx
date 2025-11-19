@@ -1,5 +1,5 @@
-import DebugPlayerState from './components/PlayerBar/DebugPlayerState';
-import PlayerBar from './components/PlayerBar/PlayerBar';
+import DebugPlayerState from '@/components/DebugPlayerState';
+import PlayerBar from '../components/PlayerBar/PlayerBar';
 import './globals.css';
 import PlayerInitializer from './PlayerInitializer';
 import { NextAuthProvider } from './providers';
