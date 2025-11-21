@@ -50,7 +50,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     deviceId: null,
     isReady: false,
     isPlaying: false,
-    isQueueOpen: true,
+    isQueueOpen: false,
     duration: 0,
     position: 0,
 
@@ -93,6 +93,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         set({
             currentIndex: idx >= 0 ? idx : 0,
             currentTrack: track,
+            // position: 0,
         });
     },
 

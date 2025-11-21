@@ -1,9 +1,19 @@
 'use client';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import styles from './QueueSidebar.module.css';
+import { useEffect, useRef } from 'react';
 
 export default function QueueSidebar() {
     const { queue, currentIndex, currentTrack, isQueueOpen } = usePlayerStore();
+    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    useEffect(() => {
+        itemRefs.current[currentIndex] &&
+            itemRefs.current[currentIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+    }, [currentIndex]);
 
     return (
         <aside
@@ -46,6 +56,9 @@ export default function QueueSidebar() {
                     return (
                         <div
                             key={track.id}
+                            ref={(el) => {
+                                itemRefs.current[index] = el;
+                            }}
                             className={`${styles.item} ${isActive ? styles.activeBlack : ''}`}
                         >
                             <img src={track.image} className={styles.thumb} />
