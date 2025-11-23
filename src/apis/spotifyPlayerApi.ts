@@ -25,21 +25,6 @@ export async function startPlayback(
     return client.put(`me/player/play?device_id=${deviceId}`, body);
 }
 
-export async function pausePlayback(deviceId: string, accessToken: string) {
-    const client = createSpotifyClient(accessToken);
-    return client.put(`me/player/pause?device_id=${deviceId}`);
-}
-
-export async function nextTrack(deviceId: string, accessToken: string) {
-    const client = createSpotifyClient(accessToken);
-    return client.post(`me/player/next?device_id=${deviceId}`);
-}
-
-export async function prevTrack(deviceId: string, accessToken: string) {
-    const client = createSpotifyClient(accessToken);
-    return client.post(`me/player/previous?device_id=${deviceId}`);
-}
-
 export async function setShuffle(
     state: boolean,
     deviceId: string,
