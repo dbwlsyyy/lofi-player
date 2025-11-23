@@ -39,3 +39,21 @@ export async function prevTrack(deviceId: string, accessToken: string) {
     const client = createSpotifyClient(accessToken);
     return client.post(`me/player/previous?device_id=${deviceId}`);
 }
+
+export async function setShuffle(
+    state: boolean,
+    deviceId: string,
+    accessToken: string
+) {
+    const client = createSpotifyClient(accessToken);
+    return client.put(`me/player/shuffle?state=${state}&device_id=${deviceId}`);
+}
+
+export async function setRepeatMode(
+    state: 'track' | 'context' | 'off',
+    deviceId: string,
+    accessToken: string
+) {
+    const client = createSpotifyClient(accessToken);
+    return client.put(`me/player/repeat?state=${state}&device_id=${deviceId}`);
+}
