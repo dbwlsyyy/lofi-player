@@ -2,10 +2,17 @@
 import { usePlayerStore } from '@/store/usePlayerStore';
 import styles from './QueueSidebar.module.css';
 import { useEffect, useRef } from 'react';
+import { usePlaylistPlayer } from '@/hooks/usePlaylistPlayer';
+import { useSession } from 'next-auth/react';
 
 export default function QueueSidebar() {
-    const { queue, currentIndex, currentTrack, isQueueOpen } = usePlayerStore();
+    const { data: session } = useSession();
+    const token = session?.accessToken;
+
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const { queue, currentIndex, currentTrack, isQueueOpen } = usePlayerStore();
+    const { playFromPlaylist } = usePlaylistPlayer();
 
     useEffect(() => {
         itemRefs.current[currentIndex] &&
@@ -59,6 +66,9 @@ export default function QueueSidebar() {
                             ref={(el) => {
                                 itemRefs.current[index] = el;
                             }}
+                            onClick={() =>
+                                playFromPlaylist(queue, index, token!)
+                            }
                             className={`${styles.item} ${isActive ? styles.activeBlack : ''}`}
                         >
                             <img src={track.image} className={styles.thumb} />

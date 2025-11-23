@@ -39,7 +39,9 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    padding-bottom: 11.5rem;
+    padding-top: 0.5rem;
+
+    padding-bottom: calc(100dvh - 26rem);
     mask-image: linear-gradient(
         to bottom,
         transparent 0%,
