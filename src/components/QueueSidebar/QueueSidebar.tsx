@@ -18,7 +18,7 @@ export default function QueueSidebar() {
         itemRefs.current[currentIndex] &&
             itemRefs.current[currentIndex].scrollIntoView({
                 behavior: 'smooth',
-                block: 'start',
+                block: 'center',
             });
     }, [currentIndex]);
 
