@@ -1,3 +1,5 @@
+import { setRepeatMode, setShuffle } from '@/apis/spotifyPlayerApi';
+import { mapSdkTrackToLocalTrack } from '@/lib/spotifyMapper';
 import { create } from 'zustand';
 
 export type Track = {
@@ -7,6 +9,8 @@ export type Track = {
     image: string;
     previewUrl?: string;
 };
+
+export type RepeatMode = 'off' | 'context' | 'track';
 
 type PlayerState = {
     playerInstance: Spotify.Player | null;
@@ -18,17 +22,27 @@ type PlayerState = {
     deviceId: string | null;
     isPlaying: boolean;
 
+    volume: number;
+    isShuffled: boolean;
+    repeatMode: RepeatMode;
+
     position: number;
     duration: number;
     isQueueOpen: boolean;
 
-    setPlayerInstance: (player: Spotify.Player) => void;
+    setPlayerInstance: (player: Spotify.Player | null) => void;
 
     optimisticPlay: (tracks: Track[], index: number) => void;
     togglePlay: () => Promise<void>;
     nextTrack: () => Promise<void>;
     prevTrack: () => Promise<void>;
     seekTo: (pos: number) => Promise<void>;
+
+    setVolume: (val: number) => Promise<void>;
+    toggleShuffle: (token: string) => Promise<void>;
+    cycleRepeatMode: (token: string) => Promise<void>;
+
+    syncStateFromSdk: (state: Spotify.PlaybackState) => void;
 
     setQueue: (tracks: Track[]) => void;
     toggleQueue: () => void;
@@ -37,7 +51,6 @@ type PlayerState = {
     setIsReady: (ready: boolean) => void;
     setPosition: (pos: number) => void;
     setDuration: (dur: number) => void;
-    syncTrackFromSdk: (track: Track) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -49,6 +62,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     isReady: false,
     isPlaying: false,
     isQueueOpen: false,
+
+    volume: 0.5,
+    isShuffled: false,
+    repeatMode: 'off',
+
     duration: 0,
     position: 0,
 
@@ -126,18 +144,68 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         });
     },
 
-    syncTrackFromSdk: (sdkTrack) => {
+    syncStateFromSdk: (state) => {
         const { currentTrack, queue } = get();
+        const sdkTrack = state.track_window.current_track;
 
-        if (currentTrack?.id === sdkTrack.id) {
-            return;
+        // 곡 정보 동기화 (같은 곡이면 리렌더링 방지)
+        if (currentTrack?.id !== sdkTrack.id) {
+            const idx = queue.findIndex((t) => t.id === sdkTrack.id);
+
+            set({
+                currentIndex: idx >= 0 ? idx : 0,
+                currentTrack: mapSdkTrackToLocalTrack(sdkTrack),
+            });
         }
 
-        const idx = queue.findIndex((t) => t.id === sdkTrack.id);
+        // 셔플/반복 상태 동기화 (외부에서 바꿨을 때 대비)
+        const repeatModes: RepeatMode[] = ['off', 'context', 'track'];
+
         set({
-            currentIndex: idx >= 0 ? idx : 0,
-            currentTrack: sdkTrack,
+            isShuffled: state.shuffle,
+            repeatMode: repeatModes[state.repeat_mode] ?? 'off',
         });
+    },
+
+    setVolume: async (val) => {
+        const { playerInstance } = get();
+        set({ volume: val });
+        if (playerInstance) {
+            await playerInstance.setVolume(val);
+        }
+    },
+
+    toggleShuffle: async (token) => {
+        const { isShuffled, deviceId } = get();
+        if (!deviceId) return;
+
+        const nextState = !isShuffled;
+        set({ isShuffled: nextState });
+
+        try {
+            await setShuffle(nextState, deviceId, token);
+        } catch (e) {
+            console.error('Shuffle Error:', e);
+            set({ isShuffled: !nextState });
+        }
+    },
+
+    cycleRepeatMode: async (token) => {
+        const { repeatMode, deviceId } = get();
+        if (!deviceId) return;
+
+        const modes: RepeatMode[] = ['off', 'context', 'track'];
+        const nextIndex = (modes.indexOf(repeatMode) + 1) % modes.length;
+        const nextMode = modes[nextIndex] as RepeatMode;
+
+        set({ repeatMode: nextMode });
+
+        try {
+            await setRepeatMode(nextMode, deviceId, token);
+        } catch (e) {
+            console.error('Repeat Error:', e);
+            set({ repeatMode });
+        }
     },
 
     setQueue: (tracks) => {
