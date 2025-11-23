@@ -9,45 +9,41 @@ export type Track = {
 };
 
 type PlayerState = {
+    playerInstance: Spotify.Player | null;
     currentTrack: Track | null;
     queue: Track[];
-    deviceId: string | null;
-    isReady: boolean;
-    isPlaying: boolean;
     currentIndex: number;
-    duration: number;
+
+    isReady: boolean;
+    deviceId: string | null;
+    isPlaying: boolean;
+
     position: number;
+    duration: number;
     isQueueOpen: boolean;
 
-    optimisticPlay: (tracks: Track[], index: number) => void; // ✨ 추가
+    setPlayerInstance: (player: Spotify.Player) => void;
 
-    prev: () => void;
+    optimisticPlay: (tracks: Track[], index: number) => void;
+    togglePlay: () => Promise<void>;
+    nextTrack: () => Promise<void>;
+    prevTrack: () => Promise<void>;
+    seekTo: (pos: number) => Promise<void>;
 
-    sdkTogglePlay: () => void;
-    sdkNextTrack: () => void;
-    sdkPrevTrack: () => void;
-    sdkSeek: (pos: number) => void;
-
-    setIsPlaying: (state: boolean) => void;
-    setDeviceId: (id: string | null) => void;
-    setIsReady: (ready: boolean) => void;
     setQueue: (tracks: Track[]) => void;
-
     toggleQueue: () => void;
-
+    setDeviceId: (id: string | null) => void;
+    setIsPlaying: (state: boolean) => void;
+    setIsReady: (ready: boolean) => void;
     setPosition: (pos: number) => void;
     setDuration: (dur: number) => void;
-
     syncTrackFromSdk: (track: Track) => void;
-    setSdkTogglePlay: (toggleFn: () => void) => void;
-    setSdkNextTrack: (nextFn: () => void) => void;
-    setSdkPrevTrack: (prevFn: () => void) => void;
-    setSdkSeek: (seekFn: (pos: number) => void) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
-    currentTrack: null, // 시작 시 재생 중인 곡 없음
-    queue: [], // 시작 시 재생 목록 비움
+    playerInstance: null,
+    currentTrack: null,
+    queue: [],
     currentIndex: 0,
     deviceId: null,
     isReady: false,
@@ -56,67 +52,107 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     duration: 0,
     position: 0,
 
+    setPlayerInstance: (player) => set({ playerInstance: player }),
+
+    togglePlay: async () => {
+        const { isPlaying, playerInstance } = get();
+        if (!playerInstance) return;
+
+        set({ isPlaying: !isPlaying });
+        await playerInstance.togglePlay();
+    },
+
+    nextTrack: async () => {
+        const { playerInstance, queue, currentIndex } = get();
+        if (!playerInstance || queue.length === 0) return;
+
+        const nextIndex = currentIndex + 1;
+        const nextTrack = queue[nextIndex] ?? null;
+
+        if (nextIndex < queue.length) {
+            set({
+                currentIndex: nextIndex,
+                currentTrack: nextTrack,
+                position: 0,
+                duration: 0,
+                isPlaying: true,
+            });
+        } // queue의 끝이면?
+
+        await playerInstance.nextTrack();
+    },
+
+    prevTrack: async () => {
+        const { playerInstance, position, queue, currentIndex } = get();
+        if (!playerInstance || queue.length === 0) return;
+
+        if (position > 5000) {
+            set({ position: 0 });
+            await playerInstance.seek(0);
+            return;
+        }
+
+        const prevIndex = currentIndex - 1;
+        const prevTrack = queue[prevIndex] ?? null;
+
+        if (prevIndex >= 0) {
+            set({
+                currentIndex: prevIndex,
+                currentTrack: prevTrack,
+                position: 0,
+                duration: 0,
+                isPlaying: true,
+            });
+        }
+
+        await playerInstance.previousTrack();
+    },
+
+    seekTo: async (pos) => {
+        const { playerInstance } = get();
+        if (!playerInstance) return;
+
+        set({ position: pos });
+        await playerInstance.seek(pos);
+    },
+
     optimisticPlay: (tracks, index) => {
         const trackToPlay = tracks[index] ?? null;
         set({
             queue: tracks,
             currentIndex: index,
-            currentTrack: trackToPlay, // SDK 기다리지 말고 바로 박아버림
-            isPlaying: true, // 재생 중 상태로 강제 변경
+            currentTrack: trackToPlay,
+            isPlaying: true,
         });
     },
 
-    prev: () => {
-        const { position, sdkPrevTrack, sdkSeek } = get();
-
-        if (position < 5000) {
-            sdkPrevTrack();
-        } else {
-            sdkSeek(0);
-        }
-    },
-
-    sdkTogglePlay: () => {},
-    sdkNextTrack: () => {},
-    sdkPrevTrack: () => {},
-    sdkSeek: (pos) => {},
-
-    setDeviceId: (id) => set({ deviceId: id }),
-    setIsReady: (ready) => set({ isReady: ready }),
-    setIsPlaying: (isPlaying) => set({ isPlaying }),
-    setQueue: (tracks) => {
-        set({
-            queue: tracks,
-            currentIndex: 0,
-        });
-    },
-
-    toggleQueue: () =>
-        set((state) => ({
-            isQueueOpen: !state.isQueueOpen,
-        })),
-
-    setPosition: (pos) => set({ position: pos }),
-    setDuration: (dur) => set({ duration: dur }),
-
-    syncTrackFromSdk: (sdkTrack: Track) => {
+    syncTrackFromSdk: (sdkTrack) => {
         const { currentTrack, queue } = get();
 
-        if (currentTrack && currentTrack.id !== sdkTrack.id) {
+        if (currentTrack?.id === sdkTrack.id) {
             return;
         }
 
-        // ID가 같을 때만 동기화 진행
         const idx = queue.findIndex((t) => t.id === sdkTrack.id);
-
         set({
             currentIndex: idx >= 0 ? idx : 0,
             currentTrack: sdkTrack,
         });
     },
 
-    setSdkTogglePlay: (toggleFn) => set({ sdkTogglePlay: toggleFn }),
-    setSdkNextTrack: (nextFn) => set({ sdkNextTrack: nextFn }),
-    setSdkPrevTrack: (prevFn) => set({ sdkPrevTrack: prevFn }),
-    setSdkSeek: (seekFn) => set({ sdkSeek: seekFn }),
+    setQueue: (tracks) => {
+        set({
+            queue: tracks,
+            currentIndex: 0,
+        });
+    },
+    toggleQueue: () =>
+        set((state) => ({
+            isQueueOpen: !state.isQueueOpen,
+        })),
+    setDeviceId: (id) => set({ deviceId: id }),
+    setIsReady: (ready) => set({ isReady: ready }),
+    setIsPlaying: (isPlaying) => set({ isPlaying }),
+    setPosition: (pos) => set({ position: pos }),
+    setDuration: (dur) => set({ duration: dur }),
 }));

@@ -13,10 +13,10 @@ export default function PlayerBar() {
         isPlaying,
         position,
         duration,
-        sdkTogglePlay,
-        sdkNextTrack,
-        prev,
-        sdkSeek,
+        togglePlay,
+        nextTrack,
+        prevTrack,
+        seekTo,
         toggleQueue,
     } = usePlayerStore();
 
@@ -32,7 +32,7 @@ export default function PlayerBar() {
         const seekPercent = clickX / width;
         const seekMs = Math.floor(seekPercent * duration);
 
-        sdkSeek(seekMs);
+        seekTo(seekMs);
     };
 
     return (
@@ -73,21 +73,19 @@ export default function PlayerBar() {
                         <div className={styles.centerArea}>
                             <div className={styles.controls}>
                                 <button
-                                    onClick={prev}
+                                    onClick={prevTrack}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepBackward />
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        if (currentTrack) sdkTogglePlay();
-                                    }}
+                                    onClick={togglePlay}
                                     className={styles.controlBtn}
                                 >
                                     {isPlaying ? <FaPause /> : <FaPlay />}
                                 </button>
                                 <button
-                                    onClick={sdkNextTrack}
+                                    onClick={nextTrack}
                                     className={styles.controlBtn}
                                 >
                                     <FaStepForward />
