@@ -2,7 +2,7 @@
 import { usePlayerStore } from '@/store/usePlayerStore';
 import styles from './QueueSidebar.module.css';
 import { useEffect, useRef } from 'react';
-import { usePlaylistPlayer } from '@/hooks/usePlaylistPlayer';
+import { usePlayControl } from '@/hooks/usePlayControl';
 import { useSession } from 'next-auth/react';
 
 export default function QueueSidebar() {
@@ -12,7 +12,7 @@ export default function QueueSidebar() {
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     const { queue, currentIndex, currentTrack, isQueueOpen } = usePlayerStore();
-    const { playFromPlaylist } = usePlaylistPlayer();
+    const { playFromPlaylist } = usePlayControl();
 
     useEffect(() => {
         itemRefs.current[currentIndex] &&

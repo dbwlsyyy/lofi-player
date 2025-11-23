@@ -5,7 +5,7 @@ import { loadSpotifySdk } from '@/lib/loadSpotifySdk';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { mapSdkTrackToLocalTrack } from '@/lib/spotifyMapper';
 
-export function useSpotifyWebPlayback(accessToken: string | null | undefined) {
+export function useSpotifySDK(accessToken: string | null | undefined) {
     const {
         setIsPlaying,
         setDeviceId,

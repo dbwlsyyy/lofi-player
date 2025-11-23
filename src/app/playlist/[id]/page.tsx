@@ -6,7 +6,7 @@ import styles from './PlaylistDetail.module.css';
 import { Track } from '@/store/usePlayerStore';
 import { fetchPlaylistTracks } from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
-import { usePlaylistPlayer } from '@/hooks/usePlaylistPlayer';
+import { usePlayControl } from '@/hooks/usePlayControl';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
@@ -16,7 +16,7 @@ export default function PlaylistDetailPage() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const { playFromPlaylist } = usePlaylistPlayer();
+    const { playFromPlaylist } = usePlayControl();
 
     useEffect(() => {
         if (!token || !id) return;

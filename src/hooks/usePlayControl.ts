@@ -1,9 +1,9 @@
 'use client';
 
 import { Track, usePlayerStore } from '@/store/usePlayerStore';
-import { transferToDevice, playTrack } from '@/apis/spotifyPlayerApi';
+import { transferToDevice, startPlayback } from '@/apis/spotifyPlayerApi';
 
-export function usePlaylistPlayer() {
+export function usePlayControl() {
     const { deviceId, setQueue } = usePlayerStore();
 
     const playFromPlaylist = async (
@@ -18,7 +18,7 @@ export function usePlaylistPlayer() {
         const uris = tracks.map((t) => `spotify:track:${t.id}`);
 
         await transferToDevice(deviceId, token);
-        await playTrack(uris, deviceId, token, startIndex);
+        await startPlayback(uris, deviceId, token, startIndex);
     };
 
     return { playFromPlaylist };
