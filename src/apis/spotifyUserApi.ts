@@ -1,18 +1,10 @@
 import { Track } from '@/store/usePlayerStore';
 import axios from 'axios';
-
-const BASE_URL = 'https://api.spotify.com/v1';
-
-export function spotifyClient(accessToken: string) {
-    return axios.create({
-        baseURL: BASE_URL,
-        headers: { Authorization: `Bearer ${accessToken}` },
-    });
-}
+import { createSpotifyClient } from '../lib/spotifyClient';
 
 export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
     try {
-        const api = spotifyClient(accessToken);
+        const api = createSpotifyClient(accessToken);
         const { data } = await api.get<SpotifyUser>('/me');
         return data;
     } catch (e: any) {
@@ -25,7 +17,7 @@ export async function fetchPlaylists(
     accessToken: string
 ): Promise<SpotifyPlaylistItem[]> {
     try {
-        const api = spotifyClient(accessToken);
+        const api = createSpotifyClient(accessToken);
         const { data } =
             await api.get<SpotifyPlaylistResponse>('/me/playlists');
         return data.items;
@@ -45,7 +37,7 @@ export async function fetchPlaylistTracks(
     playlistId: string
 ): Promise<Track[]> {
     try {
-        const api = spotifyClient(accessToken);
+        const api = createSpotifyClient(accessToken);
         const { data } = await api.get(`/playlists/${playlistId}/tracks`);
 
         // Spotify API의 응답 구조는 { items: [{ track: { ... } }] } 형태

@@ -1,7 +1,7 @@
 import DebugPlayerState from '@/components/DebugPlayerState';
 import PlayerBar from '../components/PlayerBar/PlayerBar';
 import './globals.css';
-import PlayerInitializer from './PlayerInitializer';
+import SDKProvider from './SDKProvider';
 import { NextAuthProvider } from './providers';
 import { ReactNode } from 'react';
 import QueueSidebar from '@/components/QueueSidebar/QueueSidebar';
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <html lang="ko">
             <body>
                 <NextAuthProvider>
-                    <PlayerInitializer />
+                    <SDKProvider />
                     {/* <DebugPlayerState /> */}
 
                     {children}

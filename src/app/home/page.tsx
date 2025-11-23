@@ -16,7 +16,6 @@ import { useRouter } from 'next/navigation';
 export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
-    console.log('token', session?.accessToken);
     const router = useRouter();
 
     const [me, setMe] = useState<SpotifyUser | null>(null);

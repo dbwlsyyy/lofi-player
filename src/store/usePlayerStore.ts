@@ -19,6 +19,8 @@ type PlayerState = {
     position: number;
     isQueueOpen: boolean;
 
+    optimisticPlay: (tracks: Track[], index: number) => void; // ✨ 추가
+
     prev: () => void;
 
     sdkTogglePlay: () => void;
@@ -54,6 +56,16 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     duration: 0,
     position: 0,
 
+    optimisticPlay: (tracks, index) => {
+        const trackToPlay = tracks[index] ?? null;
+        set({
+            queue: tracks,
+            currentIndex: index,
+            currentTrack: trackToPlay, // SDK 기다리지 말고 바로 박아버림
+            isPlaying: true, // 재생 중 상태로 강제 변경
+        });
+    },
+
     prev: () => {
         const { position, sdkPrevTrack, sdkSeek } = get();
 
@@ -87,13 +99,19 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     setPosition: (pos) => set({ position: pos }),
     setDuration: (dur) => set({ duration: dur }),
 
-    syncTrackFromSdk: (track: Track) => {
-        const { queue } = get();
-        const idx = queue.findIndex((t) => t.id === track.id);
+    syncTrackFromSdk: (sdkTrack: Track) => {
+        const { currentTrack, queue } = get();
+
+        if (currentTrack && currentTrack.id !== sdkTrack.id) {
+            return;
+        }
+
+        // ID가 같을 때만 동기화 진행
+        const idx = queue.findIndex((t) => t.id === sdkTrack.id);
+
         set({
             currentIndex: idx >= 0 ? idx : 0,
-            currentTrack: track,
-            // position: 0,
+            currentTrack: sdkTrack,
         });
     },
 
