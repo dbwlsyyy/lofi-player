@@ -8,16 +8,13 @@ import { transferToDevice } from '@/apis/spotifyPlayerApi';
 
 export function useSpotifySDK(accessToken: string | null | undefined) {
     const {
+        setPlayerInstance,
         setIsPlaying,
         setDeviceId,
         setIsReady,
         setPosition,
         setDuration,
         syncTrackFromSdk,
-        setSdkTogglePlay,
-        setSdkNextTrack,
-        setSdkPrevTrack,
-        setSdkSeek,
     } = usePlayerStore();
 
     const playerRef = useRef<Spotify.Player | null>(null);
@@ -49,43 +46,13 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                 } catch (err) {
                     console.error('Error getting current state:', err);
                 }
-            }, 300);
+            }, 500);
         };
 
         const init = async () => {
             try {
                 await loadSpotifySdk();
                 if (cancelled) return;
-
-                setSdkTogglePlay(() => {
-                    if (playerRef.current) {
-                        playerRef.current.togglePlay().catch((error) => {
-                            console.error('Toggle Play 실패:', error);
-                        });
-                    }
-                });
-
-                setSdkNextTrack(() => {
-                    if (playerRef.current)
-                        playerRef.current.nextTrack().catch((error) => {
-                            console.error('Next Track 실패:', error);
-                        });
-                });
-
-                setSdkPrevTrack(() => {
-                    if (playerRef.current)
-                        playerRef.current.previousTrack().catch((error) => {
-                            console.error('Previous Track 실패:', error);
-                        });
-                });
-
-                setSdkSeek((pos: number) => {
-                    if (playerRef.current) {
-                        playerRef.current.seek(pos).catch((error) => {
-                            console.error('Seek 실패:', error);
-                        });
-                    }
-                });
 
                 const player = new window.Spotify.Player({
                     name: 'Lofi Web Player',
@@ -94,6 +61,7 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                 });
 
                 playerRef.current = player;
+                setPlayerInstance(player);
 
                 player.addListener('ready', async ({ device_id }) => {
                     setDeviceId(device_id);
@@ -146,26 +114,19 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
         return () => {
             cancelled = true;
             stopPolling();
-            setSdkTogglePlay(() => {});
-            setSdkNextTrack(() => {});
-            setSdkPrevTrack(() => {});
-            setSdkSeek(() => {}); //??
             if (playerRef.current) {
                 playerRef.current.disconnect();
-                playerRef.current = null;
             }
+            setPlayerInstance(null as any); // ?
         };
     }, [
         accessToken,
+        setPlayerInstance,
         setIsPlaying,
         setDeviceId,
         setIsReady,
         setDuration,
         setPosition,
         syncTrackFromSdk,
-        setSdkTogglePlay,
-        setSdkNextTrack,
-        setSdkPrevTrack,
-        setSdkSeek,
     ]);
 }
