@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { loadSpotifySdk } from '@/lib/loadSpotifySdk';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { mapSdkTrackToLocalTrack } from '@/lib/spotifyMapper';
+import { transferToDevice } from '@/apis/spotifyPlayerApi';
 
 export function useSpotifySDK(accessToken: string | null | undefined) {
     const {
@@ -94,9 +95,12 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
 
                 playerRef.current = player;
 
-                player.addListener('ready', ({ device_id }) => {
+                player.addListener('ready', async ({ device_id }) => {
                     setDeviceId(device_id);
                     setIsReady(true);
+                    if (accessToken) {
+                        await transferToDevice(device_id, accessToken);
+                    }
                 });
 
                 player.addListener('not_ready', () => {
