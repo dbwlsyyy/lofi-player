@@ -1,69 +1,41 @@
-import { spotifyApi } from './spotifyApi';
+import { createSpotifyClient } from '@/lib/spotifyClient';
 
 export async function transferToDevice(deviceId: string, accessToken: string) {
-    return spotifyApi.put(
-        'me/player',
-        {
-            device_ids: [deviceId],
-            play: false,
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        }
-    );
+    const client = createSpotifyClient(accessToken);
+
+    return client.put('me/player', {
+        device_ids: [deviceId],
+        play: false,
+    });
 }
 
-export async function playTrack(
+export async function startPlayback(
     uris: string[],
     deviceId: string,
     accessToken: string,
     offsetIndex?: number
 ) {
-    return spotifyApi.put(
-        `me/player/play?device_id=${deviceId}`,
+    const client = createSpotifyClient(accessToken);
+
+    const body =
         offsetIndex !== undefined
             ? { uris, offset: { position: offsetIndex } }
-            : { uris },
-        {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        }
-    );
+            : { uris };
+
+    return client.put(`me/player/play?device_id=${deviceId}`, body);
 }
 
-export async function pauseTrack(deviceId: string, accessToken: string) {
-    return spotifyApi.put(
-        `me/player/pause?device_id=${deviceId}`,
-        {},
-        {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        }
-    );
+export async function pausePlayback(deviceId: string, accessToken: string) {
+    const client = createSpotifyClient(accessToken);
+    return client.put(`me/player/pause?device_id=${deviceId}`);
 }
 
 export async function nextTrack(deviceId: string, accessToken: string) {
-    return spotifyApi.post(
-        `me/player/next?device_id=${deviceId}`,
-        {},
-        {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        }
-    );
+    const client = createSpotifyClient(accessToken);
+    return client.post(`me/player/next?device_id=${deviceId}`);
 }
 
 export async function prevTrack(deviceId: string, accessToken: string) {
-    return spotifyApi.post(
-        `me/player/previous?device_id=${deviceId}`,
-        {},
-        {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        }
-    );
+    const client = createSpotifyClient(accessToken);
+    return client.post(`me/player/previous?device_id=${deviceId}`);
 }
