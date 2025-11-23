@@ -5,6 +5,7 @@ import styles from './PlayerBar.module.css';
 import Image from 'next/image';
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FiMenu } from 'react-icons/fi';
 
 export default function PlayerBar() {
     const {
@@ -16,6 +17,7 @@ export default function PlayerBar() {
         sdkNextTrack,
         prev,
         sdkSeek,
+        toggleQueue,
     } = usePlayerStore();
 
     const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
@@ -103,7 +105,14 @@ export default function PlayerBar() {
                             </div>
                         </div>
 
-                        <div className={styles.rightArea}></div>
+                        <div className={styles.rightArea}>
+                            <button
+                                className={styles.hamburger}
+                                onClick={toggleQueue}
+                            >
+                                <FiMenu size={22} />
+                            </button>
+                        </div>
                     </>
                 ) : (
                     <motion.div

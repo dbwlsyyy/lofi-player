@@ -1,9 +1,10 @@
-import DebugPlayerState from './components/PlayerBar/DebugPlayerState';
-import PlayerBar from './components/PlayerBar/PlayerBar';
+import DebugPlayerState from '@/components/DebugPlayerState';
+import PlayerBar from '../components/PlayerBar/PlayerBar';
 import './globals.css';
 import PlayerInitializer from './PlayerInitializer';
 import { NextAuthProvider } from './providers';
 import { ReactNode } from 'react';
+import QueueSidebar from '@/components/QueueSidebar/QueueSidebar';
 
 export const metadata = {
     title: 'Lofi Player',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     {/* <DebugPlayerState /> */}
 
                     {children}
+                    <QueueSidebar />
                     <PlayerBar />
                 </NextAuthProvider>
             </body>
