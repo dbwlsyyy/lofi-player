@@ -40,6 +40,53 @@ a {
     text-decoration: none;
 }
 
+.minimal-toast {
+    background: rgba(10, 10, 10, 0.9) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+
+    border: 1px solid rgba(255, 255, 255, 0.225) !important;
+    border-radius: 100px !important;
+
+    padding: 1rem 1.6rem !important;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5) !important;
+
+    color: #fff !important;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 1.4rem !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.02rem !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+
+    max-width: fit-content !important;
+    min-width: auto !important;
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 50%;
+    width: 2.8rem;
+    height: 2.8rem;
+
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+    border: none;
+}
+
+.icon-btn:hover {
+    background: #1db954;
+    color: #000;
+    transform: scale(1.05);
+}
+
 @media (prefers-color-scheme: dark) {
     html {
         color-scheme: dark;

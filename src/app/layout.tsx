@@ -5,6 +5,7 @@ import SDKProvider from './SDKProvider';
 import { NextAuthProvider } from './providers';
 import { ReactNode } from 'react';
 import QueueSidebar from '@/components/QueueSidebar/QueueSidebar';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
     title: 'Lofi Player',
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     {/* <DebugPlayerState /> */}
 
                     {children}
+                    <Toaster position="top-center" />
                     <QueueSidebar />
                     <PlayerBar />
                 </NextAuthProvider>
