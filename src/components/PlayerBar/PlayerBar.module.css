@@ -1,26 +1,34 @@
 .playerBar {
     display: flex;
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
     height: 9rem;
     background: rgba(10, 15, 25, 0.6);
     backdrop-filter: blur(5px);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 100px;
     align-items: center;
     justify-content: space-between;
     color: #e6ebff;
     box-shadow: 0 -2px 20px rgba(79, 125, 243, 0.15);
-    z-index: 50;
-    padding: 0 2.5rem;
+
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    align-items: center;
+    padding: 0 2rem;
+    z-index: 100;
+
+    transition: all 0.3s ease;
 }
 
 .leftArea {
-    flex: 1;
     display: flex;
     align-items: center;
-    min-width: 0;
+    overflow: hidden;
 }
 
 .trackInfo {
@@ -33,16 +41,31 @@
 }
 
 .albumArt {
-    width: 7rem;
-    height: 7rem;
-    border-radius: 0.8rem;
+    border-radius: 50%;
+    border: 12px solid rgba(255, 255, 255, 0.08);
     object-fit: cover;
-    box-shadow: 0 0 12px rgba(79, 125, 243, 0.25);
+    box-shadow: 0 0 12px;
+    animation: spin 10s linear infinite; /* 재생 중일 때 돌게 하려면 */
+    animation-play-state: paused;
+}
+
+.playingArt {
+    animation-play-state: running;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .textInfo {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     overflow: hidden;
 }
 
@@ -64,21 +87,23 @@
 }
 
 .centerArea {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
+    gap: 1.5rem;
 }
 
 .controls {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 2rem;
 }
 
 .controlBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     color: #e6ebff;
@@ -94,9 +119,54 @@
     color: #4f7df3;
 }
 
-.progress {
+.controlBtn:active {
+    transform: scale(0.9);
+}
+
+.activeBtn {
+    color: #4f7df3;
+    position: relative;
+}
+
+.activeBtn::after {
+    content: '';
+    position: absolute;
+    right: -7px;
+    top: -5px;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: #4f7df3;
+    border-radius: 50%;
+}
+
+.repeatSpan {
+    font-size: 1rem;
+    position: absolute;
+    top: 9px;
+    left: 15px;
+    font-weight: bold;
+}
+
+.progressContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.timeText {
+    font-size: 1.2rem;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.progressBar {
     position: relative;
     width: 100%;
+    flex: 1;
     height: 4px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
@@ -105,18 +175,61 @@
 }
 
 .progressFill {
+    position: relative;
     height: 100%;
     background: #4f7df3;
-    width: 0%;
     transition: width 0.2s linear;
 }
 
+/* .progressFill::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.progressBar:hover .progressFill::after {
+    opacity: 1;
+} */
+
 .rightArea {
-    flex: 1;
     display: flex;
-    justify-content: end;
     align-items: center;
+    justify-content: flex-end;
     gap: 1rem;
+}
+
+.volumeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 9rem;
+}
+
+.volumeSlider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    outline: none;
+
+    cursor: pointer;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 0px;
+    height: 0px;
+    background: #fff;
+    cursor: pointer;
+    border: none;
 }
 
 .hamburger {
@@ -127,7 +240,7 @@
 }
 
 .emptyState {
-    flex: 1;
+    grid-column: 1 / -1;
     text-align: center;
     color: #b1bbd8;
     font-size: 1.6rem;
