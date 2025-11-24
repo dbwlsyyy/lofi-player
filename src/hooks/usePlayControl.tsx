@@ -55,7 +55,7 @@ export function usePlayControl() {
                                     gap: '0.8rem',
                                 }}
                             >
-                                <FiLock size="1.5rem" color="#4f7df3c5" />
+                                <FiLock size="1.6rem" color="#4f7df3c5" />
                                 <span>재생 불가 (유해성 콘텐츠)</span>
                             </div>
 
