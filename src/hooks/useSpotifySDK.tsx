@@ -3,8 +3,9 @@
 import { useEffect, useRef } from 'react';
 import { loadSpotifySdk } from '@/lib/loadSpotifySdk';
 import { usePlayerStore } from '@/store/usePlayerStore';
-import { mapSdkTrackToLocalTrack } from '@/lib/spotifyMapper';
 import { transferToDevice } from '@/apis/spotifyPlayerApi';
+import toast from 'react-hot-toast';
+import { FiAlertCircle, FiLock, FiUserX, FiWifiOff } from 'react-icons/fi';
 
 export function useSpotifySDK(accessToken: string | null | undefined) {
     const {
@@ -63,6 +64,82 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                 playerRef.current = player;
                 setPlayerInstance(player);
 
+                player.on('initialization_error', (message) => {
+                    console.error('player 초기화 실패', message);
+                    toast(
+                        (t) => (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.8rem',
+                                }}
+                            >
+                                <FiWifiOff size="1.6rem" color="#ff5555" />
+                                <span>플레이어 연결 실패 (네트워크 확인)</span>
+                            </div>
+                        ),
+                        { className: 'minimal-toast', id: 'init-error' }
+                    );
+                });
+
+                player.on('authentication_error', ({ message }) => {
+                    console.error('인증 실패:', message);
+                    toast(
+                        (t) => (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.8rem',
+                                }}
+                            >
+                                <FiLock size="1.6rem" color="#ff5555" />
+                                <span>로그인 세션이 만료되었습니다.</span>
+                            </div>
+                        ),
+                        { className: 'minimal-toast', id: 'auth-error' }
+                    );
+                });
+
+                player.on('account_error', ({ message }) => {
+                    console.error('계정 오류:', message);
+                    toast(
+                        (t) => (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.8rem',
+                                }}
+                            >
+                                <FiUserX size="1.6rem" color="#ff5555" />
+                                <span>프리미엄 계정이 필요합니다.</span>
+                            </div>
+                        ),
+                        { className: 'minimal-toast', id: 'account-error' }
+                    );
+                });
+
+                player.on('playback_error', ({ message }) => {
+                    console.error('재생 실패:', message);
+                    toast(
+                        (t) => (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.8rem',
+                                }}
+                            >
+                                <FiAlertCircle size="1.6rem" color="#ff5555" />
+                                <span>일시적인 재생 오류가 발생했습니다.</span>
+                            </div>
+                        ),
+                        { className: 'minimal-toast', id: 'playback-error' }
+                    );
+                });
+
                 player.addListener('ready', async ({ device_id }) => {
                     setDeviceId(device_id);
                     setIsReady(true);
@@ -76,7 +153,7 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                 });
 
                 player.addListener('player_state_changed', (state) => {
-                    console.log(state.track_window.current_track.name);
+                    console.log('상태:', state.track_window.current_track.name);
 
                     if (!state) {
                         stopPolling();

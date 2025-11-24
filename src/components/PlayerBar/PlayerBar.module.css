@@ -45,7 +45,7 @@
     border: 12px solid rgba(255, 255, 255, 0.08);
     object-fit: cover;
     box-shadow: 0 0 12px;
-    animation: spin 10s linear infinite; /* 재생 중일 때 돌게 하려면 */
+    animation: spin 10s linear infinite;
     animation-play-state: paused;
 }
 
