@@ -14,7 +14,7 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
         setIsReady,
         setPosition,
         setDuration,
-        syncTrackFromSdk,
+        syncStateFromSdk,
     } = usePlayerStore();
 
     const playerRef = useRef<Spotify.Player | null>(null);
@@ -57,7 +57,7 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                 const player = new window.Spotify.Player({
                     name: 'Lofi Web Player',
                     getOAuthToken: (cb) => cb(accessToken),
-                    volume: 0.1,
+                    volume: 0.5,
                 });
 
                 playerRef.current = player;
@@ -90,11 +90,10 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
 
                     // 재생 여부 동기화
                     const isPlaying = !state.paused;
-                    const sdkTrack = state.track_window.current_track;
+                    setIsPlaying(isPlaying);
 
-                    if (sdkTrack?.id && !state.loading) {
-                        const mapped = mapSdkTrackToLocalTrack(sdkTrack);
-                        syncTrackFromSdk(mapped); // 현재 재생 중인 트랙 정보 동기화
+                    if (!state.loading) {
+                        syncStateFromSdk(state); // 현재 재생 중인 트랙 정보 동기화
                         setIsPlaying(isPlaying);
                     }
 
@@ -102,7 +101,6 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                     else stopPolling();
                 });
 
-                // 연결 시작
                 player.connect();
             } catch (err) {
                 console.error('Spotify Player Init Error:', err);
@@ -117,7 +115,7 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
             if (playerRef.current) {
                 playerRef.current.disconnect();
             }
-            setPlayerInstance(null as any); // ?
+            setPlayerInstance(null);
         };
     }, [
         accessToken,
@@ -127,6 +125,6 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
         setIsReady,
         setDuration,
         setPosition,
-        syncTrackFromSdk,
+        syncStateFromSdk,
     ]);
 }

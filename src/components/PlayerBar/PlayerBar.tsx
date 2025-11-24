@@ -3,27 +3,46 @@
 import { usePlayerStore } from '@/store/usePlayerStore';
 import styles from './PlayerBar.module.css';
 import Image from 'next/image';
-import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
+import {
+    FaPlay,
+    FaPause,
+    FaStepForward,
+    FaStepBackward,
+    FaRandom,
+    FaRedo,
+    FaVolumeMute,
+    FaVolumeUp,
+} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu } from 'react-icons/fi';
+import { useSession } from 'next-auth/react';
+import { formatTime } from '@/lib/formatTime';
 
 export default function PlayerBar() {
+    const { data: session } = useSession();
+    const accessToken = session?.accessToken;
     const {
         currentTrack,
         isPlaying,
         position,
         duration,
+        isShuffled,
+        repeatMode,
+        volume,
+        cycleRepeatMode,
         togglePlay,
         nextTrack,
         prevTrack,
         seekTo,
         toggleQueue,
+        setVolume,
+        toggleShuffle,
     } = usePlayerStore();
 
     const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
 
     const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!duration || duration === 0) return;
+        if (!duration) return;
 
         const progressBar = e.currentTarget;
         const clickX = e.nativeEvent.offsetX;
@@ -33,6 +52,12 @@ export default function PlayerBar() {
         const seekMs = Math.floor(seekPercent * duration);
 
         seekTo(seekMs);
+    };
+
+    // 볼륨 변경 핸들러 (0 ~ 100 -> 0.0 ~ 1.0)
+    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newVolume = Number(e.target.value) / 100;
+        setVolume(newVolume);
     };
 
     return (
@@ -57,7 +82,7 @@ export default function PlayerBar() {
                                     alt={currentTrack.name}
                                     width={60}
                                     height={60}
-                                    className={styles.albumArt}
+                                    className={`${styles.albumArt} ${isPlaying ? styles.playingArt : ''}`}
                                 />
                                 <div className={styles.textInfo}>
                                     <p className={styles.trackName}>
@@ -73,14 +98,26 @@ export default function PlayerBar() {
                         <div className={styles.centerArea}>
                             <div className={styles.controls}>
                                 <button
+                                    onClick={() =>
+                                        accessToken &&
+                                        toggleShuffle(accessToken)
+                                    }
+                                    className={`${styles.controlBtn}  ${isShuffled ? styles.activeBtn : ''}`}
+                                    title="셔플 켜기/끄기"
+                                >
+                                    <FaRandom size={17} />
+                                </button>
+                                <button
                                     onClick={prevTrack}
                                     className={styles.controlBtn}
                                 >
-                                    <FaStepBackward />
+                                    <FaStepBackward
+                                        style={{ marginLeft: '2rem' }}
+                                    />
                                 </button>
                                 <button
                                     onClick={togglePlay}
-                                    className={styles.controlBtn}
+                                    className={`${styles.controlBtn} ${styles.playBtn}`}
                                 >
                                     {isPlaying ? <FaPause /> : <FaPlay />}
                                 </button>
@@ -88,22 +125,65 @@ export default function PlayerBar() {
                                     onClick={nextTrack}
                                     className={styles.controlBtn}
                                 >
-                                    <FaStepForward />
+                                    <FaStepForward
+                                        style={{ marginRight: '2rem' }}
+                                    />
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        accessToken &&
+                                        cycleRepeatMode(accessToken)
+                                    }
+                                    className={`${styles.controlBtn} ${repeatMode !== 'off' ? styles.activeBtn : ''}`}
+                                    title={`반복 모드: ${repeatMode}`}
+                                >
+                                    <FaRedo size={17} />
+                                    {repeatMode === 'track' && (
+                                        <span className={styles.repeatSpan}>
+                                            1
+                                        </span>
+                                    )}
                                 </button>
                             </div>
 
-                            <div
-                                className={styles.progress}
-                                onClick={handleSeek}
-                            >
+                            <div className={styles.progressContainer}>
+                                <span className={styles.timeText}>
+                                    {formatTime(position)}
+                                </span>
                                 <div
-                                    className={styles.progressFill}
-                                    style={{ width: `${progressPercent}%` }}
-                                ></div>
+                                    className={styles.progressBar}
+                                    onClick={handleSeek}
+                                >
+                                    <div
+                                        className={styles.progressFill}
+                                        style={{ width: `${progressPercent}%` }}
+                                    />
+                                </div>
+                                <span className={styles.timeText}>
+                                    {formatTime(duration)}
+                                </span>
                             </div>
                         </div>
 
                         <div className={styles.rightArea}>
+                            <div className={styles.volumeWrapper}>
+                                {volume === 0 ? (
+                                    <FaVolumeMute color="#888" />
+                                ) : (
+                                    <FaVolumeUp color="#888" />
+                                )}
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={volume * 100}
+                                    onChange={handleVolumeChange}
+                                    className={styles.volumeSlider}
+                                    style={{
+                                        background: `linear-gradient(to right, #fff ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%)`,
+                                    }}
+                                />
+                            </div>
                             <button
                                 className={styles.hamburger}
                                 onClick={toggleQueue}

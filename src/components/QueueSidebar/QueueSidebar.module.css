@@ -41,7 +41,7 @@
     flex-direction: column;
     padding-top: 0.5rem;
 
-    /* padding-bottom: calc(100dvh - 26rem); */
+    padding-bottom: calc(100dvh - 25.5rem);
     mask-image: linear-gradient(
         to bottom,
         transparent 0%,
