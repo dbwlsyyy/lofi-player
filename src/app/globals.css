@@ -65,6 +65,25 @@ a {
     min-width: auto !important;
 }
 
+.toast-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    width: 100% !important;
+}
+
+.toast-message {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.toast-divider {
+    width: 1px;
+    height: 1.4rem;
+    background: rgba(255, 255, 255, 0.3);
+}
+
 .icon-btn {
     display: flex;
     align-items: center;
