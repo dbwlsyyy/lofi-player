@@ -71,6 +71,7 @@
 
 .trackName {
     font-size: 1.6rem;
+    padding-right: 0.3rem;
     font-weight: 600;
     color: #fff;
     text-overflow: ellipsis;
