@@ -53,8 +53,8 @@ export function usePlayControl() {
                         (t) => (
                             <div className="toast-content">
                                 <div className="toast-message">
-                                    <FiLock size="1.6rem" color="#4f7df3c5" />
-                                    <span>재생 불가 (유해성 콘텐츠)</span>
+                                    <FiLock size="1.6rem" color="#ff5555" />
+                                    <span>재생 불가 (성인 인증 필요)</span>
                                 </div>
                                 <div className="toast-divider"></div>
                                 <a
@@ -75,9 +75,7 @@ export function usePlayControl() {
                             id: '403-error',
                         }
                     );
-                }
-                // 🔍 2. 기기 없음 (404)
-                else if (status === 404) {
+                } else if (status === 404) {
                     toast(
                         (t) => (
                             <div className="toast-message">
@@ -89,20 +87,6 @@ export function usePlayControl() {
                             </div>
                         ),
                         { className: 'minimal-toast', id: 'device-404' }
-                    );
-                }
-                // 👤 3. 인증 만료 (401)
-                else if (status === 401) {
-                    toast(
-                        (t) => (
-                            <div className="toast-message">
-                                <FiUserX size="1.6rem" color="#ff5555" />
-                                <span>
-                                    인증이 만료되었습니다. 다시 로그인해주세요.
-                                </span>
-                            </div>
-                        ),
-                        { className: 'minimal-toast', id: 'auth-error' }
                     );
                 } else if (
                     code === 'ERR_NETWORK' ||
@@ -117,6 +101,9 @@ export function usePlayControl() {
                         ),
                         { className: 'minimal-toast', id: 'net-error' }
                     );
+                    setIsPlaying(false);
+                    setPosition(0);
+                    setDuration(0);
                 } else {
                     toast(
                         (t) => (
@@ -138,11 +125,7 @@ export function usePlayControl() {
                     );
                 }
 
-                if (
-                    status === 403 ||
-                    status === 404 ||
-                    code === 'ERR_NETWORK'
-                ) {
+                if (status === 403 || status === 404) {
                     if (previousQueue.length > 0) {
                         optimisticPlay(previousQueue, previousIndex);
                         setIsPlaying(previousPlaying);
