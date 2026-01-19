@@ -6,6 +6,8 @@
     transform: translateX(-50%);
     width: 90%;
     max-width: 800px;
+    min-width: 470px;
+
     height: 9rem;
     background: rgba(10, 15, 25, 0.6);
     backdrop-filter: blur(5px);
@@ -93,6 +95,7 @@
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
+    margin: 0 1rem;
 }
 
 .controls {
@@ -211,6 +214,11 @@
     align-items: center;
     gap: 0.5rem;
     width: 9rem;
+}
+
+.volumeIcon {
+    color: #888;
+    cursor: 'pointer';
 }
 
 .volumeSlider {

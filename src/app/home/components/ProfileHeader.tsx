@@ -1,28 +1,63 @@
 'use client';
+
+import Image from 'next/image';
 import styles from './ProfileHeader.module.css';
+import { FaSpotify } from 'react-icons/fa';
+import { SpotifyUser } from '@/apis/spotifyUserApi';
+import { FiLogOut } from 'react-icons/fi';
 
-export default function ProfileHeader({ profile, onLogout }) {
-    if (!profile) return null;
+interface ProfileHeaderProps {
+    profile: SpotifyUser | null;
+    onLogin: () => void;
+    onLogout: () => void;
+}
 
+export default function ProfileHeader({
+    profile,
+    onLogin,
+    onLogout,
+}: ProfileHeaderProps) {
     return (
-        <div className={styles.header}>
-            <div className={styles.left}>
-                <img
-                    src={profile.images?.[0]?.url || '/default_profile.png'}
-                    alt="프로필 사진"
-                    className={styles.avatar}
-                />
-                <div>
-                    <h2 className={styles.name}>{profile.display_name}</h2>
-                    <p className={styles.followers}>
-                        팔로워 {profile.followers?.total ?? 0}명
-                    </p>
-                </div>
-            </div>
+        <header className={styles.headerContainer}>
+            {!profile && (
+                <button className={styles.loginBtn} onClick={onLogin}>
+                    <FaSpotify className={styles.spotifyIcon} />
+                    <span>Spotify로 시작하기</span>
+                </button>
+            )}
 
-            <button className={styles.logoutBtn} onClick={onLogout}>
-                로그아웃
-            </button>
-        </div>
+            {profile && (
+                <>
+                    <div className={styles.profileBox}>
+                        <div className={styles.avatarWrapper}>
+                            <Image
+                                src={
+                                    profile.images?.[0]?.url ||
+                                    '/default_profile.png'
+                                }
+                                alt="Profile"
+                                width={48}
+                                height={48}
+                                className={styles.avatar}
+                            />
+                            <div className={styles.onlineBadge}></div>
+                        </div>
+
+                        <div className={styles.userInfo}>
+                            <h2 className={styles.userName}>
+                                {profile.display_name}
+                            </h2>
+                            <p className={styles.userStatus}>
+                                <span className={styles.blueText}>Spotify</span>{' '}
+                                {profile.product}
+                            </p>
+                        </div>
+                        <button className={styles.logoutBtn} onClick={onLogout}>
+                            <FiLogOut />
+                        </button>
+                    </div>
+                </>
+            )}
+        </header>
     );
 }

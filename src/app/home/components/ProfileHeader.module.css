@@ -1,59 +1,104 @@
-.header {
-    width: 25%;
+.headerContainer {
     position: fixed;
+    top: 3rem;
     right: 3rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 16px 20px;
-    margin-bottom: 32px;
-    backdrop-filter: blur(6px);
+    z-index: 1000;
 }
 
-.left {
+.loginBtn {
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: center;
+    gap: 1.2rem;
+    padding: 0.8rem 1.6rem 0.8rem 0.8rem;
+    margin-top: 1rem;
+    background: #ffffff;
+    color: #000000;
+    border-radius: 10rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.loginBtn:hover {
+    background: #3b82f6;
+    color: #ffffff;
+    transform: translateY(-0.1rem);
+    box-shadow: 0 0.5rem 2rem rgba(59, 130, 246, 0.4);
+}
+
+.spotifyIcon {
+    font-size: 2.2rem;
+}
+
+.profileBox {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(1.5rem);
+    -webkit-backdrop-filter: blur(1.5rem);
+    padding: 1rem;
+    border-radius: 10rem;
+    border: 0.1rem solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+}
+
+.avatarWrapper {
+    position: relative;
+    width: 4.8rem;
+    height: 4.8rem;
 }
 
 .avatar {
-    width: 64px;
-    height: 64px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 0.2rem solid #3b82f6;
 }
 
-.name {
-    font-size: 20px;
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.userName {
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff;
     margin: 0;
 }
 
-.followers {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.75);
-    margin-top: 4px;
+.userStatus {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+.blueText {
+    color: #3b82f6;
+    font-weight: 600;
 }
 
 .logoutBtn {
-    background: #334155;
-    color: #fff;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
     border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 14px;
+    border-radius: 5rem;
+    padding: 0.5rem;
+    font-size: 1.6rem;
+    font-weight: 500;
     cursor: pointer;
-    transition:
-        background 0.2s,
-        transform 0.1s;
+    transition: all 0.2s ease;
 }
 
 .logoutBtn:hover {
-    background: #42526b;
-    transform: scale(1.03);
+    border-color: rgba(255, 71, 87, 0.4);
+    color: #ff6b6b;
+    transform: scale(1.1);
 }

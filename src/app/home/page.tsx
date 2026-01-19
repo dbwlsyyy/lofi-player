@@ -12,37 +12,58 @@ import styles from './Home.module.css';
 import ProfileHeader from './components/ProfileHeader';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useUIStore } from '@/store/useUIStore';
 
 export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
     const router = useRouter();
 
+    const { isRelaxMode } = useUIStore();
+
     const [me, setMe] = useState<SpotifyUser | null>(null);
     const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
     const [error, setError] = useState('');
-    const [isRelaxMode, setIsRelaxMode] = useState(false);
+
+    const handleLogin = () => {
+        signIn('spotify', { callbackUrl: '/home' });
+    };
+
+    const handleLogout = () => {
+        signOut();
+    };
 
     useEffect(() => {
         if (!accessToken) return;
 
         (async () => {
             try {
-                const profile = await fetchMe(accessToken);
+                const [profile, list] = await Promise.all([
+                    fetchMe(accessToken),
+                    fetchPlaylists(accessToken),
+                ]);
                 setMe(profile);
-
-                const list = await fetchPlaylists(accessToken);
                 setPlaylists(list);
             } catch (e: any) {
-                if (e.response?.status === 401)
-                    signIn('spotify'); // 만료 시 자동 로그인
-                else setError('Spotify API 호출 실패');
+                if (e.response?.status === 401) {
+                    handleLogin();
+                } else {
+                    setError(
+                        'Spotify 데이터를 불러오는 중 오류가 발생했습니다.',
+                    );
+                }
             }
         })();
     }, [accessToken]);
 
-    if (status === 'loading') {
-        return <main className={styles.loading}>로딩 중...</main>;
+    // 로딩 상태 화면
+    if (status === 'loading' || (status === 'authenticated' && !me)) {
+        return (
+            <main className={styles.loading}>
+                <div className={styles.spinner}></div>
+                <p>당신의 리듬을 찾는 중...</p>
+            </main>
+        );
     }
 
     return (
@@ -57,87 +78,102 @@ export default function HomePage() {
                 muted
                 playsInline
             ></video>
+            <div className={styles.overlay}></div>
 
-            {!me && (
-                <div className={styles.centerContent}>
-                    <button
-                        className={styles.loginBtn}
-                        onClick={() =>
-                            signIn('spotify', { callbackUrl: '/home' })
-                        }
-                    >
-                        Spotify 로그인
-                    </button>
-                </div>
-            )}
+            <div className={styles.contentWrapper}>
+                {!isRelaxMode && (
+                    <>
+                        <ProfileHeader
+                            profile={me}
+                            onLogin={handleLogin}
+                            onLogout={handleLogout}
+                        />
 
-            {me && (
-                <>
-                    {!isRelaxMode && (
-                        <>
-                            <ProfileHeader
-                                profile={me}
-                                onLogout={() => signOut()}
-                            />
-
-                            <div className={styles.section}>
-                                <h3 className={styles.sectionTitle}>
-                                    내 플레이리스트
-                                </h3>
-
-                                {error && (
-                                    <p className={styles.error}>{error}</p>
-                                )}
-
-                                <div className={styles.playlistGrid}>
-                                    {playlists.map((pl) => (
-                                        <div
-                                            key={pl.id}
-                                            className={styles.playlistCard}
-                                            onClick={() =>
-                                                router.push(
-                                                    `/playlist/${pl.id}`
-                                                )
-                                            }
-                                        >
-                                            <Image
-                                                src={
-                                                    pl.images?.[0]?.url ||
-                                                    '/default_playlist.png'
-                                                }
-                                                alt={pl.name}
-                                                width={200}
-                                                height={200}
-                                                className={styles.playlistImage}
-                                            />
-                                            <h4>{pl.name}</h4>
-                                            <p>{pl.tracks.total}곡</p>
+                        <div className={styles.section}>
+                            {error && <p className={styles.error}>{error}</p>}
+                            {!me && (
+                                <section className={styles.heroSection}>
+                                    <div className={styles.loginCard}>
+                                        <div className={styles.brand}>
+                                            {/* <h1 className={styles.mainTitle}>
+                                                VIBE
+                                                <span
+                                                    className={styles.bluePoint}
+                                                >
+                                                    .
+                                                </span>
+                                            </h1> */}
+                                            <p className={styles.subTitle}>
+                                                로그인이 필요합니다.
+                                            </p>
                                         </div>
-                                    ))}
-                                </div>
 
-                                <button
-                                    className={styles.toggleBtn}
-                                    onClick={() => setIsRelaxMode(true)}
-                                >
-                                    휴식모드로 전환
-                                </button>
-                            </div>
-                        </>
-                    )}
+                                        <p className={styles.footerText}>
+                                            플레이리스트를 연동하여
+                                            불러와보세요!
+                                        </p>
+                                    </div>
+                                </section>
+                            )}
 
-                    <footer>
-                        {isRelaxMode && (
-                            <button
-                                className={styles.exitRelaxBtn}
-                                onClick={() => setIsRelaxMode(false)}
-                            >
-                                플레이리스트 열기
-                            </button>
-                        )}
-                    </footer>
-                </>
-            )}
+                            {me && (
+                                <>
+                                    <div className={styles.sectionHeader}>
+                                        <h3 className={styles.sectionTitle}>
+                                            My Library
+                                        </h3>
+                                        <p className={styles.sectionDesc}>
+                                            스포티파이에 저장된 플레이리스트
+                                        </p>
+                                    </div>
+                                    <div className={styles.playlistGrid}>
+                                        {playlists.map((pl) => (
+                                            <div
+                                                key={pl.id}
+                                                className={styles.playlistCard}
+                                                onClick={() =>
+                                                    router.push(
+                                                        `/playlist/${pl.id}`,
+                                                    )
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        styles.imageWrapper
+                                                    }
+                                                >
+                                                    <Image
+                                                        src={
+                                                            pl.images?.[0]
+                                                                ?.url ||
+                                                            '/default_playlist.png'
+                                                        }
+                                                        alt={pl.name}
+                                                        fill
+                                                        className={
+                                                            styles.playlistImage
+                                                        }
+                                                    />
+                                                </div>
+                                                <div
+                                                    className={
+                                                        styles.playlistInfo
+                                                    }
+                                                >
+                                                    <h4>{pl.name}</h4>
+                                                    <p>
+                                                        {pl.tracks.total} Tracks
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
         </main>
     );
 }
