@@ -128,7 +128,7 @@ export default function HomePage() {
                                                 className={styles.playlistCard}
                                                 onClick={() =>
                                                     router.push(
-                                                        `/playlist/${pl.id}`,
+                                                        `/playlist/${pl.id}?name=${encodeURIComponent(pl.name)}&img=${pl.images[0]?.url}`,
                                                     )
                                                 }
                                             >
