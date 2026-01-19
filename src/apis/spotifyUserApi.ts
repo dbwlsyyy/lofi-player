@@ -14,7 +14,7 @@ export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
 }
 
 export async function fetchPlaylists(
-    accessToken: string
+    accessToken: string,
 ): Promise<SpotifyPlaylistItem[]> {
     try {
         const api = createSpotifyClient(accessToken);
@@ -25,7 +25,7 @@ export async function fetchPlaylists(
         console.error(
             'fetchPlaylist API error:',
             e.response?.status,
-            e.message
+            e.message,
         );
         throw e;
     }
@@ -34,7 +34,7 @@ export async function fetchPlaylists(
 // 특정 플레이리스트의 트랙 목록 불러오기
 export async function fetchPlaylistTracks(
     accessToken: string,
-    playlistId: string
+    playlistId: string,
 ): Promise<Track[]> {
     try {
         const api = createSpotifyClient(accessToken);
@@ -55,7 +55,7 @@ export async function fetchPlaylistTracks(
         console.error(
             `fetchPlaylistTracks(${playlistId}) error:`,
             e.response?.status,
-            e.message
+            e.message,
         );
         throw e;
     }
@@ -66,6 +66,7 @@ export interface SpotifyUser {
     email: string;
     id: string;
     images: { url: string }[];
+    product?: string;
 }
 
 export interface SpotifyPlaylistItem {

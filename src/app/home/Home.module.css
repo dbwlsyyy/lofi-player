@@ -1,4 +1,3 @@
-/* 1. 기본 컨테이너 및 배경 설정 */
 .container {
     position: relative;
     min-height: 100vh;
@@ -22,19 +21,16 @@
         transform 1s ease;
 }
 
-/* 흐릿한 상태 (일반 모드) */
 .blurOn {
     filter: blur(2rem) brightness(0.4);
-    transform: scale(1.1); /* 약간 확대하여 블러 경계선 방지 */
+    transform: scale(1.1);
 }
 
-/* 선명한 상태 (휴식 모드) */
 .blurOff {
     filter: blur(0rem) brightness(0.8);
     transform: scale(1);
 }
 
-/* 시각적 가독성을 위한 레이어 */
 .overlay {
     position: fixed;
     inset: 0;
@@ -46,14 +42,12 @@
     z-index: 0;
 }
 
-/* 2. [로그인 전] 히로 섹션 디자인 */
 .heroSection {
     position: relative;
     z-index: 10;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 
 .loginCard {
@@ -61,7 +55,7 @@
     backdrop-filter: blur(2rem);
     -webkit-backdrop-filter: blur(2rem);
     border: 0.1rem solid rgba(255, 255, 255, 0.1);
-    padding: 5rem 4rem;
+    padding: 3rem;
     border-radius: 4rem;
     text-align: center;
     max-width: 45rem;
@@ -82,47 +76,19 @@
 }
 
 .subTitle {
-    font-size: 1.6rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 4.5rem;
+    font-size: 1.7rem;
+    font-weight: 600;
+
+    color: rgba(255, 255, 255, 0.883);
+    margin-bottom: 1.5rem;
     line-height: 1.5;
 }
 
-.loginBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.2rem;
-    width: 100%;
-    padding: 1.6rem;
-    background: #ffffff;
-    color: #000000;
-    border-radius: 10rem;
-    font-size: 1.6rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-}
-
-.loginBtn:hover {
-    background: #3b82f6;
-    color: #ffffff;
-    transform: translateY(-0.4rem);
-    box-shadow: 0 1rem 2.5rem rgba(59, 130, 246, 0.4);
-}
-
-.spotifyIcon {
-    font-size: 2.2rem;
-}
-
 .footerText {
-    margin-top: 3rem;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: rgba(255, 255, 255, 0.35);
 }
 
-/* 3. [로그인 후] 메인 콘텐츠 디자인 */
 .contentWrapper {
     position: relative;
     z-index: 10;
@@ -151,7 +117,6 @@
     font-size: 1.5rem;
 }
 
-/* 플레이리스트 그리드 */
 .playlistGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
@@ -198,32 +163,6 @@
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* 4. 휴식 모드 전환 버튼 (Floating) */
-.toggleBtn {
-    position: fixed;
-    bottom: 4rem;
-    right: 4rem;
-    background: rgba(59, 130, 246, 0.8);
-    backdrop-filter: blur(1.2rem);
-    color: #ffffff;
-    padding: 1.4rem 2.8rem;
-    border-radius: 5rem;
-    border: 0.1rem solid rgba(255, 255, 255, 0.2);
-    font-size: 1.5rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 1rem 2.5rem rgba(59, 130, 246, 0.3);
-    transition: all 0.3s ease;
-    z-index: 100;
-}
-
-.toggleBtn:hover {
-    background: #3b82f6;
-    transform: scale(1.05);
-    box-shadow: 0 1.2rem 3rem rgba(59, 130, 246, 0.5);
-}
-
-/* 5. 로딩 및 기타 상태 */
 .loading {
     height: 100vh;
     display: flex;
@@ -258,4 +197,53 @@
     border-radius: 1.2rem;
     font-size: 1.4rem;
     margin-bottom: 2.4rem;
+}
+
+.glassToggle {
+    position: fixed;
+    bottom: 5rem;
+    left: 5rem;
+    width: 10rem;
+    height: 3.6rem;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(1rem);
+    border-radius: 10rem;
+    border: 0.1rem solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    padding: 0.4rem;
+}
+.glassThumb {
+    width: 4rem;
+    height: 2.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10rem;
+    position: relative;
+    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.on {
+    transform: translateX(5rem);
+    background: #3b82f6;
+}
+.energyGlow {
+    position: absolute;
+    inset: 0;
+    border-radius: 10rem;
+    box-shadow: 0 0 1.5rem rgba(59, 130, 246, 0);
+}
+.on .energyGlow {
+    box-shadow: 0 0 2rem rgba(59, 130, 246, 0.8);
+}
+.toggleLabels {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 900;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.3);
 }
