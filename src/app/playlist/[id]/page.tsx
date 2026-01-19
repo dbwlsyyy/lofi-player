@@ -7,9 +7,10 @@ import { Track } from '@/store/usePlayerStore';
 import { fetchPlaylistTracks } from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
 import { usePlayControl } from '@/hooks/usePlayControl';
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 
 export default function PlaylistDetailPage() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const token = session?.accessToken;
     const { id } = useParams();
 
@@ -34,7 +35,7 @@ export default function PlaylistDetailPage() {
         load();
     }, [id, token]);
 
-    if (loading) return <div className={styles.loading}>불러오는 중...</div>;
+    if (loading) return <LoadingSpinner />;
 
     return (
         <main className={styles.container}>
