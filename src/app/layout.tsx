@@ -6,6 +6,7 @@ import { NextAuthProvider } from './providers';
 import { ReactNode } from 'react';
 import QueueSidebar from '@/components/QueueSidebar/QueueSidebar';
 import { Toaster } from 'react-hot-toast';
+import ToggleBtn from '@/components/ToggleBtn/ToggleBtn';
 
 export const metadata = {
     title: 'Lofi Player',
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <body>
                 <NextAuthProvider>
                     <SDKProvider />
-                    {/* <DebugPlayerState /> */}
+                    <ToggleBtn />
 
                     {children}
                     <Toaster position="top-center" />

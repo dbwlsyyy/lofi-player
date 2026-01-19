@@ -43,11 +43,9 @@
 }
 
 .heroSection {
-    position: relative;
-    z-index: 10;
     display: flex;
     justify-content: center;
-    align-items: center;
+    margin-top: 5rem;
 }
 
 .loginCard {
@@ -94,7 +92,7 @@
     z-index: 10;
     max-width: 120rem;
     margin: 0 auto;
-    padding: 4rem 2rem 12rem 2rem;
+    padding: 8rem 2rem 12rem 2rem;
 }
 
 .section {
@@ -197,53 +195,4 @@
     border-radius: 1.2rem;
     font-size: 1.4rem;
     margin-bottom: 2.4rem;
-}
-
-.glassToggle {
-    position: fixed;
-    bottom: 5rem;
-    left: 5rem;
-    width: 10rem;
-    height: 3.6rem;
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(1rem);
-    border-radius: 10rem;
-    border: 0.1rem solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-    padding: 0.4rem;
-}
-.glassThumb {
-    width: 4rem;
-    height: 2.8rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10rem;
-    position: relative;
-    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.on {
-    transform: translateX(5rem);
-    background: #3b82f6;
-}
-.energyGlow {
-    position: absolute;
-    inset: 0;
-    border-radius: 10rem;
-    box-shadow: 0 0 1.5rem rgba(59, 130, 246, 0);
-}
-.on .energyGlow {
-    box-shadow: 0 0 2rem rgba(59, 130, 246, 0.8);
-}
-.toggleLabels {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    font-size: 0.9rem;
-    font-weight: 900;
-    pointer-events: none;
-    color: rgba(255, 255, 255, 0.3);
 }

@@ -12,16 +12,28 @@ import styles from './Home.module.css';
 import ProfileHeader from './components/ProfileHeader';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useUIStore } from '@/store/useUIStore';
 
 export default function HomePage() {
     const { data: session, status } = useSession();
     const accessToken = session?.accessToken;
     const router = useRouter();
 
+    const { isRelaxMode } = useUIStore();
+
     const [me, setMe] = useState<SpotifyUser | null>(null);
     const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
     const [error, setError] = useState('');
-    const [isRelaxMode, setIsRelaxMode] = useState(false);
+
+    const handleLogin = () => {
+        signIn('spotify', { callbackUrl: '/home' });
+    };
+
+    const handleLogout = () => {
+        signOut();
+        setMe(null);
+        setPlaylists([]);
+    };
 
     useEffect(() => {
         if (!accessToken) return;
@@ -36,7 +48,7 @@ export default function HomePage() {
                 setPlaylists(list);
             } catch (e: any) {
                 if (e.response?.status === 401) {
-                    signIn('spotify');
+                    handleLogin();
                 } else {
                     setError(
                         'Spotify 데이터를 불러오는 중 오류가 발생했습니다.',
@@ -75,20 +87,11 @@ export default function HomePage() {
                     <>
                         <ProfileHeader
                             profile={me}
-                            onLogin={() => signIn('spotify')} // 질문! 여기서 'spotify'가 있으면 바로 로그인돼서 홈 화면 진입하는데 왜 이걸 빼면 http://127.0.0.1:3000/api/auth/signin?callbackUrl=http%3A%2F%2F127.0.0.1%3A3000%2Fhome로 이동하면서 sign in spotify 화면이 뜨고 그걸 클릭해야 로그인돼서 홈화면 진입되는거임?
-                            onLogout={() => signOut()}
+                            onLogin={handleLogin}
+                            onLogout={handleLogout}
                         />
 
                         <div className={styles.section}>
-                            <div className={styles.sectionHeader}>
-                                <h3 className={styles.sectionTitle}>
-                                    My Library
-                                </h3>
-                                <p className={styles.sectionDesc}>
-                                    스포티파이에 저장된 플레이리스트
-                                </p>
-                            </div>
-
                             {error && <p className={styles.error}>{error}</p>}
                             {!me && (
                                 <section className={styles.heroSection}>
@@ -116,60 +119,62 @@ export default function HomePage() {
                             )}
 
                             {me && (
-                                <div className={styles.playlistGrid}>
-                                    {playlists.map((pl) => (
-                                        <div
-                                            key={pl.id}
-                                            className={styles.playlistCard}
-                                            onClick={() =>
-                                                router.push(
-                                                    `/playlist/${pl.id}`,
-                                                )
-                                            }
-                                        >
+                                <>
+                                    <div className={styles.sectionHeader}>
+                                        <h3 className={styles.sectionTitle}>
+                                            My Library
+                                        </h3>
+                                        <p className={styles.sectionDesc}>
+                                            스포티파이에 저장된 플레이리스트
+                                        </p>
+                                    </div>
+                                    <div className={styles.playlistGrid}>
+                                        {playlists.map((pl) => (
                                             <div
-                                                className={styles.imageWrapper}
+                                                key={pl.id}
+                                                className={styles.playlistCard}
+                                                onClick={() =>
+                                                    router.push(
+                                                        `/playlist/${pl.id}`,
+                                                    )
+                                                }
                                             >
-                                                <Image
-                                                    src={
-                                                        pl.images?.[0]?.url ||
-                                                        '/default_playlist.png'
-                                                    }
-                                                    alt={pl.name}
-                                                    fill
+                                                <div
                                                     className={
-                                                        styles.playlistImage
+                                                        styles.imageWrapper
                                                     }
-                                                />
+                                                >
+                                                    <Image
+                                                        src={
+                                                            pl.images?.[0]
+                                                                ?.url ||
+                                                            '/default_playlist.png'
+                                                        }
+                                                        alt={pl.name}
+                                                        fill
+                                                        className={
+                                                            styles.playlistImage
+                                                        }
+                                                    />
+                                                </div>
+                                                <div
+                                                    className={
+                                                        styles.playlistInfo
+                                                    }
+                                                >
+                                                    <h4>{pl.name}</h4>
+                                                    <p>
+                                                        {pl.tracks.total} Tracks
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div
-                                                className={styles.playlistInfo}
-                                            >
-                                                <h4>{pl.name}</h4>
-                                                <p>{pl.tracks.total} Tracks</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                </>
                             )}
                         </div>
                     </>
                 )}
-
-                <div
-                    className={styles.glassToggle}
-                    onClick={() => setIsRelaxMode(!isRelaxMode)}
-                >
-                    <div
-                        className={`${styles.glassThumb} ${isRelaxMode ? styles.on : ''}`}
-                    >
-                        <div className={styles.energyGlow}></div>
-                    </div>
-                    <div className={styles.toggleLabels}>
-                        <span>OFF</span>
-                        <span>RELAX</span>
-                    </div>
-                </div>
             </div>
         </main>
     );
