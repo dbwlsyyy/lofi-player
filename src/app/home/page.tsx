@@ -13,6 +13,7 @@ import ProfileHeader from './components/ProfileHeader';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useUIStore } from '@/store/useUIStore';
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 
 export default function HomePage() {
     const { data: session, status } = useSession();
@@ -56,14 +57,8 @@ export default function HomePage() {
         })();
     }, [accessToken]);
 
-    // 로딩 상태 화면
     if (status === 'loading' || (status === 'authenticated' && !me)) {
-        return (
-            <main className={styles.loading}>
-                <div className={styles.spinner}></div>
-                <p>당신의 리듬을 찾는 중...</p>
-            </main>
-        );
+        return <LoadingSpinner />;
     }
 
     return (
