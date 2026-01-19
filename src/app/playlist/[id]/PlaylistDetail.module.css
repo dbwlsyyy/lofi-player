@@ -5,6 +5,17 @@
     overflow-x: hidden;
 }
 
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+    z-index: -1;
+}
+
 .backBtn {
     background: none;
     border: none;
@@ -29,6 +40,7 @@
     padding: 4rem 2rem 16rem 2rem;
 }
 
+/* 히어로 섹션 */
 .hero {
     display: flex;
     align-items: flex-end;
@@ -70,8 +82,8 @@
     letter-spacing: 0.2rem;
     color: #3b82f6;
 }
-.title {
-    font-size: 5.6rem;
+.titleText {
+    font-size: 5rem;
     font-weight: 900;
     letter-spacing: -0.2rem;
     line-height: 1;
@@ -87,10 +99,111 @@
     font-size: 1rem;
 }
 
+/* --- 제목 및 수정 스타일 (핵심) --- */
+.titleContainer {
+    min-height: 6rem; /* 높이 고정으로 레이아웃 시프트 방지 */
+    display: flex;
+    align-items: center;
+}
+
+/* 보기 모드 */
+.titleWrapper {
+    margin: 0;
+    font-size: 5rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: baseline;
+    gap: 1.2rem;
+    position: relative;
+}
+
+.editIcon {
+    font-size: 1.8rem; /* 작고 심플하게 */
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+.editIcon:hover {
+    color: #3b82f6;
+}
+
+/* 수정 모드 */
+.editForm {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+}
+
+.titleInput {
+    /* H2 스타일 상속 */
+    font-family: inherit;
+    font-size: 5rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #fff;
+
+    /* 인풋 스타일 초기화 */
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent; /* 포커스 시 밑줄용 */
+    outline: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    caret-color: #3b82f6; /* 커서 색상 */
+    transition: border-color 0.2s;
+}
+
+.titleInput:focus {
+    border-bottom-color: #3b82f6; /* 포커스 되면 파란 밑줄 */
+}
+
+/* 수정 모드 버튼 그룹 (작게, 엔터/ESC 보조용) */
+.editBtnGroup {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.editActionBtn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: 0.2s;
+}
+.editActionBtn:hover {
+    background: #3b82f6;
+    color: #fff;
+}
+.editActionBtn.cancel:hover {
+    background: #ff4b4b;
+}
+/* --- 여기까지 제목 수정 스타일 --- */
+
+.metaRow {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.5rem;
+    font-weight: 700;
+}
+
 .playBtn {
     margin-top: 1.5rem;
     display: flex;
     align-items: center;
+    width: 20rem;
     gap: 1rem;
     background: #fff;
     color: #000;
@@ -160,8 +273,8 @@
     gap: 1.6rem;
 }
 .art {
-    width: 4rem;
-    height: 4rem;
+    width: 4.4rem;
+    height: 4.4rem;
     border-radius: 0.4rem;
 }
 .name {
@@ -208,6 +321,9 @@
     .heroArtWrapper {
         width: 18rem;
         height: 18rem;
+    }
+    .heroText {
+        align-items: center;
     }
     .title {
         font-size: 3.6rem;

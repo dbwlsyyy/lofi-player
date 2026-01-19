@@ -62,6 +62,24 @@ export async function fetchPlaylistTracks(
     }
 }
 
+// 플레이리스트 이름 수정 API
+export async function updatePlaylistName(
+    accessToken: string,
+    playlistId: string,
+    newName: string,
+) {
+    try {
+        const api = createSpotifyClient(accessToken);
+        await api.put(`/playlists/${playlistId}`, {
+            name: newName,
+        });
+        return true;
+    } catch (e: any) {
+        console.error('이름 수정 실패:', e);
+        throw e;
+    }
+}
+
 export interface SpotifyUser {
     display_name: string;
     email: string;
