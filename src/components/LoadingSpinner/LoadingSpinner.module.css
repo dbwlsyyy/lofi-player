@@ -13,6 +13,8 @@
     height: 5rem;
     border: 0.5rem solid rgba(59, 130, 246, 0.1);
     border-top-color: #3b82f6;
+    box-shadow: 0 0 1.5rem rgba(59, 130, 246, 0.2);
+
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 2rem;

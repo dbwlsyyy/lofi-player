@@ -10,6 +10,7 @@ import { usePlayControl } from '@/hooks/usePlayControl';
 import { useUIStore } from '@/store/useUIStore';
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 import { FaPlay, FaChevronLeft, FaMusic } from 'react-icons/fa';
+import LoadingDots from '@/components/LoadingDots/LoadingDots';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
@@ -40,9 +41,6 @@ export default function PlaylistDetailPage() {
         };
         load();
     }, [id, token]);
-
-    if (loading)
-        return <LoadingSpinner message="플레이리스트를 가져오는 중..." />;
 
     return (
         <main className={styles.container}>
@@ -111,37 +109,45 @@ export default function PlaylistDetailPage() {
                                 <span className={styles.hTitle}>TITLE</span>
                                 <span className={styles.hArtist}>ARTIST</span>
                             </div>
-                            <div className={styles.list}>
-                                {tracks.map((t, i) => (
-                                    <div
-                                        key={t.id}
-                                        className={styles.row}
-                                        onClick={() =>
-                                            playFromPlaylist(tracks, i, token!)
-                                        }
-                                        style={{
-                                            animationDelay: `${i * 0.05}s`,
-                                        }} // 순차적 등장 애니메이션
-                                    >
-                                        <span className={styles.number}>
-                                            {i + 1}
-                                        </span>
-                                        <div className={styles.trackMain}>
-                                            <img
-                                                src={t.image}
-                                                alt={t.name}
-                                                className={styles.art}
-                                            />
-                                            <p className={styles.name}>
-                                                {t.name}
-                                            </p>
+                            {loading ? (
+                                <LoadingDots />
+                            ) : (
+                                <div className={styles.list}>
+                                    {tracks.map((t, i) => (
+                                        <div
+                                            key={t.id}
+                                            className={styles.row}
+                                            onClick={() =>
+                                                playFromPlaylist(
+                                                    tracks,
+                                                    i,
+                                                    token!,
+                                                )
+                                            }
+                                            style={{
+                                                animationDelay: `${i * 0.05}s`,
+                                            }} // 순차적 등장 애니메이션
+                                        >
+                                            <span className={styles.number}>
+                                                {i + 1}
+                                            </span>
+                                            <div className={styles.trackMain}>
+                                                <img
+                                                    src={t.image}
+                                                    alt={t.name}
+                                                    className={styles.art}
+                                                />
+                                                <p className={styles.name}>
+                                                    {t.name}
+                                                </p>
+                                            </div>
+                                            <span className={styles.artist}>
+                                                {t.artists.join(', ')}
+                                            </span>
                                         </div>
-                                        <span className={styles.artist}>
-                                            {t.artists.join(', ')}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </section>
                     </div>
                 )}
