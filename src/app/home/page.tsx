@@ -63,18 +63,6 @@ export default function HomePage() {
 
     return (
         <main className={styles.container}>
-            <video
-                className={`${styles.background} ${
-                    isRelaxMode ? styles.blurOff : styles.blurOn
-                }`}
-                src="/a.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-            ></video>
-            <div className={styles.overlay}></div>
-
             <div className={styles.contentWrapper}>
                 {!isRelaxMode && (
                     <>

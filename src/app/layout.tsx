@@ -1,4 +1,3 @@
-import DebugPlayerState from '@/components/DebugPlayerState';
 import PlayerBar from '../components/PlayerBar/PlayerBar';
 import './globals.css';
 import SDKProvider from './SDKProvider';
@@ -7,6 +6,7 @@ import { ReactNode } from 'react';
 import QueueSidebar from '@/components/QueueSidebar/QueueSidebar';
 import { Toaster } from 'react-hot-toast';
 import ToggleBtn from '@/components/ToggleBtn/ToggleBtn';
+import GlobalBackground from '@/components/GlobalBackground/GlobalBackground'; // 추가
 
 export const metadata = {
     title: 'Lofi Player',
@@ -18,10 +18,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <html lang="ko">
             <body>
                 <NextAuthProvider>
+                    <GlobalBackground />
+
                     <SDKProvider />
                     <ToggleBtn />
 
                     {children}
+
                     <Toaster position="top-center" />
                     <QueueSidebar />
                     <PlayerBar />

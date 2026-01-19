@@ -8,7 +8,6 @@ import { fetchPlaylistTracks } from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
 import { usePlayControl } from '@/hooks/usePlayControl';
 import { useUIStore } from '@/store/useUIStore';
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 import { FaPlay, FaChevronLeft, FaMusic } from 'react-icons/fa';
 import LoadingDots from '@/components/LoadingDots/LoadingDots';
 import { formatTime, formatTotalDuration } from '@/lib/formatTime';
@@ -52,16 +51,6 @@ export default function PlaylistDetailPage() {
 
     return (
         <main className={styles.container}>
-            <video
-                className={`${styles.background} ${isRelaxMode ? styles.blurOff : styles.blurOn}`}
-                src="/a.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-            />
-            <div className={styles.overlay}></div>
-
             <div className={styles.content}>
                 {!isRelaxMode && (
                     <div className={styles.wrapper}>
