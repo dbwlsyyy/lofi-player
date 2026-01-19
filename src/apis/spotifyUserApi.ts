@@ -49,6 +49,7 @@ export async function fetchPlaylistTracks(
                 artists: item.track.artists.map((a: any) => a.name),
                 image:
                     item.track.album.images?.[0]?.url ?? '/default_album.png',
+                durationMs: item.track.duration_ms,
                 previewUrl: item.track.preview_url ?? undefined,
             }));
     } catch (e: any) {

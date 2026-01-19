@@ -5,7 +5,6 @@
     overflow-x: hidden;
 }
 
-/* 배경: 어둡고 깊이감 있게 */
 .background {
     position: fixed;
     inset: 0;
@@ -55,7 +54,6 @@
     padding: 4rem 2rem 16rem 2rem;
 }
 
-/* 히어로 섹션 */
 .hero {
     display: flex;
     align-items: flex-end;
@@ -135,7 +133,6 @@
     color: #fff;
 }
 
-/* 리스트 섹션 */
 .listHeader {
     display: flex;
     align-items: center;
@@ -155,6 +152,9 @@
 .hArtist {
     flex: 1;
 }
+.hTime {
+    flex: 0.3;
+}
 
 .row {
     display: flex;
@@ -164,7 +164,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     opacity: 0;
-    animation: slideUp 0.5s ease forwards; /* 등장 애니메이션 */
+    animation: slideUp 0.5s ease forwards;
 }
 
 .row:hover {
@@ -199,8 +199,12 @@
     font-size: 1.4rem;
     color: rgba(255, 255, 255, 0.4);
 }
+.time {
+    flex: 0.3;
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.4);
+}
 
-/* 애니메이션 */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -220,7 +224,6 @@
     }
 }
 
-/* 반응형 */
 @media (max-width: 768px) {
     .hero {
         flex-direction: column;
@@ -234,8 +237,7 @@
     .title {
         font-size: 3.6rem;
     }
-    .hArtist,
-    .artist {
-        display: none;
-    } /* 모바일에서 아티스트 숨김 */
+    .playBtn {
+        justify-content: center;
+    }
 }

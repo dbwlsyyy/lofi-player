@@ -11,13 +11,14 @@ import { useUIStore } from '@/store/useUIStore';
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner';
 import { FaPlay, FaChevronLeft, FaMusic } from 'react-icons/fa';
 import LoadingDots from '@/components/LoadingDots/LoadingDots';
+import { formatTime, formatTotalDuration } from '@/lib/formatTime';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
     const token = session?.accessToken;
     const { id } = useParams();
     const router = useRouter();
-    const searchParams = useSearchParams(); // 쿼리 스트링 읽기
+    const searchParams = useSearchParams();
     const playlistName = searchParams.get('name') || 'Your Selection';
     const playlistImg = searchParams.get('img');
 
@@ -26,6 +27,13 @@ export default function PlaylistDetailPage() {
     const [loading, setLoading] = useState(true);
 
     const { playFromPlaylist } = usePlayControl();
+
+    const totalMs = tracks.reduce(
+        (acc, track) => acc + (track.durationMs || 0),
+        0,
+    );
+
+    const displayTotalTime = formatTotalDuration(totalMs);
 
     useEffect(() => {
         if (!token || !id) return;
@@ -57,7 +65,6 @@ export default function PlaylistDetailPage() {
             <div className={styles.content}>
                 {!isRelaxMode && (
                     <div className={styles.wrapper}>
-                        {/* 상단 네비게이션 */}
                         <nav className={styles.nav}>
                             <button
                                 className={styles.backBtn}
@@ -67,7 +74,6 @@ export default function PlaylistDetailPage() {
                             </button>
                         </nav>
 
-                        {/* 히어로 섹션: 플레이리스트 정보 강조 */}
                         <header className={styles.hero}>
                             <div className={styles.heroArtWrapper}>
                                 {playlistImg ? (
@@ -89,7 +95,11 @@ export default function PlaylistDetailPage() {
                                     <span className={styles.dot}>•</span>
                                     <span>{tracks.length} tracks</span>
                                     <span className={styles.dot}>•</span>
-                                    <span>Discover new rhythms</span>
+                                    <span>
+                                        {loading
+                                            ? '0시간 00분'
+                                            : displayTotalTime}
+                                    </span>
                                 </div>
                                 <button
                                     className={styles.playBtn}
@@ -102,12 +112,12 @@ export default function PlaylistDetailPage() {
                             </div>
                         </header>
 
-                        {/* 트랙 리스트: 정갈한 라인 스타일 */}
                         <section className={styles.listSection}>
                             <div className={styles.listHeader}>
                                 <span className={styles.hNum}>#</span>
                                 <span className={styles.hTitle}>TITLE</span>
                                 <span className={styles.hArtist}>ARTIST</span>
+                                <span className={styles.hTime}>TIME</span>
                             </div>
                             {loading ? (
                                 <LoadingDots />
@@ -126,7 +136,7 @@ export default function PlaylistDetailPage() {
                                             }
                                             style={{
                                                 animationDelay: `${i * 0.05}s`,
-                                            }} // 순차적 등장 애니메이션
+                                            }}
                                         >
                                             <span className={styles.number}>
                                                 {i + 1}
@@ -143,6 +153,9 @@ export default function PlaylistDetailPage() {
                                             </div>
                                             <span className={styles.artist}>
                                                 {t.artists.join(', ')}
+                                            </span>
+                                            <span className={styles.time}>
+                                                {formatTime(t.durationMs)}
                                             </span>
                                         </div>
                                     ))}

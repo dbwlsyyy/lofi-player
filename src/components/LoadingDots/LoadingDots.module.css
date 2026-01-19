@@ -9,14 +9,12 @@
 .dot {
     width: 0.8rem;
     height: 0.8rem;
-    background-color: #3b82f6; /* 포인트 블루 컬러 */
+    background-color: #3b82f6;
     border-radius: 50%;
-    /* 푸른색 빛 번짐 효과 (Glow) */
     box-shadow: 0 0 1rem rgba(59, 130, 246, 0.6);
     animation: bounce 0.6s infinite alternate;
 }
 
-/* 두 번째 점과 세 번째 점에 시간차를 줘서 물결 효과 생성 */
 .dot:nth-child(2) {
     animation-delay: 0.2s;
 }
@@ -32,6 +30,6 @@
     }
     to {
         opacity: 0.3;
-        transform: translateY(-1.2rem); /* 위로 12px 이동 */
+        transform: translateY(-1.2rem);
     }
 }
