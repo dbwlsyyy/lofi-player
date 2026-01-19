@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu } from 'react-icons/fi';
 import { useSession } from 'next-auth/react';
 import { formatTime } from '@/lib/formatTime';
+import { useRef } from 'react';
 
 export default function PlayerBar() {
     const { data: session } = useSession();
@@ -54,10 +55,24 @@ export default function PlayerBar() {
         seekTo(seekMs);
     };
 
-    // 볼륨 변경 핸들러 (0 ~ 100 -> 0.0 ~ 1.0)
+    const lastVolumeRef = useRef(volume || 0.5);
+
     const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newVolume = Number(e.target.value) / 100;
         setVolume(newVolume);
+
+        if (newVolume > 0) {
+            lastVolumeRef.current = newVolume;
+        }
+    };
+
+    const toggleMute = () => {
+        if (volume > 0) {
+            lastVolumeRef.current = volume;
+            setVolume(0);
+        } else {
+            setVolume(lastVolumeRef.current);
+        }
     };
 
     return (
@@ -168,9 +183,15 @@ export default function PlayerBar() {
                         <div className={styles.rightArea}>
                             <div className={styles.volumeWrapper}>
                                 {volume === 0 ? (
-                                    <FaVolumeMute color="#888" />
+                                    <FaVolumeMute
+                                        className={styles.volumeIcon}
+                                        onClick={toggleMute}
+                                    />
                                 ) : (
-                                    <FaVolumeUp color="#888" />
+                                    <FaVolumeUp
+                                        className={styles.volumeIcon}
+                                        onClick={toggleMute}
+                                    />
                                 )}
                                 <input
                                     type="range"
