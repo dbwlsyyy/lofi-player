@@ -31,8 +31,6 @@ export default function HomePage() {
 
     const handleLogout = () => {
         signOut();
-        setMe(null);
-        setPlaylists([]);
     };
 
     useEffect(() => {
@@ -59,7 +57,7 @@ export default function HomePage() {
     }, [accessToken]);
 
     // 로딩 상태 화면
-    if (status === 'loading') {
+    if (status === 'loading' || (status === 'authenticated' && !me)) {
         return (
             <main className={styles.loading}>
                 <div className={styles.spinner}></div>
