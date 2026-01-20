@@ -289,6 +289,11 @@ export default function PlaylistDetailPage() {
                                                     src={t.image}
                                                     alt={t.name}
                                                     className={styles.art}
+                                                    onClick={() =>
+                                                        router.push(
+                                                            `/song/0{currentTrack.id}`,
+                                                        )
+                                                    }
                                                 />
                                                 <p className={styles.name}>
                                                     {t.name}
