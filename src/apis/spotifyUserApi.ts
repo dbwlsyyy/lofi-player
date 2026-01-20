@@ -1,5 +1,4 @@
 import { Track } from '@/store/usePlayerStore';
-import axios from 'axios';
 import { createSpotifyClient } from '../lib/spotifyClient';
 
 export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
@@ -49,6 +48,8 @@ export async function fetchPlaylistTracks(
                 artists: item.track.artists.map((a: any) => a.name),
                 image:
                     item.track.album.images?.[0]?.url ?? '/default_album.png',
+                durationMs: item.track.duration_ms,
+                uri: item.track.uri,
                 previewUrl: item.track.preview_url ?? undefined,
             }));
     } catch (e: any) {
@@ -57,6 +58,42 @@ export async function fetchPlaylistTracks(
             e.response?.status,
             e.message,
         );
+        throw e;
+    }
+}
+
+// 플레이리스트 이름 수정 API
+export async function updatePlaylistName(
+    accessToken: string,
+    playlistId: string,
+    newName: string,
+) {
+    try {
+        const api = createSpotifyClient(accessToken);
+        await api.put(`/playlists/${playlistId}`, {
+            name: newName,
+        });
+        return true;
+    } catch (e: any) {
+        console.error('이름 수정 실패:', e);
+        throw e;
+    }
+}
+
+export async function removeTrackFromPlaylist(
+    accessToken: string,
+    playlistId: string,
+    trackUri: string,
+) {
+    try {
+        const api = createSpotifyClient(accessToken);
+        console.log('삭제 요청 URI:', trackUri);
+        await api.delete(`/playlists/${playlistId}/tracks`, {
+            data: { tracks: [{ uri: trackUri }] },
+        });
+        return true;
+    } catch (e: any) {
+        console.error('곡 삭제 실패:', e);
         throw e;
     }
 }

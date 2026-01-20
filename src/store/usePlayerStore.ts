@@ -7,6 +7,8 @@ export type Track = {
     name: string;
     artists: string[];
     image: string;
+    durationMs: number;
+    uri: string;
     previewUrl?: string;
 };
 

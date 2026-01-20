@@ -1,0 +1,32 @@
+.background {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    transition:
+        filter 0.5s ease,
+        transform 1s ease;
+}
+
+.blurOn {
+    filter: blur(2rem) brightness(0.4);
+    transform: scale(1.1);
+}
+
+.blurOff {
+    filter: blur(0rem) brightness(0.8);
+    transform: scale(1);
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+    z-index: 0;
+}
