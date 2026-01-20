@@ -4,7 +4,11 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, KeyboardEvent } from 'react';
 import styles from './PlaylistDetail.module.css';
 import { Track } from '@/store/usePlayerStore';
-import { fetchPlaylistTracks, updatePlaylistName } from '@/apis/spotifyUserApi';
+import {
+    fetchPlaylistTracks,
+    removeTrackFromPlaylist,
+    updatePlaylistName,
+} from '@/apis/spotifyUserApi';
 import { useSession } from 'next-auth/react';
 import { usePlayControl } from '@/hooks/usePlayControl';
 import { useUIStore } from '@/store/useUIStore';
@@ -15,6 +19,7 @@ import {
     FaRegEdit,
     FaCheck,
     FaTimes,
+    FaRegTrashAlt,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import LoadingDots from '@/components/LoadingDots/LoadingDots';
@@ -123,6 +128,23 @@ export default function PlaylistDetailPage() {
         return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
     };
 
+    const handleRemoveTrack = async (e: React.MouseEvent, trackUri: string) => {
+        e.stopPropagation(); // 행 클릭(재생) 이벤트 전파 방지
+
+        if (!confirm('이 곡을 플레이리스트에서 삭제할까요?')) return;
+
+        const previousTracks = [...tracks];
+        // 낙관적 업데이트: UI에서 먼저 제거
+        setTracks(tracks.filter((t) => t.uri !== trackUri));
+
+        try {
+            await removeTrackFromPlaylist(token!, id as string, trackUri);
+            toast.success('곡이 삭제되었습니다.');
+        } catch (err) {
+            setTracks(previousTracks); // 실패 시 복구
+            toast.error('곡 삭제에 실패했습니다.');
+        }
+    };
     return (
         <main className={styles.container}>
             <div className={styles.content}>
@@ -237,6 +259,7 @@ export default function PlaylistDetailPage() {
                                 <span className={styles.hTitle}>TITLE</span>
                                 <span className={styles.hArtist}>ARTIST</span>
                                 <span className={styles.hTime}>TIME</span>
+                                <span className={styles.hEmpty}></span>
                             </div>
 
                             {loading ? (
@@ -277,6 +300,15 @@ export default function PlaylistDetailPage() {
                                             <span className={styles.time}>
                                                 {formatTime(t.durationMs)}
                                             </span>
+                                            <button
+                                                className={styles.removeBtn}
+                                                onClick={(e) =>
+                                                    handleRemoveTrack(e, t.uri)
+                                                }
+                                                title="곡 삭제"
+                                            >
+                                                <FaRegTrashAlt />
+                                            </button>
                                         </div>
                                     ))}
                                 </div>

@@ -40,7 +40,6 @@
     padding: 4rem 2rem 16rem 2rem;
 }
 
-/* 히어로 섹션 */
 .hero {
     display: flex;
     align-items: flex-end;
@@ -99,9 +98,8 @@
     font-size: 1rem;
 }
 
-/* --- 제목 및 수정 스타일 (핵심) --- */
 .titleContainer {
-    min-height: 6rem; /* 높이 고정으로 레이아웃 시프트 방지 */
+    min-height: 6rem;
     display: flex;
     align-items: center;
 }
@@ -119,7 +117,7 @@
 }
 
 .editIcon {
-    font-size: 1.8rem; /* 작고 심플하게 */
+    font-size: 1.8rem;
     color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
 }
@@ -137,30 +135,27 @@
 }
 
 .titleInput {
-    /* H2 스타일 상속 */
     font-family: inherit;
     font-size: 5rem;
     font-weight: 900;
     letter-spacing: -0.02em;
     color: #fff;
 
-    /* 인풋 스타일 초기화 */
     background: transparent;
     border: none;
-    border-bottom: 2px solid transparent; /* 포커스 시 밑줄용 */
+    border-bottom: 2px solid transparent;
     outline: none;
     padding: 0;
     margin: 0;
     width: 100%;
-    caret-color: #3b82f6; /* 커서 색상 */
+    caret-color: #3b82f6;
     transition: border-color 0.2s;
 }
 
 .titleInput:focus {
-    border-bottom-color: #3b82f6; /* 포커스 되면 파란 밑줄 */
+    border-bottom-color: #3b82f6;
 }
 
-/* 수정 모드 버튼 그룹 (작게, 엔터/ESC 보조용) */
 .editBtnGroup {
     display: flex;
     gap: 0.5rem;
@@ -187,7 +182,6 @@
 .editActionBtn.cancel:hover {
     background: #ff4b4b;
 }
-/* --- 여기까지 제목 수정 스타일 --- */
 
 .metaRow {
     display: flex;
@@ -242,6 +236,12 @@
 }
 .hTime {
     flex: 0.3;
+    text-align: right;
+    margin-right: 2rem;
+}
+
+.hEmpty {
+    width: 3.2rem;
 }
 
 .row {
@@ -291,6 +291,32 @@
     flex: 0.3;
     font-size: 1.4rem;
     color: rgba(255, 255, 255, 0.4);
+    text-align: right;
+    margin-right: 2rem;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.2);
+    width: 3.2rem;
+    height: 3.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.4rem;
+    transition: all 0.2s;
+    opacity: 0;
+}
+
+.row:hover .removeBtn {
+    opacity: 1;
+}
+
+.removeBtn:hover {
+    color: #ff4b4b;
+    transform: scale(1.2);
 }
 
 @keyframes fadeIn {
