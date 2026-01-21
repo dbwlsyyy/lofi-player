@@ -24,7 +24,8 @@ import {
 import toast from 'react-hot-toast';
 import LoadingDots from '@/components/LoadingDots/LoadingDots';
 import { formatTime } from '@/lib/formatTime';
-import { FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiAlertCircle, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
+import Modal from '@/components/Modal/Modal';
 
 export default function PlaylistDetailPage() {
     const { data: session } = useSession();
@@ -43,6 +44,11 @@ export default function PlaylistDetailPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState(initialName);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTrackUri, setSelectedTrackUri] = useState<string | null>(
+        null,
+    );
+
     const { playFromPlaylist } = usePlayControl();
 
     useEffect(() => {
@@ -53,7 +59,15 @@ export default function PlaylistDetailPage() {
                 setTracks(list);
             } catch (err) {
                 console.error('로드 실패:', err);
-                toast.error('트랙 정보를 불러오지 못했습니다.');
+                toast(
+                    (t) => (
+                        <div className="toast-message">
+                            <FiAlertTriangle size="1.6rem" color="#ff5555" />
+                            <span>트랙 정보를 불러오지 못했습니다.</span>
+                        </div>
+                    ),
+                    { className: 'minimal-toast' },
+                );
             } finally {
                 setLoading(false);
             }
@@ -98,11 +112,28 @@ export default function PlaylistDetailPage() {
         } catch (err: any) {
             setTitle(previousTitle);
             if (err.response?.status === 403) {
-                toast.error(
-                    '이름을 수정할 권한이 없습니다. 다시 로그인해주세요.',
+                toast(
+                    (t) => (
+                        <div className="toast-message">
+                            <FiAlertTriangle size="1.6rem" color="#ff5555" />
+                            <span>
+                                이름을 수정할 권한이 없습니다. 다시
+                                로그인해주세요.
+                            </span>
+                        </div>
+                    ),
+                    { className: 'minimal-toast' },
                 );
             } else {
-                toast.error('이름 수정 중 오류가 발생했습니다.');
+                toast(
+                    (t) => (
+                        <div className="toast-message">
+                            <FiAlertTriangle size="1.6rem" color="#ff5555" />
+                            <span>이름 수정 중 오류가 발생했습니다.</span>
+                        </div>
+                    ),
+                    { className: 'minimal-toast' },
+                );
             }
         }
     };
@@ -128,23 +159,57 @@ export default function PlaylistDetailPage() {
         return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
     };
 
-    const handleRemoveTrack = async (e: React.MouseEvent, trackUri: string) => {
-        e.stopPropagation(); // 행 클릭(재생) 이벤트 전파 방지
+    const handleRemoveClick = (e: React.MouseEvent, trackUri: string) => {
+        e.stopPropagation();
+        setSelectedTrackUri(trackUri);
+        setIsModalOpen(true);
+    };
 
-        if (!confirm('이 곡을 플레이리스트에서 삭제할까요?')) return;
+    const handleConfirmDelete = async () => {
+        if (!selectedTrackUri) return;
 
         const previousTracks = [...tracks];
-        // 낙관적 업데이트: UI에서 먼저 제거
-        setTracks(tracks.filter((t) => t.uri !== trackUri));
+        // 낙관적 업데이트
+        setTracks(tracks.filter((t) => t.uri !== selectedTrackUri));
+        setIsModalOpen(false); // 모달 닫기
 
         try {
-            await removeTrackFromPlaylist(token!, id as string, trackUri);
-            toast.success('곡이 삭제되었습니다.');
+            await removeTrackFromPlaylist(
+                token!,
+                id as string,
+                selectedTrackUri,
+            );
+            toast(
+                (t) => (
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.8rem',
+                        }}
+                    >
+                        <FiCheckCircle size="1.6rem" color="#3b82f6" />
+                        <span>곡이 삭제되었습니다.</span>
+                    </div>
+                ),
+                { className: 'minimal-toast' },
+            );
         } catch (err) {
             setTracks(previousTracks); // 실패 시 복구
-            toast.error('곡 삭제에 실패했습니다.');
+            toast(
+                (t) => (
+                    <div className="toast-message">
+                        <FiAlertTriangle size="1.6rem" color="#ff5555" />
+                        <span>곡 삭제에 실패했습니다.</span>
+                    </div>
+                ),
+                { className: 'minimal-toast' },
+            );
+        } finally {
+            setSelectedTrackUri(null);
         }
     };
+
     return (
         <main className={styles.container}>
             <div className={styles.content}>
@@ -291,7 +356,7 @@ export default function PlaylistDetailPage() {
                                                     className={styles.art}
                                                     onClick={() =>
                                                         router.push(
-                                                            `/song/0{currentTrack.id}`,
+                                                            `/song/${t.id}`,
                                                         )
                                                     }
                                                 />
@@ -308,7 +373,7 @@ export default function PlaylistDetailPage() {
                                             <button
                                                 className={styles.removeBtn}
                                                 onClick={(e) =>
-                                                    handleRemoveTrack(e, t.uri)
+                                                    handleRemoveClick(e, t.uri)
                                                 }
                                                 title="곡 삭제"
                                             >
@@ -322,6 +387,16 @@ export default function PlaylistDetailPage() {
                     </div>
                 )}
             </div>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="곡 삭제 확인"
+                message="이 곡을 플레이리스트에서 삭제할까요?"
+                confirmText="삭제하기"
+                type="danger"
+            />
         </main>
     );
 }
