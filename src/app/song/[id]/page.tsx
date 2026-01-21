@@ -76,6 +76,7 @@ export default function SongDetailPage() {
                 <div className={styles.mainVisual}>
                     <div className={styles.albumWrapper}>
                         <img
+                            key={currentTrack.id}
                             src={currentTrack.image}
                             alt={currentTrack.name}
                             className={`${styles.albumArt} ${isPlaying ? styles.playing : ''}`}

@@ -12,7 +12,7 @@
 .heroSection {
     display: flex;
     justify-content: center;
-    margin-top: 5rem;
+    margin-top: 12rem;
 }
 
 .loginCard {
@@ -20,7 +20,7 @@
     backdrop-filter: blur(2rem);
     -webkit-backdrop-filter: blur(2rem);
     border: 0.1rem solid rgba(255, 255, 255, 0.1);
-    padding: 3rem;
+    padding: 5rem;
     border-radius: 4rem;
     text-align: center;
     max-width: 45rem;
@@ -41,10 +41,11 @@
 }
 
 .subTitle {
-    font-size: 1.7rem;
+    font-size: 1.8rem;
     font-weight: 600;
 
     color: rgba(255, 255, 255, 0.883);
+    margin-top: 2rem;
     margin-bottom: 1.5rem;
     line-height: 1.5;
 }
