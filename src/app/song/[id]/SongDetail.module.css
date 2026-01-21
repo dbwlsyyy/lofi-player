@@ -1,0 +1,319 @@
+.container {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    animation: pageEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: transform, opacity;
+}
+
+.closing {
+    animation: pageExit 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    will-change: transform, opacity;
+}
+
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(2.7rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pageExit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(3.6rem);
+    }
+}
+
+.dynamicBg {
+    position: absolute;
+    inset: -13.5rem;
+    background-size: cover;
+    background-position: center;
+    filter: blur(2.7rem) brightness(0.35) saturate(1.3);
+    z-index: -1;
+    transform: scale(1.25);
+    opacity: 0.85;
+    transition: background-image 1s ease-in-out;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.1) 0%,
+        rgba(0, 0, 0, 0.4) 50%,
+        rgba(0, 0, 0, 0.85) 100%
+    );
+    z-index: 0;
+}
+
+.content {
+    position: relative;
+    z-index: 10;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.8rem 3.6rem;
+    box-sizing: border-box;
+}
+
+.header {
+    height: 5.4rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.52rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.closeBtn:hover {
+    opacity: 1;
+    transform: translateY(0.36rem);
+}
+
+.mainVisual {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4.05rem;
+    width: 100%;
+    max-width: 52.2rem;
+    margin: 0 auto;
+}
+
+.albumWrapper {
+    width: 100%;
+    aspect-ratio: 1/1;
+    max-width: 37.8rem;
+    border-radius: 2.16rem;
+    overflow: hidden;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.albumArt {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: songChange 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.3s ease-in-out;
+}
+
+@keyframes songChange {
+    0% {
+        opacity: 0;
+        filter: blur(1rem);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+.albumArt.playing {
+    transform: scale(1.03);
+}
+
+.playerInfo {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.songMeta {
+    text-align: left;
+    margin-bottom: 3.15rem;
+}
+
+.title {
+    font-size: 2.88rem;
+    font-weight: 800;
+    letter-spacing: -0.036rem;
+    margin-bottom: 0.72rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artist {
+    font-size: 1.62rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.progressSection {
+    width: 100%;
+    margin-bottom: 2.7rem;
+}
+
+.progressBar {
+    position: relative;
+    height: 0.36rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: height 0.2s;
+}
+
+.progressFill {
+    height: 100%;
+    background: #fff;
+    border-radius: 0.9rem;
+    position: relative;
+    box-shadow: 0 0 0.9rem rgba(255, 255, 255, 0.4);
+}
+
+.progressFill::after {
+    content: '';
+    position: absolute;
+    right: -0.54rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.08rem;
+    height: 1.08rem;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0.9rem rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.progressBar:hover .progressFill::after {
+    opacity: 1;
+}
+
+.timeRow {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.08rem;
+    font-size: 1.17rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3.6rem;
+}
+
+.mainBtn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.52rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mainBtn:hover {
+    transform: scale(1.15);
+    color: #3b82f6;
+}
+
+.playToggle {
+    width: 7.2rem;
+    height: 7.2rem;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.52rem;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0.9rem 2.7rem rgba(255, 255, 255, 0.1);
+}
+
+.playToggle:hover {
+    transform: scale(1.1);
+    background: #3b82f6;
+    color: #fff;
+    box-shadow: 0 0 2.7rem rgba(59, 130, 246, 0.5);
+}
+
+.subBtn {
+    position: relative;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.subBtn.active {
+    color: #3b82f6;
+    text-shadow: 0 0 0.9rem rgba(59, 130, 246, 0.6);
+}
+.repeatOne {
+    position: absolute;
+    top: -0.3rem;
+    right: -0.5rem;
+
+    width: 1.2rem;
+    height: 1.2rem;
+    background: none;
+    color: #3b82f6;
+    border: none;
+
+    font-size: 0.8rem;
+    font-weight: 900;
+    line-height: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .content {
+        padding: 1.8rem 2.3rem 5.4rem;
+    }
+    .albumWrapper {
+        width: 85%;
+    }
+    .title {
+        font-size: 2.4rem;
+    }
+    .controls {
+        gap: 2.3rem;
+    }
+    .playToggle {
+        width: 6rem;
+        height: 6rem;
+        font-size: 2rem;
+    }
+}

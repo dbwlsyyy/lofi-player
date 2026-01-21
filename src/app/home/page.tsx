@@ -78,14 +78,14 @@ export default function HomePage() {
                                 <section className={styles.heroSection}>
                                     <div className={styles.loginCard}>
                                         <div className={styles.brand}>
-                                            {/* <h1 className={styles.mainTitle}>
+                                            <h1 className={styles.mainTitle}>
                                                 VIBE
                                                 <span
                                                     className={styles.bluePoint}
                                                 >
                                                     .
                                                 </span>
-                                            </h1> */}
+                                            </h1>
                                             <p className={styles.subTitle}>
                                                 로그인이 필요합니다.
                                             </p>

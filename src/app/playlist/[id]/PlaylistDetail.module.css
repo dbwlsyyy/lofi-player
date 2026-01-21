@@ -276,6 +276,10 @@
     width: 4.4rem;
     height: 4.4rem;
     border-radius: 0.4rem;
+    transition: 0.2s ease-in-out;
+}
+.art:hover {
+    transform: scale(1.1);
 }
 .name {
     font-size: 1.5rem;

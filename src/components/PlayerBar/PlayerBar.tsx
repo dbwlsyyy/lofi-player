@@ -18,10 +18,13 @@ import { FiMenu } from 'react-icons/fi';
 import { useSession } from 'next-auth/react';
 import { formatTime } from '@/lib/formatTime';
 import { useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function PlayerBar() {
     const { data: session } = useSession();
     const accessToken = session?.accessToken;
+    const router = useRouter();
+
     const {
         currentTrack,
         isPlaying,
@@ -98,6 +101,9 @@ export default function PlayerBar() {
                                     width={60}
                                     height={60}
                                     className={`${styles.albumArt} ${isPlaying ? styles.playingArt : ''}`}
+                                    onClick={() =>
+                                        router.push(`/song/0{currentTrack.id}`)
+                                    }
                                 />
                                 <div className={styles.textInfo}>
                                     <p className={styles.trackName}>

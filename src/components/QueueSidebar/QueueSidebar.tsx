@@ -4,13 +4,14 @@ import styles from './QueueSidebar.module.css';
 import { useEffect, useRef } from 'react';
 import { usePlayControl } from '@/hooks/usePlayControl';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function QueueSidebar() {
     const { data: session } = useSession();
     const token = session?.accessToken;
 
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-
+    const router = useRouter();
     const { queue, currentIndex, currentTrack, isQueueOpen } = usePlayerStore();
     const { playFromPlaylist } = usePlayControl();
 
@@ -31,7 +32,13 @@ export default function QueueSidebar() {
                 <>
                     <div className={styles.sectionTitle}>지금 재생 중</div>
 
-                    <div className={`${styles.item} ${styles.active}`}>
+                    <div
+                        className={`${styles.item} ${styles.active}`}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/song/${currentTrack.id}`);
+                        }}
+                    >
                         <img
                             src={currentTrack.image}
                             className={styles.thumb}
