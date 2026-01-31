@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchPlaylists, type SpotifyPlaylistItem } from "@/apis/userApi";
+import { fetchPlaylists } from "@/apis/userApi";
 import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
+import { SpotifyPlaylistItem } from "@/types/api";
 
 interface AddModalProps {
   isOpen: boolean;
@@ -29,8 +30,14 @@ export default function AddToPlaylistModal({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.content} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={styles.overlay}
+      onClick={onClose}
+    >
+      <div
+        className={styles.content}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={styles.header}>
           <h3>내 플레이리스트</h3>
           <p>어디에 담을까요?</p>
@@ -55,7 +62,10 @@ export default function AddToPlaylistModal({
           ))}
         </div>
 
-        <button className={styles.closeBtn} onClick={onClose}>
+        <button
+          className={styles.closeBtn}
+          onClick={onClose}
+        >
           취소
         </button>
       </div>
