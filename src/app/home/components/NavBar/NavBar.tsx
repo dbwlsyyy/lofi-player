@@ -2,15 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiHome, FiDisc, FiClipboard, FiMusic } from "react-icons/fi";
+import { FiDisc, FiMusic } from "react-icons/fi";
 import styles from "./NavBar.module.css";
+import { useUIStore } from "@/store/useUIStore";
 
 export default function NavBar() {
   const pathname = usePathname();
+  const { isRelaxMode } = useUIStore();
+
+  if (isRelaxMode) return null;
 
   const isHomeActive = pathname === "/home" || pathname === "/" || pathname.startsWith("/playlist");
 
-  const isSearchActive = pathname === "/search";
+  const isDiggingActive = pathname === "/digging";
 
   return (
     <nav className={styles.dockContainer}>
@@ -28,8 +32,8 @@ export default function NavBar() {
         <div className={styles.divider} />
 
         <Link
-          href="/search"
-          className={`${styles.navItem} ${isSearchActive ? styles.active : ""}`}
+          href="/digging"
+          className={`${styles.navItem} ${isDiggingActive ? styles.active : ""}`}
         >
           <div className={styles.iconWrapper}>
             <FiDisc size="2.4rem" />

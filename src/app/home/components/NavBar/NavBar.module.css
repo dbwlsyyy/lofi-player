@@ -112,8 +112,4 @@
     justify-content: center;
     padding: 1rem 0;
   }
-
-  .divider {
-    display: none; /* 모바일에서는 구분선 제거 */
-  }
 }
