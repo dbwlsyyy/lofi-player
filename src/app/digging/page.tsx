@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { searchTracks } from "@/apis/spotifyUserApi";
+import { addTrackToPlaylist, searchTracks } from "@/apis/spotifyUserApi";
 import styles from "./Digging.module.css";
 import NavBar from "../home/components/NavBar/NavBar"; // 경로 확인 필요
-import { FiSearch } from "react-icons/fi";
+import { FiCheckCircle, FiSearch } from "react-icons/fi";
 import Image from "next/image";
 import { Track } from "@/store/usePlayerStore";
 import { useUIStore } from "@/store/useUIStore";
+import AddModal from "./components/AddModal";
+import toast from "react-hot-toast";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
@@ -17,7 +19,9 @@ export default function DiggingPage() {
   const [results, setResults] = useState<Track[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 디바운싱 로직 (입력이 멈추고 0.5초 뒤에 실행)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [targetTrackUri, setTargetTrackUri] = useState("");
+
   useEffect(() => {
     if (!query.trim() || !session?.accessToken) {
       setResults([]);
@@ -38,6 +42,35 @@ export default function DiggingPage() {
 
     return () => clearTimeout(timer);
   }, [query, session?.accessToken]);
+
+  const handleAddClick = (uri: string) => {
+    setTargetTrackUri(uri);
+    setIsModalOpen(true);
+  };
+
+  const handleSelect = async (playlistId: string) => {
+    try {
+      await addTrackToPlaylist(session?.accessToken!, playlistId, targetTrackUri);
+      setIsModalOpen(false);
+      toast(
+        <div className="toast-content">
+          <div className="toast-message">
+            <FiCheckCircle
+              size="1.6rem"
+              color="#3b82f6"
+            />
+            <span>디깅 완료!</span>
+          </div>
+        </div>,
+        {
+          className: "minimal-toast",
+          duration: 3000,
+        },
+      );
+    } catch (error) {
+      toast.error("추가 실패. 다시 시도해주세요.");
+    }
+  };
 
   return (
     <main className={styles.container}>
@@ -63,7 +96,7 @@ export default function DiggingPage() {
               <p className={styles.statusMsg}>음악을 찾는 중...</p>
             ) : results.length > 0 ? (
               <div className={styles.trackGrid}>
-                {results.map((track: any) => (
+                {results.map((track: Track) => (
                   <div
                     key={track.id}
                     className={styles.trackCard}
@@ -77,6 +110,7 @@ export default function DiggingPage() {
                       <button
                         className={styles.addBtn}
                         title="플리에 추가"
+                        onClick={() => handleAddClick(track.uri)}
                       >
                         +
                       </button>
@@ -99,8 +133,13 @@ export default function DiggingPage() {
         </div>
       )}
 
-      {/* 홈에서처럼 네비바 수동 추가 */}
       <NavBar />
+      <AddModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleSelect}
+        accessToken={session?.accessToken || ""}
+      />
     </main>
   );
 }

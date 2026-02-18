@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 import QueueSidebar from "@/components/QueueSidebar/QueueSidebar";
 import { Toaster } from "react-hot-toast";
 import ToggleBtn from "@/components/ToggleBtn/ToggleBtn";
-import GlobalBackground from "@/components/GlobalBackground/GlobalBackground"; // 추가
+import GlobalBackground from "@/components/GlobalBackground/GlobalBackground";
 
 export const metadata = {
   title: "Lofi Player",
