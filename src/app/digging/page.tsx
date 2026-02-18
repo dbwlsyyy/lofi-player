@@ -5,16 +5,19 @@ import { useSession } from "next-auth/react";
 import { addTrackToPlaylist, searchTracks } from "@/apis/spotifyUserApi";
 import styles from "./Digging.module.css";
 import NavBar from "../home/components/NavBar/NavBar"; // 경로 확인 필요
-import { FiCheckCircle, FiSearch } from "react-icons/fi";
+import { FiCheckCircle, FiPlay, FiSearch } from "react-icons/fi";
 import Image from "next/image";
-import { Track } from "@/store/usePlayerStore";
+import { Track, usePlayerStore } from "@/store/usePlayerStore";
 import { useUIStore } from "@/store/useUIStore";
 import AddModal from "./components/AddModal";
 import toast from "react-hot-toast";
+import { usePlayControl } from "@/hooks/usePlayControl";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
   const { isRelaxMode } = useUIStore();
+  const { playFromPlaylist } = usePlayControl();
+
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Track[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +45,14 @@ export default function DiggingPage() {
 
     return () => clearTimeout(timer);
   }, [query, session?.accessToken]);
+
+  const handlePlayNow = (track: Track) => {
+    if (!session?.accessToken) return;
+
+    // playFromPlaylist(재생할 곡 배열, 시작 인덱스, 토큰)
+    // 검색 결과 리스트 전체를 넘기면 다음 곡으로 넘기기도 가능해집니다.
+    playFromPlaylist([track], 0, session.accessToken);
+  };
 
   const handleAddClick = (uri: string) => {
     setTargetTrackUri(uri);
@@ -108,6 +119,16 @@ export default function DiggingPage() {
                         fill
                       />
                       <button
+                        className={styles.playBtn}
+                        title="바로 재생"
+                        onClick={() => handlePlayNow(track)}
+                      >
+                        <FiPlay
+                          className={styles.playIcon}
+                          size="1.6rem"
+                        />
+                      </button>
+                      <button
                         className={styles.addBtn}
                         title="플리에 추가"
                         onClick={() => handleAddClick(track.uri)}
@@ -126,7 +147,7 @@ export default function DiggingPage() {
               <p className={styles.statusMsg}>검색 결과가 없습니다.</p>
             ) : (
               <div className={styles.emptyState}>
-                <p>오늘의 무드에 맞는 새로운 음악을 디깅해보세요.</p>
+                <p>새로운 음악을 디깅해보세요.</p>
               </div>
             )}
           </div>

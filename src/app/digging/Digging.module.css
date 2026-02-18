@@ -80,6 +80,50 @@
   box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.3);
 }
 
+/* Digging.module.css */
+
+.playBtn {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem; /* 좌측 하단 배치 */
+  width: 3.6rem;
+  height: 3.6rem;
+  background: #3b82f6; /* 재생 버튼은 블루 포인트 컬러 */
+  color: #fff;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 0.5rem 1.5rem rgba(59, 130, 246, 0.4);
+}
+
+.trackCard:hover .playBtn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.playBtn:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+}
+
+/* 아이콘 위치 미세 조정 */
+.playIcon {
+  margin-left: 0.2rem;
+}
+
+/* 기존 addBtn 위치와 디자인은 유지하되 겹치지 않게 확인 */
+.addBtn {
+  /* 기존 코드 유지 */
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+}
+
 .addBtn {
   position: absolute;
   bottom: 1rem;
