@@ -1,166 +1,167 @@
 .container {
-    position: relative;
-    min-height: 100vh;
-    color: #ffffff;
-    overflow: hidden;
-    font-family:
-        'Pretendard',
-        -apple-system,
-        sans-serif;
+  position: relative;
+  margin-top: 5rem;
+  min-height: 100vh;
+  color: #ffffff;
+  overflow: hidden;
+  font-family:
+    "Pretendard",
+    -apple-system,
+    sans-serif;
 }
 
 .heroSection {
-    display: flex;
-    justify-content: center;
-    margin-top: 12rem;
+  display: flex;
+  justify-content: center;
+  margin-top: 12rem;
 }
 
 .loginCard {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(2rem);
-    -webkit-backdrop-filter: blur(2rem);
-    border: 0.1rem solid rgba(255, 255, 255, 0.1);
-    padding: 5rem;
-    border-radius: 4rem;
-    text-align: center;
-    max-width: 45rem;
-    width: 90%;
-    box-shadow: 0 2.5rem 5rem -1.2rem rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(2rem);
+  -webkit-backdrop-filter: blur(2rem);
+  border: 0.1rem solid rgba(255, 255, 255, 0.1);
+  padding: 5rem;
+  border-radius: 4rem;
+  text-align: center;
+  max-width: 45rem;
+  width: 90%;
+  box-shadow: 0 2.5rem 5rem -1.2rem rgba(0, 0, 0, 0.5);
 }
 
 .mainTitle {
-    font-size: 5rem;
-    font-weight: 900;
-    letter-spacing: -0.2rem;
-    margin-bottom: 1rem;
+  font-size: 5rem;
+  font-weight: 900;
+  letter-spacing: -0.2rem;
+  margin-bottom: 1rem;
 }
 
 .bluePoint {
-    color: #3b82f6;
-    text-shadow: 0 0 2rem rgba(59, 130, 246, 0.6);
+  color: #3b82f6;
+  text-shadow: 0 0 2rem rgba(59, 130, 246, 0.6);
 }
 
 .subTitle {
-    font-size: 1.8rem;
-    font-weight: 600;
+  font-size: 1.8rem;
+  font-weight: 600;
 
-    color: rgba(255, 255, 255, 0.883);
-    margin-top: 2rem;
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
+  color: rgba(255, 255, 255, 0.883);
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
 }
 
 .footerText {
-    font-size: 1.4rem;
-    color: rgba(255, 255, 255, 0.35);
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .contentWrapper {
-    position: relative;
-    z-index: 10;
-    max-width: 120rem;
-    margin: 0 auto;
-    padding: 8rem 2rem 12rem 2rem;
+  position: relative;
+  z-index: 10;
+  max-width: 120rem;
+  margin: 0 auto;
+  padding: 8rem 2rem 12rem 2rem;
 }
 
 .section {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 .sectionHeader {
-    margin-bottom: 3.2rem;
-    text-align: left;
+  margin-bottom: 3.2rem;
+  text-align: left;
 }
 
 .sectionTitle {
-    font-size: 2.8rem;
-    font-weight: 800;
-    margin-bottom: 0.8rem;
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 0.8rem;
 }
 
 .sectionDesc {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.5rem;
 }
 
 .playlistGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
-    gap: 2.4rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 2.4rem;
 }
 
 .playlistCard {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(1rem);
-    border: 0.1rem solid rgba(255, 255, 255, 0.08);
-    border-radius: 2.4rem;
-    padding: 1.6rem;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(1rem);
+  border: 0.1rem solid rgba(255, 255, 255, 0.08);
+  border-radius: 2.4rem;
+  padding: 1.6rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .playlistCard:hover {
-    background: rgba(59, 130, 246, 0.08);
-    border-color: rgba(59, 130, 246, 0.3);
-    transform: translateY(-1rem);
-    box-shadow: 0 1.5rem 3.5rem rgba(0, 0, 0, 0.4);
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-1rem);
+  box-shadow: 0 1.5rem 3.5rem rgba(0, 0, 0, 0.4);
 }
 
 .imageWrapper {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    border-radius: 1.6rem;
-    overflow: hidden;
-    margin-bottom: 1.6rem;
-    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.3);
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  margin-bottom: 1.6rem;
+  box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.3);
 }
 
 .playlistInfo h4 {
-    font-size: 1.7rem;
-    font-weight: 600;
-    margin-bottom: 0.6rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .playlistInfo p {
-    font-size: 1.4rem;
-    color: rgba(255, 255, 255, 0.4);
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .loading {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: #000000;
-    font-size: 1.8rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #000000;
+  font-size: 1.8rem;
 }
 
 .spinner {
-    width: 4rem;
-    height: 4rem;
-    border: 0.4rem solid rgba(59, 130, 246, 0.2);
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s infinite linear;
-    margin-bottom: 2rem;
+  width: 4rem;
+  height: 4rem;
+  border: 0.4rem solid rgba(59, 130, 246, 0.2);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
+  margin-bottom: 2rem;
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .error {
-    background: rgba(255, 71, 87, 0.1);
-    border: 0.1rem solid rgba(255, 71, 87, 0.3);
-    color: #ff6b6b;
-    padding: 1.5rem 2rem;
-    border-radius: 1.2rem;
-    font-size: 1.4rem;
-    margin-bottom: 2.4rem;
+  background: rgba(255, 71, 87, 0.1);
+  border: 0.1rem solid rgba(255, 71, 87, 0.3);
+  color: #ff6b6b;
+  padding: 1.5rem 2rem;
+  border-radius: 1.2rem;
+  font-size: 1.4rem;
+  margin-bottom: 2.4rem;
 }
