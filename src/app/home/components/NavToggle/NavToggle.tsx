@@ -3,16 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiDisc, FiMusic } from "react-icons/fi";
-import styles from "./NavBar.module.css";
+import styles from "./NavToggle.module.css";
 import { useUIStore } from "@/store/useUIStore";
 
-export default function NavBar() {
+export default function NavToggle() {
   const pathname = usePathname();
   const { isRelaxMode } = useUIStore();
 
   if (isRelaxMode) return null;
 
-  const isHomeActive = pathname === "/home" || pathname === "/" || pathname.startsWith("/playlist");
+  const isHomeActive =
+    pathname === "/home" ||
+    pathname === "/" ||
+    pathname.startsWith("/playlist");
 
   const isDiggingActive = pathname === "/digging";
 

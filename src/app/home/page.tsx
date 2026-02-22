@@ -14,7 +14,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/useUIStore";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
-import NavBar from "./components/NavBar/NavBar";
+import NavToggle from "./components/NavToggle/NavToggle";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -65,12 +65,12 @@ export default function HomePage() {
       <div className={styles.contentWrapper}>
         {!isRelaxMode && (
           <>
-            <NavBar />
-            {/* <ProfileHeader
+            <NavToggle />
+            <ProfileHeader
               profile={me}
               onLogin={handleLogin}
               onLogout={handleLogout}
-            /> */}
+            />
 
             <div className={styles.section}>
               {error && <p className={styles.error}>{error}</p>}
@@ -85,7 +85,9 @@ export default function HomePage() {
                       <p className={styles.subTitle}>로그인이 필요합니다.</p>
                     </div>
 
-                    <p className={styles.footerText}>플레이리스트를 연동하여 불러와보세요!</p>
+                    <p className={styles.footerText}>
+                      플레이리스트를 연동하여 불러와보세요!
+                    </p>
                   </div>
                 </section>
               )}

@@ -13,7 +13,7 @@ import { useUIStore } from "@/store/useUIStore";
 import toast from "react-hot-toast";
 
 import styles from "./Digging.module.css";
-import NavBar from "../home/components/NavBar/NavBar";
+import NavBar from "../home/components/NavToggle/NavToggle";
 import AddToPlaylistModal from "./components/AddToPlaylistModal/AddToPlaylistModal";
 
 // 분리한 컴포넌트 임포트
