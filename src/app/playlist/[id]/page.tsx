@@ -52,8 +52,12 @@ export default function PlaylistDetailPage() {
     if (!token || !id) return;
     const load = async () => {
       try {
-        const list = await fetchPlaylistTracks(token, id as string);
-        setTracks(list);
+        const lists = await fetchPlaylistTracks(token, id as string);
+        const tracksWithKey = lists.map((track) => ({
+          ...track,
+          uniqueKey: crypto.randomUUID(),
+        }));
+        setTracks(tracksWithKey);
       } catch (err) {
         console.error("로드 실패:", err);
         toast(
@@ -314,7 +318,7 @@ export default function PlaylistDetailPage() {
                 <div className={styles.list}>
                   {tracks.map((t, i) => (
                     <div
-                      key={t.id}
+                      key={t.uniqueKey}
                       className={styles.row}
                       onClick={() => playFromPlaylist(tracks, i, token!)}
                       style={{
