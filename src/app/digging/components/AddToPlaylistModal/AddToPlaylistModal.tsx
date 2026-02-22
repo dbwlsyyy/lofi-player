@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchPlaylists, type SpotifyPlaylistItem } from "@/apis/spotifyUserApi";
-import styles from "./AddModal.module.css";
+import {
+  fetchPlaylists,
+  type SpotifyPlaylistItem,
+} from "@/apis/spotifyUserApi";
+import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
 
 interface AddModalProps {
@@ -12,7 +15,12 @@ interface AddModalProps {
   accessToken: string;
 }
 
-export default function AddModal({ isOpen, onClose, onSelect, accessToken }: AddModalProps) {
+export default function AddToPlaylistModal({
+  isOpen,
+  onClose,
+  onSelect,
+  accessToken,
+}: AddModalProps) {
   const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
 
   useEffect(() => {
