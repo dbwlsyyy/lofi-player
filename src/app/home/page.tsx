@@ -9,12 +9,12 @@ import {
   type SpotifyUser,
 } from "@/apis/spotifyUserApi";
 import styles from "./Home.module.css";
-import ProfileHeader from "./components/ProfileHeader/ProfileHeader";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/useUIStore";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import NavToggle from "./components/NavToggle/NavToggle";
+import LoginHero from "./components/NavToggle/LoginHero/LoginHero";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -29,10 +29,6 @@ export default function HomePage() {
 
   const handleLogin = () => {
     signIn("spotify", { callbackUrl: "/home" });
-  };
-
-  const handleLogout = () => {
-    signOut();
   };
 
   useEffect(() => {
@@ -66,31 +62,13 @@ export default function HomePage() {
         {!isRelaxMode && (
           <>
             <NavToggle />
-            <ProfileHeader
-              profile={me}
-              onLogin={handleLogin}
-              onLogout={handleLogout}
-            />
 
             <div className={styles.section}>
               {error && <p className={styles.error}>{error}</p>}
-              {!me && (
-                <section className={styles.heroSection}>
-                  <div className={styles.loginCard}>
-                    <div className={styles.brand}>
-                      <h1 className={styles.mainTitle}>
-                        VIBE
-                        <span className={styles.bluePoint}>.</span>
-                      </h1>
-                      <p className={styles.subTitle}>로그인이 필요합니다.</p>
-                    </div>
 
-                    <p className={styles.footerText}>
-                      플레이리스트를 연동하여 불러와보세요!
-                    </p>
-                  </div>
-                </section>
-              )}
+              <div className={styles.loginHero}>
+                {!me && <LoginHero onLogin={handleLogin} />}
+              </div>
 
               {me && (
                 <>
