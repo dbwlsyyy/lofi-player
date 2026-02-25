@@ -1,0 +1,115 @@
+.dockContainer {
+  position: fixed;
+  top: 3.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  width: auto;
+  animation: floatUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.glassDock {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(1.6rem);
+  -webkit-backdrop-filter: blur(1.6rem);
+
+  border: 0.1rem solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
+  padding: 0.8rem 1.2rem;
+
+  box-shadow:
+    0 1rem 2.5rem rgba(0, 0, 0, 0.4),
+    0 0 0 0.1rem rgba(0, 0, 0, 0.2);
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2.4rem;
+  border-radius: 100px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+}
+
+.navItem:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.navItem.active {
+  color: #ffffff;
+  background: rgba(59, 130, 246, 0.15);
+  text-shadow: 0 0 1.5rem rgba(59, 130, 246, 0.5);
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.navItem.active .iconWrapper {
+  transform: scale(1.1);
+  color: #3b82f6;
+}
+
+.label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02rem;
+}
+
+.divider {
+  width: 0.1rem;
+  height: 2.4rem;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 0.4rem;
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes popIn {
+  from {
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .glassDock {
+    padding: 0.6rem 0.8rem;
+    width: 90vw;
+    max-width: 34rem;
+    justify-content: space-around;
+  }
+
+  .navItem {
+    flex: 1;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+}

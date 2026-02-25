@@ -1,0 +1,59 @@
+.container {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.icon {
+  font-size: 6.4rem;
+  color: #1db954;
+  margin-bottom: 2.4rem;
+  filter: drop-shadow(0 0 1.2rem rgba(29, 185, 84, 0.3));
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1.2rem;
+}
+
+.description {
+  font-size: 1.6rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 4rem;
+}
+
+.loginBtn {
+  background: #1db954;
+  color: #000;
+  font-size: 1.6rem;
+  font-weight: 600;
+  padding: 1.4rem 4rem;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.loginBtn:hover {
+  background: #1ed760;
+  transform: scale(1.05);
+  box-shadow: 0 0.8rem 2rem rgba(29, 185, 84, 0.25);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
