@@ -58,8 +58,10 @@ export default function AlbumGrid({ albums, onClick }: AlbumGridProps) {
                 className={styles.albumImg}
               />
 
-              {/* ✨ 새로운 디자인: 연도 배지 (이미지 위에 오버레이) */}
-              <div className={styles.yearBadge}>{item.releaseDate?.split("-")[0]}</div>
+              {/* 연도 배지 (이미지 위에 오버레이) */}
+              <div className={styles.yearBadge}>
+                {item.releaseDate?.split("-")[0]}
+              </div>
             </div>
 
             <div className={styles.cardInfo}>

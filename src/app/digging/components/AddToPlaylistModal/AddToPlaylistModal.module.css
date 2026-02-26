@@ -13,7 +13,7 @@
 .content {
   width: 100%;
   max-width: 36rem;
-  background: rgba(15, 23, 42, 0.85); /* 네비바 계열 딥블루 */
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(2rem);
   -webkit-backdrop-filter: blur(2rem);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -21,7 +21,6 @@
   padding: 2.4rem;
   box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.5);
 
-  /* 아래에서 위로 슥 올라오는 애니메이션 */
   animation: modalUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
