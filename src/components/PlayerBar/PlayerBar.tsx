@@ -1,6 +1,6 @@
 "use client";
 
-import { usePlayerStore } from "@/store/usePlayerStore";
+import { usePlayerStore } from "@/store/playerStore";
 import styles from "./PlayerBar.module.css";
 import Image from "next/image";
 import {

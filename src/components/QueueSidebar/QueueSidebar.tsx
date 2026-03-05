@@ -1,5 +1,5 @@
 "use client";
-import { usePlayerStore } from "@/store/usePlayerStore";
+import { usePlayerStore } from "@/store/playerStore";
 import styles from "./QueueSidebar.module.css";
 import { useEffect, useRef } from "react";
 import { usePlayControl } from "@/hooks/usePlayControl";

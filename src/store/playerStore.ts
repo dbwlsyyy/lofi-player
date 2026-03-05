@@ -1,4 +1,4 @@
-import { setRepeatMode, setShuffle } from "@/apis/spotifyPlayerApi";
+import { setRepeatMode, setShuffle } from "@/apis/playbackApi";
 import { mapSdkTrackToLocalTrack } from "@/lib/spotifyMapper";
 import { create } from "zustand";
 

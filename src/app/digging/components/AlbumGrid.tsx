@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { FiChevronDown } from "react-icons/fi";
-import { SearchResult } from "@/apis/spotifyUserApi";
+import { SearchResult } from "@/apis/userApi";
 import styles from "../Digging.module.css";
 
 interface AlbumGridProps {

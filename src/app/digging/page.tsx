@@ -7,9 +7,9 @@ import {
   addTrackToPlaylist,
   type SearchResult,
   type SearchFilter,
-} from "@/apis/spotifyUserApi";
+} from "@/apis/userApi";
 import { usePlayControl } from "@/hooks/usePlayControl";
-import { useUIStore } from "@/store/useUIStore";
+import { useUIStore } from "@/store/uiStore";
 import toast from "react-hot-toast";
 
 import styles from "./Digging.module.css";
@@ -122,10 +122,7 @@ export default function DiggingPage() {
           />
 
           {/* 2. 필터바 컴포넌트 */}
-          <FilterBar
-            filter={filter}
-            setFilter={setFilter}
-          />
+          <FilterBar filter={filter} setFilter={setFilter} />
 
           {/* 3. 결과 렌더링 (조건부) */}
           <div className={styles.resultSection}>

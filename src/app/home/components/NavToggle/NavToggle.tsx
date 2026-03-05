@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiDisc, FiMusic } from "react-icons/fi";
 import styles from "./NavToggle.module.css";
-import { useUIStore } from "@/store/useUIStore";
+import { useUIStore } from "@/store/uiStore";
 
 export default function NavToggle() {
   const pathname = usePathname();

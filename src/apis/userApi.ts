@@ -1,4 +1,4 @@
-import { Track } from "@/store/usePlayerStore";
+import { Track } from "@/store/playerStore";
 import { createSpotifyClient } from "../lib/spotifyClient";
 
 export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
@@ -12,7 +12,9 @@ export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
   }
 }
 
-export async function fetchPlaylists(accessToken: string): Promise<SpotifyPlaylistItem[]> {
+export async function fetchPlaylists(
+  accessToken: string,
+): Promise<SpotifyPlaylistItem[]> {
   try {
     const api = createSpotifyClient(accessToken);
     const { data } = await api.get<SpotifyPlaylistResponse>("/me/playlists");
@@ -45,13 +47,21 @@ export async function fetchPlaylistTracks(
         previewUrl: item.track.preview_url ?? undefined,
       }));
   } catch (e: any) {
-    console.error(`fetchPlaylistTracks(${playlistId}) error:`, e.response?.status, e.message);
+    console.error(
+      `fetchPlaylistTracks(${playlistId}) error:`,
+      e.response?.status,
+      e.message,
+    );
     throw e;
   }
 }
 
 // 플레이리스트 이름 수정 API
-export async function updatePlaylistName(accessToken: string, playlistId: string, newName: string) {
+export async function updatePlaylistName(
+  accessToken: string,
+  playlistId: string,
+  newName: string,
+) {
   try {
     const api = createSpotifyClient(accessToken);
     await api.put(`/playlists/${playlistId}`, {

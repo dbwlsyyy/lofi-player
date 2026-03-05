@@ -7,11 +7,11 @@ import {
   fetchPlaylists,
   type SpotifyPlaylistItem,
   type SpotifyUser,
-} from "@/apis/spotifyUserApi";
+} from "@/apis/userApi";
 import styles from "./Home.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useUIStore } from "@/store/useUIStore";
+import { useUIStore } from "@/store/uiStore";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import NavToggle from "./components/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";

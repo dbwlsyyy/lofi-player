@@ -3,15 +3,15 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import { Track } from "@/store/usePlayerStore";
+import { Track } from "@/store/playerStore";
 import {
   fetchPlaylistTracks,
   removeTrackFromPlaylist,
   updatePlaylistName,
-} from "@/apis/spotifyUserApi";
+} from "@/apis/userApi";
 import { useSession } from "next-auth/react";
 import { usePlayControl } from "@/hooks/usePlayControl";
-import { useUIStore } from "@/store/useUIStore";
+import { useUIStore } from "@/store/uiStore";
 import {
   FaPlay,
   FaMusic,
