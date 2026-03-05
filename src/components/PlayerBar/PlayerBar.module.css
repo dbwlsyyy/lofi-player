@@ -1,189 +1,193 @@
 .playerBar {
-    display: flex;
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 800px;
-    min-width: 470px;
+  display: flex;
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 800px;
+  min-width: 470px;
 
-    height: 9rem;
-    background: rgba(10, 15, 25, 0.6);
-    backdrop-filter: blur(5px);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 100px;
-    align-items: center;
-    justify-content: space-between;
-    color: #e6ebff;
-    box-shadow: 0 -2px 20px rgba(79, 125, 243, 0.15);
+  height: 9rem;
+  background: rgba(10, 15, 25, 0.6);
+  backdrop-filter: blur(5px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 100px;
+  align-items: center;
+  justify-content: space-between;
+  color: #e6ebff;
+  box-shadow: 0 -2px 20px rgba(79, 125, 243, 0.15);
 
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr;
-    align-items: center;
-    padding: 0 2rem;
-    z-index: 100;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  align-items: center;
+  padding: 0 2rem;
+  z-index: 100;
 
-    transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .leftArea {
-    display: flex;
-    align-items: center;
-    overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-areas: "stack";
+  overflow: hidden; /* 영역 밖으로 밀려나는 요소 숨김 */
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .trackInfo {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    min-width: 0;
-    overflow: hidden;
-    font-style: italic;
-}
+  grid-area: stack;
+  width: 100%;
 
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  min-width: 0;
+}
 .albumArt {
-    border-radius: 50%;
-    border: 12px solid rgba(255, 255, 255, 0.08);
-    object-fit: cover;
-    box-shadow: 0 0 12px;
-    animation: spin 10s linear infinite;
-    animation-play-state: paused;
-    cursor: pointer;
+  border-radius: 50%;
+  border: 12px solid rgba(255, 255, 255, 0.08);
+  object-fit: cover;
+  box-shadow: 0 0 12px;
+  animation: spin 10s linear infinite;
+  animation-play-state: paused;
+  cursor: pointer;
 }
 
 .playingArt {
-    animation-play-state: running;
+  animation-play-state: running;
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .textInfo {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .trackName {
-    font-size: 1.6rem;
-    padding-right: 0.3rem;
-    font-weight: 600;
-    color: #fff;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+  font-size: 1.6rem;
+  padding-right: 0.3rem;
+  font-weight: 600;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .trackArtist {
-    font-size: 1.3rem;
-    color: #a7b3d1;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+  font-size: 1.3rem;
+  color: #a7b3d1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .centerArea {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    margin: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 0 1rem;
 }
 
 .controls {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .controlBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: #e6ebff;
-    font-size: 2rem;
-    cursor: pointer;
-    transition:
-        transform 0.2s ease,
-        color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #e6ebff;
+  font-size: 2rem;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .controlBtn:hover {
-    transform: scale(1.1);
-    color: #4f7df3;
+  transform: scale(1.1);
+  color: #4f7df3;
 }
 
 .controlBtn:active {
-    transform: scale(0.9);
+  transform: scale(0.9);
 }
 
 .activeBtn {
-    color: #4f7df3;
-    position: relative;
+  color: #4f7df3;
+  position: relative;
 }
 
 .activeBtn::after {
-    content: '';
-    position: absolute;
-    right: -7px;
-    top: -5px;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
-    background-color: #4f7df3;
-    border-radius: 50%;
+  content: "";
+  position: absolute;
+  right: -7px;
+  top: -5px;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: #4f7df3;
+  border-radius: 50%;
 }
 
 .repeatSpan {
-    font-size: 1rem;
-    position: absolute;
-    top: 9px;
-    left: 15px;
-    font-weight: bold;
+  font-size: 1rem;
+  position: absolute;
+  top: 9px;
+  left: 15px;
+  font-weight: bold;
 }
 
 .progressContainer {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
 }
 
 .timeText {
-    font-size: 1.2rem;
-    color: #888;
-    font-variant-numeric: tabular-nums;
-    min-width: 2rem;
-    text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  font-variant-numeric: tabular-nums;
+  min-width: 2rem;
+  text-align: center;
 }
 
 .progressBar {
-    position: relative;
-    width: 100%;
-    flex: 1;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    cursor: pointer;
-    overflow: hidden;
+  position: relative;
+  width: 100%;
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
 }
 
 .progressFill {
-    position: relative;
-    height: 100%;
-    background: #4f7df3;
-    transition: width 0.2s linear;
+  position: relative;
+  height: 100%;
+  background: #4f7df3;
+  transition: width 0.2s linear;
 }
 
 /* .progressFill::after {
@@ -204,66 +208,66 @@
 } */
 
 .rightArea {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
 .volumeWrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 9rem;
 }
 
 .volumeIcon {
-    color: #888;
-    cursor: 'pointer';
+  color: #888;
+  cursor: "pointer";
 }
 
 .volumeSlider {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    outline: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
 
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .volumeSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 0px;
-    height: 0px;
-    background: #fff;
-    cursor: pointer;
-    border: none;
+  -webkit-appearance: none;
+  width: 0px;
+  height: 0px;
+  background: #fff;
+  cursor: pointer;
+  border: none;
 }
 
 .hamburger {
-    cursor: pointer;
-    padding: 0.5rem;
-    background-color: transparent;
-    border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  background-color: transparent;
+  border: none;
 }
 
 .emptyState {
-    grid-column: 1 / -1;
-    text-align: center;
-    color: #b1bbd8;
-    font-size: 1.6rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    opacity: 0.7;
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #b1bbd8;
+  font-size: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  opacity: 0.7;
 }
 
 .hint {
-    margin-top: 0.3rem;
-    font-size: 1.3rem;
-    color: #8894b0;
+  margin-top: 0.3rem;
+  font-size: 1.3rem;
+  color: #8894b0;
 }

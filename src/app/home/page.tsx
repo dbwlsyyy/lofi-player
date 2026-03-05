@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/useUIStore";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import NavToggle from "./components/NavToggle/NavToggle";
-import LoginHero from "./components/NavToggle/LoginHero/LoginHero";
+import LoginHero from "./components/LoginHero/LoginHero";
 
 export default function HomePage() {
   const { data: session, status } = useSession();

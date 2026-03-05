@@ -10,7 +10,10 @@ interface PlaylistListProps {
   onClick: (id: string) => void;
 }
 
-export default function PlaylistList({ playlists, onClick }: PlaylistListProps) {
+export default function PlaylistList({
+  playlists,
+  onClick,
+}: PlaylistListProps) {
   return (
     <div className={styles.listContainer}>
       {playlists.map((item) => (
@@ -41,7 +44,6 @@ export default function PlaylistList({ playlists, onClick }: PlaylistListProps) 
           <div className={styles.trackTrailing}>
             <div className={styles.metaBadge}>
               <FiDisc size="1.2rem" />
-              {/* 곡 수 표시 */}
               <span>{item.tracksTotal}곡</span>
             </div>
           </div>

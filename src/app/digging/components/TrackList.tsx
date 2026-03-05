@@ -23,10 +23,7 @@ export default function TrackList({ tracks, onPlay, onAdd }: TrackListProps) {
   return (
     <div className={styles.listContainer}>
       {tracks.map((item) => (
-        <div
-          key={item.id}
-          className={styles.trackRow}
-        >
+        <div key={item.id} className={styles.trackRow}>
           <div className={styles.trackLeading}>
             <div className={styles.trackImgWrapper}>
               <Image
@@ -43,7 +40,9 @@ export default function TrackList({ tracks, onPlay, onAdd }: TrackListProps) {
           </div>
 
           <div className={styles.trackTrailing}>
-            <span className={styles.duration}>{formatDuration(item.durationMs)}</span>
+            <span className={styles.duration}>
+              {formatDuration(item.durationMs)}
+            </span>
             <div className={styles.trackActions}>
               <button
                 className={styles.actionBtn}

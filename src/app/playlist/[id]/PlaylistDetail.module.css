@@ -199,6 +199,10 @@
   color: #fff;
 }
 
+.loading {
+  padding: 8rem 0;
+}
+
 .listHeader {
   display: flex;
   align-items: center;

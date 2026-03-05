@@ -21,9 +21,12 @@ type PlayerState = {
   queue: Track[];
   currentIndex: number;
 
-  isReady: boolean;
+  isReady: boolean; // Spotify SDK ready
   deviceId: string | null;
   isPlaying: boolean;
+
+  isLoadingTrack: boolean; // 곡 정보 불러오기 중
+  setIsLoadingTrack: (loading: boolean) => void;
 
   volume: number;
   isShuffled: boolean;
@@ -73,6 +76,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   duration: 0,
   position: 0,
 
+  isLoadingTrack: false,
+  setIsLoadingTrack: (loading) => set({ isLoadingTrack: loading }),
+
   setPlayerInstance: (player) => set({ playerInstance: player }),
 
   togglePlay: async () => {
@@ -84,27 +90,34 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   },
 
   nextTrack: async () => {
-    const { playerInstance, queue, currentIndex } = get();
+    const { playerInstance, queue, currentIndex, isShuffled } = get();
     if (!playerInstance || queue.length === 0) return;
 
-    const nextIndex = currentIndex + 1;
-    const nextTrack = queue[nextIndex] ?? null;
+    set({ isLoadingTrack: true });
 
-    if (nextIndex < queue.length) {
-      set({
-        currentIndex: nextIndex,
-        currentTrack: nextTrack,
-        position: 0,
-        duration: 0,
-        isPlaying: true,
-      });
-    } // queue의 끝이면?
+    if (!isShuffled) {
+      const nextIndex = currentIndex + 1;
+      const nextTrack = queue[nextIndex] ?? null;
 
+      if (nextIndex < queue.length) {
+        set({
+          currentIndex: nextIndex,
+          currentTrack: nextTrack,
+          position: 0,
+          duration: 0,
+          isPlaying: true,
+        });
+      } // queue의 끝이면?
+    } else {
+      // 셔플 모드일 때는 "어떤 곡이 나올지 모르니" 곡 정보는 건드리지 않습니다.
+      // 대신 사용자가 '다음'을 눌렀다는 피드백을 주기 위해 프로그레스 바만 0으로 밀어버립니다.
+      set({ position: 0 });
+    }
     await playerInstance.nextTrack();
   },
 
   prevTrack: async () => {
-    const { playerInstance, position, queue, currentIndex } = get();
+    const { playerInstance, position, queue, currentIndex, isShuffled } = get();
     if (!playerInstance || queue.length === 0) return;
 
     if (position > 5000) {
@@ -113,17 +126,24 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       return;
     }
 
-    const prevIndex = currentIndex - 1;
-    const prevTrack = queue[prevIndex] ?? null;
+    set({ isLoadingTrack: true });
 
-    if (prevIndex >= 0) {
-      set({
-        currentIndex: prevIndex,
-        currentTrack: prevTrack,
-        position: 0,
-        duration: 0,
-        isPlaying: true,
-      });
+    if (!isShuffled) {
+      const prevIndex = currentIndex - 1;
+      const prevTrack = queue[prevIndex] ?? null;
+
+      if (prevIndex >= 0) {
+        set({
+          currentIndex: prevIndex,
+          currentTrack: prevTrack,
+          position: 0,
+          duration: 0,
+          isPlaying: true,
+        });
+      }
+    } else {
+      // 셔플 모드: 곡 정보는 바꾸지 않고 로딩 상태(position=0)만 트리거
+      set({ position: 0 });
     }
 
     await playerInstance.previousTrack();
@@ -167,6 +187,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     set({
       isShuffled: state.shuffle,
       repeatMode: repeatModes[state.repeat_mode] ?? "off",
+      isLoadingTrack: false,
     });
   },
 
