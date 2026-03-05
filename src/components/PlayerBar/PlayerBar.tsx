@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { formatTime } from "@/lib/formatTime";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
+import LoadingDots from "../LoadingDots/LoadingDots";
 
 export default function PlayerBar() {
   const { data: session } = useSession();
@@ -41,6 +42,7 @@ export default function PlayerBar() {
     toggleQueue,
     setVolume,
     toggleShuffle,
+    isLoadingTrack,
   } = usePlayerStore();
 
   const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
@@ -121,35 +123,44 @@ export default function PlayerBar() {
 
             <div className={styles.centerArea}>
               <div className={styles.controls}>
-                <button
-                  onClick={() => accessToken && toggleShuffle(accessToken)}
-                  className={`${styles.controlBtn}  ${isShuffled ? styles.activeBtn : ""}`}
-                  title="셔플 켜기/끄기"
-                >
-                  <FaRandom size={17} />
-                </button>
-                <button onClick={prevTrack} className={styles.controlBtn}>
-                  <FaStepBackward style={{ marginLeft: "2rem" }} />
-                </button>
-                <button
-                  onClick={togglePlay}
-                  className={`${styles.controlBtn} ${styles.playBtn}`}
-                >
-                  {isPlaying ? <FaPause /> : <FaPlay />}
-                </button>
-                <button onClick={nextTrack} className={styles.controlBtn}>
-                  <FaStepForward style={{ marginRight: "2rem" }} />
-                </button>
-                <button
-                  onClick={() => accessToken && cycleRepeatMode(accessToken)}
-                  className={`${styles.controlBtn} ${repeatMode !== "off" ? styles.activeBtn : ""}`}
-                  title={`반복 모드: ${repeatMode}`}
-                >
-                  <FaRedo size={17} />
-                  {repeatMode === "track" && (
-                    <span className={styles.repeatSpan}>1</span>
-                  )}
-                </button>
+                {isLoadingTrack ? (
+                  <LoadingDots />
+                ) : (
+                  <>
+                    <button
+                      onClick={() => accessToken && toggleShuffle(accessToken)}
+                      className={`${styles.controlBtn}  ${isShuffled ? styles.activeBtn : ""}`}
+                      title="셔플 켜기/끄기"
+                    >
+                      <FaRandom size={17} />
+                    </button>
+                    <button onClick={prevTrack} className={styles.controlBtn}>
+                      <FaStepBackward style={{ marginLeft: "2rem" }} />
+                    </button>
+                    <button
+                      disabled={isLoadingTrack}
+                      onClick={togglePlay}
+                      className={`${styles.controlBtn} ${styles.playBtn}`}
+                    >
+                      {isPlaying ? <FaPause /> : <FaPlay />}
+                    </button>
+                    <button onClick={nextTrack} className={styles.controlBtn}>
+                      <FaStepForward style={{ marginRight: "2rem" }} />
+                    </button>
+                    <button
+                      onClick={() =>
+                        accessToken && cycleRepeatMode(accessToken)
+                      }
+                      className={`${styles.controlBtn} ${repeatMode !== "off" ? styles.activeBtn : ""}`}
+                      title={`반복 모드: ${repeatMode}`}
+                    >
+                      <FaRedo size={17} />
+                      {repeatMode === "track" && (
+                        <span className={styles.repeatSpan}>1</span>
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
 
               <div className={styles.progressContainer}>

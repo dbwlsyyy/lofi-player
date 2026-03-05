@@ -21,9 +21,12 @@ type PlayerState = {
   queue: Track[];
   currentIndex: number;
 
-  isReady: boolean;
+  isReady: boolean; // Spotify SDK ready
   deviceId: string | null;
   isPlaying: boolean;
+
+  isLoadingTrack: boolean; // 곡 정보 불러오기 중
+  setIsLoadingTrack: (loading: boolean) => void;
 
   volume: number;
   isShuffled: boolean;
@@ -73,6 +76,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   duration: 0,
   position: 0,
 
+  isLoadingTrack: false,
+  setIsLoadingTrack: (loading) => set({ isLoadingTrack: loading }),
+
   setPlayerInstance: (player) => set({ playerInstance: player }),
 
   togglePlay: async () => {
@@ -86,6 +92,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   nextTrack: async () => {
     const { playerInstance, queue, currentIndex, isShuffled } = get();
     if (!playerInstance || queue.length === 0) return;
+
+    set({ isLoadingTrack: true });
 
     if (!isShuffled) {
       const nextIndex = currentIndex + 1;
@@ -117,6 +125,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       await playerInstance.seek(0);
       return;
     }
+
+    set({ isLoadingTrack: true });
 
     if (!isShuffled) {
       const prevIndex = currentIndex - 1;
@@ -177,6 +187,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     set({
       isShuffled: state.shuffle,
       repeatMode: repeatModes[state.repeat_mode] ?? "off",
+      isLoadingTrack: false,
     });
   },
 

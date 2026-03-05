@@ -63,10 +63,7 @@ export default function PlaylistDetailPage() {
         toast(
           (t) => (
             <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
+              <FiAlertTriangle size="1.6rem" color="#ff5555" />
               <span>트랙 정보를 불러오지 못했습니다.</span>
             </div>
           ),
@@ -99,10 +96,7 @@ export default function PlaylistDetailPage() {
               gap: "0.8rem",
             }}
           >
-            <FiCheckCircle
-              size="1.6rem"
-              color="#3b82f6"
-            />
+            <FiCheckCircle size="1.6rem" color="#3b82f6" />
             <span>플레이리스트 이름이 변경되었습니다.</span>
           </div>
         ),
@@ -122,10 +116,7 @@ export default function PlaylistDetailPage() {
         toast(
           (t) => (
             <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
+              <FiAlertTriangle size="1.6rem" color="#ff5555" />
               <span>이름을 수정할 권한이 없습니다. 다시 로그인해주세요.</span>
             </div>
           ),
@@ -135,10 +126,7 @@ export default function PlaylistDetailPage() {
         toast(
           (t) => (
             <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
+              <FiAlertTriangle size="1.6rem" color="#ff5555" />
               <span>이름 수정 중 오류가 발생했습니다.</span>
             </div>
           ),
@@ -194,10 +182,7 @@ export default function PlaylistDetailPage() {
               gap: "0.8rem",
             }}
           >
-            <FiCheckCircle
-              size="1.6rem"
-              color="#3b82f6"
-            />
+            <FiCheckCircle size="1.6rem" color="#3b82f6" />
             <span>곡이 삭제되었습니다.</span>
           </div>
         ),
@@ -208,10 +193,7 @@ export default function PlaylistDetailPage() {
       toast(
         (t) => (
           <div className="toast-message">
-            <FiAlertTriangle
-              size="1.6rem"
-              color="#ff5555"
-            />
+            <FiAlertTriangle size="1.6rem" color="#ff5555" />
             <span>곡 삭제에 실패했습니다.</span>
           </div>
         ),
@@ -313,7 +295,9 @@ export default function PlaylistDetailPage() {
               </div>
 
               {loading ? (
-                <LoadingDots />
+                <div className={styles.loading}>
+                  <LoadingDots />
+                </div>
               ) : (
                 <div className={styles.list}>
                   {tracks.map((t, i) => (
