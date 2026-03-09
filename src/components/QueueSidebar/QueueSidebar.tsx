@@ -2,7 +2,7 @@
 import { usePlayerStore } from "@/store/playerStore";
 import styles from "./QueueSidebar.module.css";
 import { useEffect, useRef } from "react";
-import { usePlayControl } from "@/hooks/usePlayControl";
+import { usePlayControl } from "@/hooks/usePlaybackActions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/uiStore";

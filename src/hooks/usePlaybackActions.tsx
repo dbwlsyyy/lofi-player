@@ -1,7 +1,11 @@
+// 앨범 정보를 가져오고(Fetch), 큐에 넣고(Queue), 재생 API를 쏘는(Play)
+// 복합적인 액션(Action) 묶음, 복잡한 재생 관련 행동들을 모아둔 곳"
+
 "use client";
 
-import { Track, usePlayerStore } from "@/store/playerStore";
+import { usePlayerStore } from "@/store/playerStore";
 import { startPlayback } from "@/apis/playbackApi";
+import { Track } from "@/types/spotify";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
@@ -9,7 +13,6 @@ import {
   FiLock,
   FiWifiOff,
   FiAlertCircle,
-  FiUserX,
   FiAlertTriangle,
 } from "react-icons/fi";
 

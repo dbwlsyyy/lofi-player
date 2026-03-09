@@ -9,7 +9,7 @@ import {
   updatePlaylistName,
 } from "@/apis/userApi";
 import { useSession } from "next-auth/react";
-import { usePlayControl } from "@/hooks/usePlayControl";
+import { usePlayControl } from "@/hooks/usePlaybackActions";
 import { useUIStore } from "@/store/uiStore";
 import {
   FaPlay,

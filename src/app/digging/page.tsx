@@ -8,7 +8,7 @@ import {
   type SearchResult,
   type SearchFilter,
 } from "@/apis/userApi";
-import { usePlayControl } from "@/hooks/usePlayControl";
+import { usePlayControl } from "@/hooks/usePlaybackActions";
 import { useUIStore } from "@/store/uiStore";
 import toast from "react-hot-toast";
 
