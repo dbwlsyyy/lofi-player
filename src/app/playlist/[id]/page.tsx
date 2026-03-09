@@ -3,7 +3,6 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import { Track } from "@/store/playerStore";
 import {
   fetchPlaylistTracks,
   removeTrackFromPlaylist,
@@ -25,6 +24,7 @@ import LoadingDots from "@/components/LoadingDots/LoadingDots";
 import { formatTime } from "@/lib/formatTime";
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import Modal from "@/components/Modal/Modal";
+import { Track } from "@/types/spotify";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();

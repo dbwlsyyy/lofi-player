@@ -12,7 +12,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   deviceId: null,
   isReady: false,
   isPlaying: false,
-  isQueueOpen: false,
   volume: 0.5,
   isShuffled: false,
   repeatMode: "off",
@@ -29,10 +28,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       currentIndex: 0,
     });
   },
-  toggleQueue: () =>
-    set((state) => ({
-      isQueueOpen: !state.isQueueOpen,
-    })),
   setDeviceId: (id) => set({ deviceId: id }),
   setIsReady: (ready) => set({ isReady: ready }),
   setIsPlaying: (isPlaying) => set({ isPlaying }),

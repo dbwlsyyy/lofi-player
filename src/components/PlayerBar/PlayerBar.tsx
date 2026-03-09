@@ -20,6 +20,7 @@ import { formatTime } from "@/lib/formatTime";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import LoadingDots from "../LoadingDots/LoadingDots";
+import { useUIStore } from "@/store/uiStore";
 
 export default function PlayerBar() {
   const { data: session } = useSession();
@@ -39,11 +40,11 @@ export default function PlayerBar() {
     nextTrack,
     prevTrack,
     seekTo,
-    toggleQueue,
     setVolume,
     toggleShuffle,
     isLoadingTrack,
   } = usePlayerStore();
+  const { toggleSidebar } = useUIStore();
 
   const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
 
@@ -200,7 +201,7 @@ export default function PlayerBar() {
                   }}
                 />
               </div>
-              <button className={styles.hamburger} onClick={toggleQueue}>
+              <button className={styles.hamburger} onClick={toggleSidebar}>
                 <FiMenu size={22} />
               </button>
             </div>

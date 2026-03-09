@@ -1,4 +1,4 @@
-import { Track } from "@/store/playerStore";
+import { Track } from "@/types/spotify";
 import { createSpotifyClient } from "../lib/spotifyClient";
 
 export async function fetchMe(accessToken: string): Promise<SpotifyUser> {

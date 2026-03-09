@@ -32,7 +32,6 @@ export type PlayerState = {
 
   position: number;
   duration: number;
-  isQueueOpen: boolean;
 
   setPlayerInstance: (player: Spotify.Player | null) => void;
 
@@ -49,7 +48,6 @@ export type PlayerState = {
   syncStateFromSdk: (state: Spotify.PlaybackState) => void;
 
   setQueue: (tracks: Track[]) => void;
-  toggleQueue: () => void;
   setDeviceId: (id: string | null) => void;
   setIsPlaying: (state: boolean) => void;
   setIsReady: (ready: boolean) => void;

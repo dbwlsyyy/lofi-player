@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { usePlayControl } from "@/hooks/usePlayControl";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useUIStore } from "@/store/uiStore";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
@@ -12,7 +13,8 @@ export default function QueueSidebar() {
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const router = useRouter();
-  const { queue, currentIndex, currentTrack, isQueueOpen } = usePlayerStore();
+  const { queue, currentIndex, currentTrack } = usePlayerStore();
+  const { isSidebarOpen } = useUIStore();
   const { playFromPlaylist } = usePlayControl();
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function QueueSidebar() {
   }, [currentIndex]);
 
   return (
-    <aside className={`${styles.sidebar} ${isQueueOpen ? styles.open : ""}`}>
+    <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
       <h2 className={styles.title}>Playlist</h2>
       {currentTrack && (
         <>
