@@ -21,7 +21,7 @@ import {
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import LoadingDots from "@/components/LoadingDots/LoadingDots";
-import { formatTime } from "@/lib/formatTime";
+import { formatTime, formatTotalDuration } from "@/lib/formatTime";
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import Modal from "@/components/Modal/Modal";
 import { Track } from "@/types/player";
@@ -161,13 +161,6 @@ export default function PlaylistDetailPage() {
     (acc, track) => acc + (track.durationMs || 0),
     0,
   );
-  const formatTotalDuration = (ms: number) => {
-    if (!ms || ms <= 0) return "0분";
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
-  };
 
   const handleRemoveClick = (e: React.MouseEvent, trackUri: string) => {
     e.stopPropagation();
