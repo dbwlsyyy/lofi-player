@@ -10,12 +10,12 @@ import { uiToast } from "@/lib/toasts";
 import styles from "./Digging.module.css";
 import NavBar from "../../components/common/NavToggle/NavToggle";
 
-import SearchBar from "./components/SearchBar";
-import FilterBar from "./components/FilterBar";
-import TrackList from "./components/TrackList";
-import ArtistGrid from "./components/ArtistGrid";
-import AlbumGrid from "./components/AlbumGrid";
-import PlaylistList from "./components/PlaylistList";
+import SearchBar from "./components/SearchBar/SearchBar";
+import FilterBar from "./components/FilterBar/FilterBar";
+import TrackList from "./components/TrackList/TrackList";
+import ArtistGrid from "./components/ArtistGrid/ArtistGrid";
+import AlbumGrid from "./components/AlbumGrid/AlbumGrid";
+import PlaylistList from "./components/PlaylistList/PlaylistList";
 import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
 
 export default function DiggingPage() {

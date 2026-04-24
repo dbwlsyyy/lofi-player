@@ -1,7 +1,7 @@
 "use client";
 
 import { SearchFilter } from "@/types/api";
-import styles from "../Digging.module.css";
+import styles from "./FilterBar.module.css";
 
 interface FilterBarProps {
   filter: SearchFilter;

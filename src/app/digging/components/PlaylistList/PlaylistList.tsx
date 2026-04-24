@@ -3,17 +3,14 @@
 import Image from "next/image";
 import { FiUser, FiDisc } from "react-icons/fi";
 import { SearchResult } from "@/types/api";
-import styles from "../Digging.module.css";
+import styles from "./PlaylistList.module.css";
 
 interface PlaylistListProps {
   playlists: SearchResult[];
   onClick: (id: string) => void;
 }
 
-export default function PlaylistList({
-  playlists,
-  onClick,
-}: PlaylistListProps) {
+export default function PlaylistList({ playlists, onClick }: PlaylistListProps) {
   return (
     <div className={styles.listContainer}>
       {playlists.map((item) => (

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FiPlay, FiPlus } from "react-icons/fi";
 import { SearchResult } from "@/types/api";
-import styles from "../Digging.module.css";
+import styles from "./TrackList.module.css";
 
 interface TrackListProps {
   tracks: SearchResult[];
@@ -43,9 +43,7 @@ export default function TrackList({ tracks, onPlay, onAdd }: TrackListProps) {
           </div>
 
           <div className={styles.trackTrailing}>
-            <span className={styles.duration}>
-              {formatDuration(item.durationMs)}
-            </span>
+            <span className={styles.duration}>{formatDuration(item.durationMs)}</span>
             <div className={styles.trackActions}>
               <button
                 className={styles.actionBtn}

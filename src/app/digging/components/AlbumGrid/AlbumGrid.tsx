@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { FiChevronDown } from "react-icons/fi";
-import styles from "../Digging.module.css";
 import { SearchResult } from "@/types/api";
+import styles from "./AlbumGrid.module.css";
 
 interface AlbumGridProps {
   albums: SearchResult[];
@@ -59,9 +59,7 @@ export default function AlbumGrid({ albums, onClick }: AlbumGridProps) {
               />
 
               {/* 연도 배지 (이미지 위에 오버레이) */}
-              <div className={styles.yearBadge}>
-                {item.releaseDate?.split("-")[0]}
-              </div>
+              <div className={styles.yearBadge}>{item.releaseDate?.split("-")[0]}</div>
             </div>
 
             <div className={styles.cardInfo}>

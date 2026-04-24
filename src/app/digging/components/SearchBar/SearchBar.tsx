@@ -1,7 +1,7 @@
 "use client";
 
 import { FiSearch } from "react-icons/fi";
-import styles from "../Digging.module.css";
+import styles from "./SearchBar.module.css";
 
 interface SearchBarProps {
   query: string;
