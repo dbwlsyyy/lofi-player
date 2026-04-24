@@ -1,0 +1,468 @@
+.container {
+  position: relative;
+  min-height: 100vh;
+  color: #fff;
+  margin-top: 3rem;
+  padding-bottom: 12rem;
+  z-index: 10;
+}
+
+.contentWrapper {
+  max-width: 120rem;
+  margin: 0 auto;
+  padding: 12rem 4rem;
+  pointer-events: auto;
+}
+
+/* --- 1. SearchBar (Minimal Style) --- */
+.searchHeader {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4rem;
+  animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.searchBoxMinimal {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* 바닥선만 존재 */
+  padding: 1rem 0.5rem;
+  width: 100%;
+  max-width: 60rem;
+  transition: all 0.3s ease;
+}
+
+.searchBoxMinimal:focus-within {
+  border-bottom-color: #fff;
+  transform: translateY(-2px);
+}
+
+.searchIcon {
+  font-size: 2.4rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 2.4rem; /* 폰트 큼직하게 */
+  font-weight: 300;
+  width: 100%;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- 2. FilterBar --- */
+.filterBar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5rem;
+  animation: slideUp 0.8s ease-out backwards;
+  animation-delay: 0.1s;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 3rem;
+}
+
+.filterBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.6rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid transparent; /* 밑줄 효과 준비 */
+}
+
+.filterBtn:hover {
+  color: #fff;
+}
+
+.filterBtn.active {
+  color: #fff;
+  border-bottom-color: #fff; /* 활성화 시 밑줄 */
+}
+
+/* --- 3. Track List --- */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  animation: slideUp 0.6s ease-out;
+}
+
+.trackRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 2rem;
+  border-radius: 1.2rem;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.trackRow:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.trackLeading {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+.trackImgWrapper {
+  position: relative;
+  width: 5.2rem;
+  height: 5.2rem;
+  border-radius: 0.6rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.trackImg {
+  object-fit: cover;
+}
+
+.trackMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  overflow: hidden;
+}
+
+.trackMeta .name {
+  font-size: 1.6rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackMeta .artist {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackTrailing {
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+}
+
+.duration {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-variant-numeric: tabular-nums;
+  min-width: 4rem;
+  text-align: right;
+}
+
+.trackActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.actionBtn {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* --- 4. Grids (Album, Artist, Playlist) --- */
+.gridWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: slideUp 0.6s ease-out;
+}
+
+.subFilter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.miniSelect {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  outline: none;
+  padding-right: 1rem;
+}
+.miniSelect option {
+  background: #0f172a;
+  color: #fff;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 3rem 2.4rem;
+}
+
+/* 앨범/플레이리스트 카드 */
+.albumCard {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.albumCard:hover {
+  transform: translateY(-0.6rem);
+}
+
+.albumImgWrapper {
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  margin-bottom: 1.4rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+.albumImg {
+  object-fit: cover;
+}
+
+.cardInfo {
+  margin-top: 0.5rem;
+}
+
+.albumName {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.3rem;
+}
+
+.dot {
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+/* --- Custom Dropdown (Glassmorphism) --- */
+.customSelectWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.customSelect {
+  appearance: none; /* 기본 화살표 제거 */
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.8rem 3.2rem 0.8rem 1.6rem;
+  border-radius: 2rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.customSelect:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.selectIcon {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  font-size: 1.4rem;
+}
+
+/* --- Grouped Album Grid --- */
+.groupedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem; /* 연도별 간격 */
+}
+
+.yearSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.yearHeader {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-left: 0.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+/* 연도 옆에 작은 장식 */
+.yearHeader::after {
+  content: "";
+  display: block;
+  width: 2rem;
+  height: 2px;
+  background: #3b82f6;
+  margin-top: 0.4rem;
+  border-radius: 2px;
+}
+
+/* 앨범 연도 배지 스타일 */
+.yearBadge {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(0.4rem);
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+/* 플레이리스트 메타 정보 스타일 */
+.metaRowList {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.4rem;
+}
+
+.metaBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 100px;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+
+/* --- Playlist List Style --- */
+.metaRowList {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.4rem;
+}
+
+.metaBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 100px;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 아티스트 카드 */
+.artistCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s;
+  animation: slideUp 0.6s ease-out;
+}
+
+.artistCard:hover {
+  transform: translateY(-0.6rem);
+}
+
+.artistImgWrapper {
+  position: relative;
+  width: 15rem;
+  height: 15rem;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 1.4rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.artistImg {
+  object-fit: cover;
+}
+
+.artistName {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* 상태 메시지 */
+.statusMsg {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.6rem;
+  margin-top: 8rem;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

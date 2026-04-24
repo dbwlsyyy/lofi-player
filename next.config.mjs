@@ -1,18 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: true,
-    images: {
-        remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: 'i.scdn.co',
-            },
-            {
-                protocol: 'https',
-                hostname: 'mosaic.scdn.co',
-            },
-        ],
-    },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.spotifycdn.com", // 👈 모든 spotifycdn 서브도메인 허용 (fa, ak 등)
+      },
+      {
+        protocol: "https",
+        hostname: "*.scdn.co", // 👈 i.scdn.co, mosaic.scdn.co 등 모두 허용
+      },
+    ],
+  },
 };
 
 export default nextConfig;

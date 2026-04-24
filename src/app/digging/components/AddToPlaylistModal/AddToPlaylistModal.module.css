@@ -1,0 +1,120 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(0.4rem);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.content {
+  width: 100%;
+  max-width: 36rem;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(2rem);
+  -webkit-backdrop-filter: blur(2rem);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3.2rem;
+  padding: 2.4rem;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.5);
+
+  animation: modalUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.header h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.header p {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.list {
+  max-height: 32rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  /* 스크롤바 숨기기 */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  border-radius: 1.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+  text-align: left;
+}
+
+.item:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.imgBox {
+  position: relative;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.closeBtn {
+  width: 100%;
+  padding: 1.2rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: #fff;
+}
+
+@keyframes modalUp {
+  from {
+    opacity: 0;
+    transform: translateY(4rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
