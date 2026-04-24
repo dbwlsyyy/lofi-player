@@ -20,6 +20,7 @@ import { formatTime } from "@/lib/formatTime";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import LoadingDots from "../LoadingDots/LoadingDots";
+import { useUIStore } from "@/store/useUiStore";
 
 export default function PlayerBar() {
   const { data: session } = useSession();
@@ -39,11 +40,11 @@ export default function PlayerBar() {
     nextTrack,
     prevTrack,
     seekTo,
-    toggleQueue,
     setVolume,
     toggleShuffle,
     isLoadingTrack,
   } = usePlayerStore();
+  const { toggleSidebar } = useUIStore();
 
   const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
 
@@ -134,7 +135,10 @@ export default function PlayerBar() {
                     >
                       <FaRandom size={17} />
                     </button>
-                    <button onClick={prevTrack} className={styles.controlBtn}>
+                    <button
+                      onClick={prevTrack}
+                      className={styles.controlBtn}
+                    >
                       <FaStepBackward style={{ marginLeft: "2rem" }} />
                     </button>
                     <button
@@ -144,7 +148,10 @@ export default function PlayerBar() {
                     >
                       {isPlaying ? <FaPause /> : <FaPlay />}
                     </button>
-                    <button onClick={nextTrack} className={styles.controlBtn}>
+                    <button
+                      onClick={nextTrack}
+                      className={styles.controlBtn}
+                    >
                       <FaStepForward style={{ marginRight: "2rem" }} />
                     </button>
                     <button
@@ -165,7 +172,10 @@ export default function PlayerBar() {
 
               <div className={styles.progressContainer}>
                 <span className={styles.timeText}>{formatTime(position)}</span>
-                <div className={styles.progressBar} onClick={handleSeek}>
+                <div
+                  className={styles.progressBar}
+                  onClick={handleSeek}
+                >
                   <div
                     className={styles.progressFill}
                     style={{ width: `${progressPercent}%` }}
@@ -200,7 +210,10 @@ export default function PlayerBar() {
                   }}
                 />
               </div>
-              <button className={styles.hamburger} onClick={toggleQueue}>
+              <button
+                className={styles.hamburger}
+                onClick={toggleSidebar}
+              >
                 <FiMenu size={22} />
               </button>
             </div>

@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  fetchPlaylists,
-  type SpotifyPlaylistItem,
-} from "@/apis/spotifyUserApi";
+import { fetchPlaylists } from "@/apis/userApi";
 import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
+import { SpotifyPlaylistItem } from "@/types/api";
 
 interface AddModalProps {
   isOpen: boolean;

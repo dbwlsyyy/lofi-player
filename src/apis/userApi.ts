@@ -1,29 +1,49 @@
-import { Track } from "@/store/usePlayerStore";
-import { createSpotifyClient } from "../lib/spotifyClient";
+// 유저 관련 Web API (JSDoc 포함)
 
+import { Track } from "@/types/player";
+import { createSpotifyClient } from "../lib/spotifyClient";
+import {
+  SearchFilter,
+  SearchResult,
+  SpotifyPlaylistItem,
+  SpotifyPlaylistResponse,
+  SpotifyUser,
+} from "@/types/api";
+
+/**
+ * [내 정보 가져오기]
+ */
 export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
   try {
     const api = createSpotifyClient(accessToken);
     const { data } = await api.get<SpotifyUser>("/me");
     return data;
   } catch (e: any) {
-    console.error("fetchMe API Error:", e.response?.status, e.message);
+    console.error("fetchMe API 에러:", e.response?.status, e.message);
     throw e; // 다시 던짐 (호출부에서 처리)
   }
 }
 
-export async function fetchPlaylists(accessToken: string): Promise<SpotifyPlaylistItem[]> {
+/**
+ * [내 플레이리스트 목록 가져오기]
+ */
+export async function fetchPlaylists(
+  accessToken: string,
+): Promise<SpotifyPlaylistItem[]> {
   try {
     const api = createSpotifyClient(accessToken);
     const { data } = await api.get<SpotifyPlaylistResponse>("/me/playlists");
     return data.items;
   } catch (e: any) {
-    console.error("fetchPlaylist API error:", e.response?.status, e.message);
+    console.error("fetchPlaylist API 에러:", e.response?.status, e.message);
     throw e;
   }
 }
 
-// 특정 플레이리스트의 트랙 목록 불러오기
+/**
+ * [특정 플리 트랙 가져오기]
+ * 플레이리스트 ID를 던지면 Track[] 타입으로 변환해서 return
+ */
 export async function fetchPlaylistTracks(
   accessToken: string,
   playlistId: string,
@@ -34,7 +54,7 @@ export async function fetchPlaylistTracks(
 
     // Spotify API의 응답 구조는 { items: [{ track: { ... } }] } 형태
     return data.items
-      .filter((item: any) => !!item.track) // null 트랙 방지
+      .filter((item: any) => !!item.track) // null 트랙 방지 (삭제된 곡 등)
       .map((item: any) => ({
         id: item.track.id,
         name: item.track.name,
@@ -45,13 +65,23 @@ export async function fetchPlaylistTracks(
         previewUrl: item.track.preview_url ?? undefined,
       }));
   } catch (e: any) {
-    console.error(`fetchPlaylistTracks(${playlistId}) error:`, e.response?.status, e.message);
+    console.error(
+      `fetchPlaylistTracks(${playlistId}) 에러:`,
+      e.response?.status,
+      e.message,
+    );
     throw e;
   }
 }
 
-// 플레이리스트 이름 수정 API
-export async function updatePlaylistName(accessToken: string, playlistId: string, newName: string) {
+/**
+ * [플리 이름 수정]
+ */
+export async function updatePlaylistName(
+  accessToken: string,
+  playlistId: string,
+  newName: string,
+) {
   try {
     const api = createSpotifyClient(accessToken);
     await api.put(`/playlists/${playlistId}`, {
@@ -64,6 +94,9 @@ export async function updatePlaylistName(accessToken: string, playlistId: string
   }
 }
 
+/**
+ * [플리에서 곡 삭제]
+ */
 export async function removeTrackFromPlaylist(
   accessToken: string,
   playlistId: string,
@@ -82,23 +115,31 @@ export async function removeTrackFromPlaylist(
   }
 }
 
-//
-export interface SearchResult {
-  id: string;
-  name: string;
-  image: string;
-  type: "track" | "artist" | "album" | "playlist"; // playlist 추가
-  uri: string;
-  artists?: string[];
-  durationMs?: number;
-  releaseDate?: string; // 앨범 정렬용
-  owner?: string; // 플레이리스트 제작자용
-  tracksTotal?: number; // 곡 수 추가
-  description?: string; // 설명 추가
+/**
+ * [플리에 곡 추가]
+ */
+export async function addTrackToPlaylist(
+  accessToken: string,
+  playlistId: string,
+  trackUri: string,
+) {
+  try {
+    const api = createSpotifyClient(accessToken);
+    // Spotify API 명세: POST /playlists/{playlist_id}/tracks
+    await api.post(`/playlists/${playlistId}/tracks`, {
+      uris: [trackUri], // 배열 형태로 전달해야 함
+    });
+    return true;
+  } catch (e: any) {
+    console.error("곡 추가 실패:", e.response?.status, e.message);
+    throw e;
+  }
 }
 
-export type SearchFilter = "track" | "artist" | "album" | "playlist"; // all 제거
-
+/**
+ * [디깅용]
+ * 입력한 쿼리(query)와 필터(곡, 아티스트, 앨범, 플리)에 따라 Spotify DB에서 검색
+ */
 export async function searchSpotify(
   accessToken: string,
   query: string,
@@ -163,43 +204,4 @@ export async function searchSpotify(
     uri: t.uri,
     durationMs: t.duration_ms, // 시간 표시용
   }));
-}
-
-// 플레이리스트에 곡 추가 API
-export async function addTrackToPlaylist(
-  accessToken: string,
-  playlistId: string,
-  trackUri: string,
-) {
-  try {
-    const api = createSpotifyClient(accessToken);
-    // Spotify API 명세: POST /playlists/{playlist_id}/tracks
-    await api.post(`/playlists/${playlistId}/tracks`, {
-      uris: [trackUri], // 배열 형태로 전달해야 함
-    });
-    return true;
-  } catch (e: any) {
-    console.error("곡 추가 실패:", e.response?.status, e.message);
-    throw e;
-  }
-}
-
-export interface SpotifyUser {
-  display_name: string;
-  email: string;
-  id: string;
-  images: { url: string }[];
-  product?: string;
-}
-
-export interface SpotifyPlaylistItem {
-  id: string;
-  name: string;
-  images: { url: string }[];
-  tracks: { total: number };
-  // owner?: { display_name: string };
-}
-
-export interface SpotifyPlaylistResponse {
-  items: SpotifyPlaylistItem[];
 }

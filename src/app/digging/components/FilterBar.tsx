@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchFilter } from "@/apis/spotifyUserApi";
+import { SearchFilter } from "@/types/api";
 import styles from "../Digging.module.css";
 
 interface FilterBarProps {

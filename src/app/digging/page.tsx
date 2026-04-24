@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import {
-  searchSpotify,
-  addTrackToPlaylist,
-  type SearchResult,
-  type SearchFilter,
-} from "@/apis/spotifyUserApi";
-import { usePlayControl } from "@/hooks/usePlayControl";
-import { useUIStore } from "@/store/useUIStore";
+import { searchSpotify, addTrackToPlaylist } from "@/apis/userApi";
+import { usePlayControl } from "@/hooks/usePlayTracks";
+import { useUIStore } from "@/store/useUiStore";
 import toast from "react-hot-toast";
 
 import styles from "./Digging.module.css";
@@ -23,6 +18,7 @@ import TrackList from "./components/TrackList";
 import ArtistGrid from "./components/ArtistGrid";
 import AlbumGrid from "./components/AlbumGrid";
 import PlaylistList from "./components/PlaylistList";
+import { SearchFilter, SearchResult } from "@/types/api";
 
 export default function DiggingPage() {
   const { data: session } = useSession();

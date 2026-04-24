@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { FiUser, FiMusic, FiDisc } from "react-icons/fi";
-import { SearchResult } from "@/apis/spotifyUserApi";
+import { FiUser, FiDisc } from "react-icons/fi";
+import { SearchResult } from "@/types/api";
 import styles from "../Digging.module.css";
 
 interface PlaylistListProps {

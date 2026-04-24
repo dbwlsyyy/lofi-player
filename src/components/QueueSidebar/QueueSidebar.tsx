@@ -2,9 +2,10 @@
 import { usePlayerStore } from "@/store/usePlayerStore";
 import styles from "./QueueSidebar.module.css";
 import { useEffect, useRef } from "react";
-import { usePlayControl } from "@/hooks/usePlayControl";
+import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useUIStore } from "@/store/useUiStore";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
@@ -12,7 +13,8 @@ export default function QueueSidebar() {
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const router = useRouter();
-  const { queue, currentIndex, currentTrack, isQueueOpen } = usePlayerStore();
+  const { queue, currentIndex, currentTrack } = usePlayerStore();
+  const { isSidebarOpen } = useUIStore();
   const { playFromPlaylist } = usePlayControl();
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function QueueSidebar() {
   }, [currentIndex]);
 
   return (
-    <aside className={`${styles.sidebar} ${isQueueOpen ? styles.open : ""}`}>
+    <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
       <h2 className={styles.title}>Playlist</h2>
       {currentTrack && (
         <>
@@ -37,7 +39,10 @@ export default function QueueSidebar() {
               router.push(`/song/${currentTrack.id}`);
             }}
           >
-            <img src={currentTrack.image} className={styles.thumb} />
+            <img
+              src={currentTrack.image}
+              className={styles.thumb}
+            />
 
             <div className={styles.textGroup}>
               <div className={styles.titleText}>{currentTrack.name}</div>
@@ -69,7 +74,10 @@ export default function QueueSidebar() {
               onClick={() => playFromPlaylist(queue, index, token!)}
               className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
             >
-              <img src={track.image} className={styles.thumb} />
+              <img
+                src={track.image}
+                className={styles.thumb}
+              />
 
               <div className={styles.textGroup}>
                 <div className={styles.titleText}>{track.name}</div>

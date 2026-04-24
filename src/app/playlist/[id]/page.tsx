@@ -3,15 +3,14 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import { Track } from "@/store/usePlayerStore";
 import {
   fetchPlaylistTracks,
   removeTrackFromPlaylist,
   updatePlaylistName,
-} from "@/apis/spotifyUserApi";
+} from "@/apis/userApi";
 import { useSession } from "next-auth/react";
-import { usePlayControl } from "@/hooks/usePlayControl";
-import { useUIStore } from "@/store/useUIStore";
+import { usePlayControl } from "@/hooks/usePlayTracks";
+import { useUIStore } from "@/store/useUiStore";
 import {
   FaPlay,
   FaMusic,
@@ -22,9 +21,10 @@ import {
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import LoadingDots from "@/components/LoadingDots/LoadingDots";
-import { formatTime } from "@/lib/formatTime";
+import { formatTime, formatTotalDuration } from "@/lib/formatTime";
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import Modal from "@/components/Modal/Modal";
+import { Track } from "@/types/player";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -63,7 +63,10 @@ export default function PlaylistDetailPage() {
         toast(
           (t) => (
             <div className="toast-message">
-              <FiAlertTriangle size="1.6rem" color="#ff5555" />
+              <FiAlertTriangle
+                size="1.6rem"
+                color="#ff5555"
+              />
               <span>트랙 정보를 불러오지 못했습니다.</span>
             </div>
           ),
@@ -96,7 +99,10 @@ export default function PlaylistDetailPage() {
               gap: "0.8rem",
             }}
           >
-            <FiCheckCircle size="1.6rem" color="#3b82f6" />
+            <FiCheckCircle
+              size="1.6rem"
+              color="#3b82f6"
+            />
             <span>플레이리스트 이름이 변경되었습니다.</span>
           </div>
         ),
@@ -116,7 +122,10 @@ export default function PlaylistDetailPage() {
         toast(
           (t) => (
             <div className="toast-message">
-              <FiAlertTriangle size="1.6rem" color="#ff5555" />
+              <FiAlertTriangle
+                size="1.6rem"
+                color="#ff5555"
+              />
               <span>이름을 수정할 권한이 없습니다. 다시 로그인해주세요.</span>
             </div>
           ),
@@ -126,7 +135,10 @@ export default function PlaylistDetailPage() {
         toast(
           (t) => (
             <div className="toast-message">
-              <FiAlertTriangle size="1.6rem" color="#ff5555" />
+              <FiAlertTriangle
+                size="1.6rem"
+                color="#ff5555"
+              />
               <span>이름 수정 중 오류가 발생했습니다.</span>
             </div>
           ),
@@ -149,13 +161,6 @@ export default function PlaylistDetailPage() {
     (acc, track) => acc + (track.durationMs || 0),
     0,
   );
-  const formatTotalDuration = (ms: number) => {
-    if (!ms || ms <= 0) return "0분";
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
-  };
 
   const handleRemoveClick = (e: React.MouseEvent, trackUri: string) => {
     e.stopPropagation();
@@ -182,7 +187,10 @@ export default function PlaylistDetailPage() {
               gap: "0.8rem",
             }}
           >
-            <FiCheckCircle size="1.6rem" color="#3b82f6" />
+            <FiCheckCircle
+              size="1.6rem"
+              color="#3b82f6"
+            />
             <span>곡이 삭제되었습니다.</span>
           </div>
         ),
@@ -193,7 +201,10 @@ export default function PlaylistDetailPage() {
       toast(
         (t) => (
           <div className="toast-message">
-            <FiAlertTriangle size="1.6rem" color="#ff5555" />
+            <FiAlertTriangle
+              size="1.6rem"
+              color="#ff5555"
+            />
             <span>곡 삭제에 실패했습니다.</span>
           </div>
         ),
