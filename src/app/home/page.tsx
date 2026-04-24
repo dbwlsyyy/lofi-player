@@ -2,12 +2,7 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import {
-  fetchMe,
-  fetchPlaylists,
-  type SpotifyPlaylistItem,
-  type SpotifyUser,
-} from "@/apis/userApi";
+import { fetchMe, fetchPlaylists } from "@/apis/userApi";
 import styles from "./Home.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -15,6 +10,7 @@ import { useUIStore } from "@/store/useUiStore";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import NavToggle from "./components/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";
+import { SpotifyPlaylistItem, SpotifyUser } from "@/types/api";
 
 export default function HomePage() {
   const { data: session, status } = useSession();

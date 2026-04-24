@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FiPlay, FiPlus } from "react-icons/fi";
-import { SearchResult } from "@/apis/userApi";
+import { SearchResult } from "@/types/api";
 import styles from "../Digging.module.css";
 
 interface TrackListProps {
@@ -23,7 +23,10 @@ export default function TrackList({ tracks, onPlay, onAdd }: TrackListProps) {
   return (
     <div className={styles.listContainer}>
       {tracks.map((item) => (
-        <div key={item.id} className={styles.trackRow}>
+        <div
+          key={item.id}
+          className={styles.trackRow}
+        >
           <div className={styles.trackLeading}>
             <div className={styles.trackImgWrapper}>
               <Image
