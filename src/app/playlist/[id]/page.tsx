@@ -3,25 +3,14 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import {
-  fetchPlaylistTracks,
-  removeTrackFromPlaylist,
-  updatePlaylistName,
-} from "@/apis/userApi";
+import { fetchPlaylistTracks, removeTrackFromPlaylist, updatePlaylistName } from "@/apis/userApi";
 import { useSession } from "next-auth/react";
 import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useUIStore } from "@/store/useUiStore";
-import {
-  FaPlay,
-  FaMusic,
-  FaRegEdit,
-  FaCheck,
-  FaTimes,
-  FaRegTrashAlt,
-} from "react-icons/fa";
-import LoadingDots from "@/components/LoadingDots/LoadingDots";
+import { FaPlay, FaMusic, FaRegEdit, FaCheck, FaTimes, FaRegTrashAlt } from "react-icons/fa";
+import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTime, formatTotalDuration } from "@/lib/formatTime";
-import Modal from "@/components/Modal/Modal";
+import ConfirmModal from "@/components/modal/ConfirmModal/ConfirmModal";
 import { Track } from "@/types/player";
 import { uiToast } from "@/lib/toasts";
 
@@ -106,10 +95,7 @@ export default function PlaylistDetailPage() {
     }
   };
 
-  const totalMs = tracks.reduce(
-    (acc, track) => acc + (track.durationMs || 0),
-    0,
-  );
+  const totalMs = tracks.reduce((acc, track) => acc + (track.durationMs || 0), 0);
 
   const handleRemoveClick = (e: React.MouseEvent, trackUri: string) => {
     e.stopPropagation();
@@ -204,9 +190,7 @@ export default function PlaylistDetailPage() {
                   <span className={styles.dot}>•</span>
                   <span>{tracks.length} tracks</span>
                   <span className={styles.dot}>•</span>
-                  <span>
-                    {loading ? "0시간 00분" : formatTotalDuration(totalMs)}
-                  </span>
+                  <span>{loading ? "0시간 00분" : formatTotalDuration(totalMs)}</span>
                 </div>
                 <button
                   className={styles.playBtn}
@@ -251,12 +235,8 @@ export default function PlaylistDetailPage() {
                         />
                         <p className={styles.name}>{t.name}</p>
                       </div>
-                      <span className={styles.artist}>
-                        {t.artists.join(", ")}
-                      </span>
-                      <span className={styles.time}>
-                        {formatTime(t.durationMs)}
-                      </span>
+                      <span className={styles.artist}>{t.artists.join(", ")}</span>
+                      <span className={styles.time}>{formatTime(t.durationMs)}</span>
                       <button
                         className={styles.removeBtn}
                         onClick={(e) => handleRemoveClick(e, t.uri)}
@@ -273,7 +253,7 @@ export default function PlaylistDetailPage() {
         )}
       </div>
 
-      <Modal
+      <ConfirmModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmDelete}

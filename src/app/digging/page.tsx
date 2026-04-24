@@ -8,8 +8,7 @@ import { useUIStore } from "@/store/useUiStore";
 import { SearchFilter, SearchResult } from "@/types/api";
 import { uiToast } from "@/lib/toasts";
 import styles from "./Digging.module.css";
-import NavBar from "../home/components/NavToggle/NavToggle";
-import AddToPlaylistModal from "./components/AddToPlaylistModal/AddToPlaylistModal";
+import NavBar from "../../components/common/NavToggle/NavToggle";
 
 import SearchBar from "./components/SearchBar";
 import FilterBar from "./components/FilterBar";
@@ -17,6 +16,7 @@ import TrackList from "./components/TrackList";
 import ArtistGrid from "./components/ArtistGrid";
 import AlbumGrid from "./components/AlbumGrid";
 import PlaylistList from "./components/PlaylistList";
+import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
 
 export default function DiggingPage() {
   const { data: session } = useSession();

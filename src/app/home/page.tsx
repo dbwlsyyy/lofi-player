@@ -7,8 +7,8 @@ import styles from "./Home.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/useUiStore";
-import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
-import NavToggle from "./components/NavToggle/NavToggle";
+import LoadingSpinner from "@/components/loading/LoadingSpinner/LoadingSpinner";
+import NavToggle from "../../components/common/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";
 import { SpotifyPlaylistItem, SpotifyUser } from "@/types/api";
 
@@ -62,9 +62,7 @@ export default function HomePage() {
             <div className={styles.section}>
               {error && <p className={styles.error}>{error}</p>}
 
-              <div className={styles.loginHero}>
-                {!me && <LoginHero onLogin={handleLogin} />}
-              </div>
+              <div className={styles.loginHero}>{!me && <LoginHero onLogin={handleLogin} />}</div>
 
               {me && (
                 <>
