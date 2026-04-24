@@ -5,20 +5,18 @@ import { useSession } from "next-auth/react";
 import { searchSpotify, addTrackToPlaylist } from "@/apis/userApi";
 import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useUIStore } from "@/store/useUiStore";
-import toast from "react-hot-toast";
-
+import { SearchFilter, SearchResult } from "@/types/api";
+import { uiToast } from "@/lib/toasts";
 import styles from "./Digging.module.css";
 import NavBar from "../home/components/NavToggle/NavToggle";
 import AddToPlaylistModal from "./components/AddToPlaylistModal/AddToPlaylistModal";
 
-// 분리한 컴포넌트 임포트
 import SearchBar from "./components/SearchBar";
 import FilterBar from "./components/FilterBar";
 import TrackList from "./components/TrackList";
 import ArtistGrid from "./components/ArtistGrid";
 import AlbumGrid from "./components/AlbumGrid";
 import PlaylistList from "./components/PlaylistList";
-import { SearchFilter, SearchResult } from "@/types/api";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
@@ -73,14 +71,7 @@ export default function DiggingPage() {
       durationMs: item.durationMs || 0,
     };
     playFromPlaylist([trackToPlay], 0, session.accessToken);
-    toast.success(
-      <div className="toast-content">
-        <div className="toast-message">바로 재생</div>
-        <div className="toast-divider" />
-        <span style={{ opacity: 0.6 }}>{item.name}</span>
-      </div>,
-      { className: "minimal-toast", icon: null },
-    );
+    uiToast.custom("준비 중인 기능", null);
   };
 
   const handleAddClick = (uri: string) => {
@@ -93,17 +84,14 @@ export default function DiggingPage() {
     try {
       await addTrackToPlaylist(session.accessToken, playlistId, targetTrackUri);
       setIsModalOpen(false);
-      toast.success("플리에 추가완료!", {
-        className: "minimal-toast",
-        icon: null,
-      });
+      uiToast.success("내 플리에 추가 완료!");
     } catch (error) {
-      toast.error("추가 실패");
+      uiToast.error("곡 추가 실패!");
     }
   };
 
   const handlePending = (msg: string) => {
-    toast(msg + " 준비중", { className: "minimal-toast", icon: null });
+    uiToast.custom("준비 중인 기능", null);
   };
 
   return (

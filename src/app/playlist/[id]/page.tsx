@@ -19,12 +19,11 @@ import {
   FaTimes,
   FaRegTrashAlt,
 } from "react-icons/fa";
-import toast from "react-hot-toast";
 import LoadingDots from "@/components/LoadingDots/LoadingDots";
 import { formatTime, formatTotalDuration } from "@/lib/formatTime";
-import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import Modal from "@/components/Modal/Modal";
 import { Track } from "@/types/player";
+import { uiToast } from "@/lib/toasts";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -60,18 +59,7 @@ export default function PlaylistDetailPage() {
         setTracks(tracksWithKey);
       } catch (err) {
         console.error("로드 실패:", err);
-        toast(
-          (t) => (
-            <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
-              <span>트랙 정보를 불러오지 못했습니다.</span>
-            </div>
-          ),
-          { className: "minimal-toast" },
-        );
+        uiToast.error("트랙 정보를 불러오지 못했습니다.");
       } finally {
         setLoading(false);
       }
@@ -90,24 +78,7 @@ export default function PlaylistDetailPage() {
 
     try {
       setIsEditing(false);
-      toast(
-        (t) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.8rem",
-            }}
-          >
-            <FiCheckCircle
-              size="1.6rem"
-              color="#3b82f6"
-            />
-            <span>플레이리스트 이름이 변경되었습니다.</span>
-          </div>
-        ),
-        { className: "minimal-toast" },
-      );
+      uiToast.success("플레이리스트 이름이 변경되었습니다.");
 
       await updatePlaylistName(token!, id as string, title);
 
@@ -119,31 +90,9 @@ export default function PlaylistDetailPage() {
     } catch (err: any) {
       setTitle(previousTitle);
       if (err.response?.status === 403) {
-        toast(
-          (t) => (
-            <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
-              <span>이름을 수정할 권한이 없습니다. 다시 로그인해주세요.</span>
-            </div>
-          ),
-          { className: "minimal-toast" },
-        );
+        uiToast.error("이름을 수정할 권한이 없습니다. 다시 로그인해주세요.");
       } else {
-        toast(
-          (t) => (
-            <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
-              <span>이름 수정 중 오류가 발생했습니다.</span>
-            </div>
-          ),
-          { className: "minimal-toast" },
-        );
+        uiToast.error("이름 수정 중 오류가 발생했습니다.");
       }
     }
   };
@@ -178,38 +127,10 @@ export default function PlaylistDetailPage() {
 
     try {
       await removeTrackFromPlaylist(token!, id as string, selectedTrackUri);
-      toast(
-        (t) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.8rem",
-            }}
-          >
-            <FiCheckCircle
-              size="1.6rem"
-              color="#3b82f6"
-            />
-            <span>곡이 삭제되었습니다.</span>
-          </div>
-        ),
-        { className: "minimal-toast" },
-      );
+      uiToast.success("곡이 삭제되었습니다.");
     } catch (err) {
       setTracks(previousTracks); // 실패 시 복구
-      toast(
-        (t) => (
-          <div className="toast-message">
-            <FiAlertTriangle
-              size="1.6rem"
-              color="#ff5555"
-            />
-            <span>곡 삭제에 실패했습니다.</span>
-          </div>
-        ),
-        { className: "minimal-toast" },
-      );
+      uiToast.error("곡 삭제에 실패했습니다.");
     } finally {
       setSelectedTrackUri(null);
     }
