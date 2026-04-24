@@ -82,6 +82,7 @@ export default function HomePage() {
                             src={pl.images?.[0]?.url || "/default_playlist.png"}
                             alt={pl.name}
                             fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                             className={styles.playlistImage}
                           />
                         </div>

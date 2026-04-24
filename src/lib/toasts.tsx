@@ -64,20 +64,13 @@ export const uiToast = {
     ),
 
   // 액션 버튼 (클릭 시 닫힘 로직 포함)
-  action: (
-    message: string,
-    icon: React.ReactNode,
-    actionElement: React.ReactNode,
-    id?: string,
-  ) =>
+  action: (message: string, icon: React.ReactNode, actionElement: React.ReactNode, id?: string) =>
     toast(
       (t) => (
         <ToastLayout
           icon={icon}
           message={message}
-          actionElement={
-            <div onClick={() => toast.dismiss(t.id)}>{actionElement}</div>
-          }
+          actionElement={<div onClick={() => t.id && toast.dismiss(t.id)}>{actionElement}</div>}
         />
       ),
       {

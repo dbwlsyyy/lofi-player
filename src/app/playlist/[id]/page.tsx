@@ -57,6 +57,10 @@ export default function PlaylistDetailPage() {
     load();
   }, [id, token]);
 
+  useEffect(() => {
+    setTitle(playlistName); // URL 변경 시 로컬 상태(title)를 최신 정보로 동기화
+  }, [playlistName]);
+
   const handleUpdateName = async () => {
     if (!title.trim() || title === playlistName) {
       setTitle(playlistName);

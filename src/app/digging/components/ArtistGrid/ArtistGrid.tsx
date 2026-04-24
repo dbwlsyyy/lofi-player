@@ -16,6 +16,7 @@ export default function ArtistGrid({ artists, onClick }: { artists: any[]; onCli
               src={item.image}
               alt={item.name}
               fill
+              sizes="15rem"
               className={styles.artistImg}
             />
           </div>

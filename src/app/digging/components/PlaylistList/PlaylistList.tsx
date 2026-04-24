@@ -26,6 +26,7 @@ export default function PlaylistList({ playlists, onClick }: PlaylistListProps) 
                 src={item.image}
                 alt={item.name}
                 fill
+                sizes="5.2rem"
                 className={styles.trackImg}
               />
             </div>

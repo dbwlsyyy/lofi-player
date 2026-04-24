@@ -55,6 +55,7 @@ export default function AlbumGrid({ albums, onClick }: AlbumGridProps) {
                 src={item.image}
                 alt={item.name}
                 fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 17rem"
                 className={styles.albumImg}
               />
 

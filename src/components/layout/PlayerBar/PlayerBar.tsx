@@ -101,14 +101,18 @@ export default function PlayerBar() {
                   }}
                   className={styles.trackInfo}
                 >
-                  <Image
-                    src={currentTrack.image}
-                    alt={currentTrack.name}
-                    width={60}
-                    height={60}
-                    className={`${styles.albumArt} ${isPlaying ? styles.playingArt : ""}`}
+                  <div
+                    className={styles.albumArtWrapper}
                     onClick={() => router.push(`/song/${currentTrack.id}`)}
-                  />
+                  >
+                    <Image
+                      src={currentTrack.image}
+                      alt={currentTrack.name}
+                      fill
+                      sizes="6rem"
+                      className={`${styles.albumArt} ${isPlaying ? styles.playingArt : ""}`}
+                    />
+                  </div>
                   <div className={styles.textInfo}>
                     <p className={styles.trackName}>{currentTrack.name}</p>
                     <p className={styles.trackArtist}>{currentTrack.artists.join(", ")}</p>
