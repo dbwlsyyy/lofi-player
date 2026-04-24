@@ -11,7 +11,7 @@ import {
 import styles from "./Home.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useUIStore } from "@/store/uiStore";
+import { useUIStore } from "@/store/useUiStore";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import NavToggle from "./components/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";

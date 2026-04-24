@@ -1,4 +1,4 @@
-import { Track } from "@/types/spotify";
+import { Track } from "@/types/player";
 
 // SDK Track → Local Track 변환
 export function mapSdkTrackToLocalTrack(sdkTrack: Spotify.Track): Track {

@@ -1,6 +1,6 @@
 import { setRepeatMode, setShuffle } from "@/apis/playbackApi";
 import { mapSdkTrackToLocalTrack } from "@/lib/spotifyMapper";
-import { PlayerState, RepeatMode } from "@/types/spotify";
+import { PlayerState, RepeatMode } from "@/types/player";
 import { create } from "zustand";
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({

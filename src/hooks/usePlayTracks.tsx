@@ -1,11 +1,10 @@
 // 앨범 정보를 가져오고(Fetch), 큐에 넣고(Queue), 재생 API를 쏘는(Play)
-// 복합적인 액션(Action) 묶음, 복잡한 재생 관련 행동들을 모아둔 곳"
 
 "use client";
 
-import { usePlayerStore } from "@/store/playerStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
 import { startPlayback } from "@/apis/playbackApi";
-import { Track } from "@/types/spotify";
+import { Track } from "@/types/player";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
@@ -56,7 +55,10 @@ export function usePlayControl() {
             (t) => (
               <div className="toast-content">
                 <div className="toast-message">
-                  <FiLock size="1.6rem" color="#ff5555" />
+                  <FiLock
+                    size="1.6rem"
+                    color="#ff5555"
+                  />
                   <span>재생 불가 (성인 인증 필요)</span>
                 </div>
                 <div className="toast-divider"></div>
@@ -82,7 +84,10 @@ export function usePlayControl() {
           toast(
             (t) => (
               <div className="toast-message">
-                <FiAlertCircle size="1.6rem" color="#ff5555" />
+                <FiAlertCircle
+                  size="1.6rem"
+                  color="#ff5555"
+                />
                 <span>플레이어가 비활성화되었습니다. 새로고침 해주세요.</span>
               </div>
             ),
@@ -95,7 +100,10 @@ export function usePlayControl() {
           toast(
             (t) => (
               <div className="toast-message">
-                <FiWifiOff size="1.6rem" color="#ff5555" />
+                <FiWifiOff
+                  size="1.6rem"
+                  color="#ff5555"
+                />
                 <span>네트워크 연결이 불안정합니다.</span>
               </div>
             ),
@@ -108,7 +116,10 @@ export function usePlayControl() {
           toast(
             (t) => (
               <div className="toast-message">
-                <FiAlertTriangle size="1.6rem" color="#ff5555" />
+                <FiAlertTriangle
+                  size="1.6rem"
+                  color="#ff5555"
+                />
                 <span>
                   일시적인 오류가 발생했습니다.{" "}
                   {status
@@ -138,7 +149,10 @@ export function usePlayControl() {
         toast(
           (t) => (
             <div className="toast-message">
-              <FiAlertTriangle size="1.6rem" color="#ff5555" />
+              <FiAlertTriangle
+                size="1.6rem"
+                color="#ff5555"
+              />
               <span>알 수 없는 오류가 발생했습니다. 새로고침 해주세요.</span>
             </div>
           ),

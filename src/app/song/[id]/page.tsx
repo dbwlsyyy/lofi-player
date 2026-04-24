@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { usePlayerStore } from "@/store/playerStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
 import styles from "./SongDetail.module.css";
 import {
   FaChevronDown,
@@ -66,7 +66,10 @@ export default function SongDetailPage() {
 
       <div className={styles.content}>
         <header className={styles.header}>
-          <button className={styles.closeBtn} onClick={handleClose}>
+          <button
+            className={styles.closeBtn}
+            onClick={handleClose}
+          >
             <FaChevronDown />
           </button>
         </header>
@@ -88,7 +91,10 @@ export default function SongDetailPage() {
             </div>
 
             <div className={styles.progressSection}>
-              <div className={styles.progressBar} onClick={handleSeek}>
+              <div
+                className={styles.progressBar}
+                onClick={handleSeek}
+              >
                 <div
                   className={styles.progressFill}
                   style={{ width: `${progressPercent}%` }}
@@ -112,11 +118,17 @@ export default function SongDetailPage() {
                 <FaRandom />
               </button>
 
-              <button className={styles.mainBtn} onClick={prevTrack}>
+              <button
+                className={styles.mainBtn}
+                onClick={prevTrack}
+              >
                 <FaStepBackward />
               </button>
 
-              <button className={styles.playToggle} onClick={togglePlay}>
+              <button
+                className={styles.playToggle}
+                onClick={togglePlay}
+              >
                 {isPlaying ? (
                   <FaPause />
                 ) : (
@@ -124,7 +136,10 @@ export default function SongDetailPage() {
                 )}
               </button>
 
-              <button className={styles.mainBtn} onClick={nextTrack}>
+              <button
+                className={styles.mainBtn}
+                onClick={nextTrack}
+              >
                 <FaStepForward />
               </button>
 

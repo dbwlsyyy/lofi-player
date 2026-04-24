@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useSpotifySDK } from "@/hooks/useInitSpotifyPlayer";
+import { useSpotifySDK } from "@/hooks/useSpotifyPlayerSync";
 
 export default function SDKProvider() {
   const { data: session } = useSession();

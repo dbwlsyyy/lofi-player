@@ -1,6 +1,6 @@
 "use client";
 
-import { useUIStore } from "@/store/uiStore";
+import { useUIStore } from "@/store/useUiStore";
 import styles from "./GlobalBackground.module.css";
 
 export default function GlobalBackground() {

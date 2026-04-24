@@ -1,6 +1,6 @@
 // 유저 관련 Web API (JSDoc 포함)
 
-import { Track } from "@/types/spotify";
+import { Track } from "@/types/player";
 import { createSpotifyClient } from "../lib/spotifyClient";
 import {
   SearchFilter,

@@ -5,7 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { FiHome, FiLogOut } from "react-icons/fi";
 import styles from "./TopNav.module.css";
-import { useUIStore } from "@/store/uiStore";
+import { useUIStore } from "@/store/useUiStore";
 
 export default function TopNav() {
   const pathname = usePathname();
@@ -18,7 +18,11 @@ export default function TopNav() {
 
   return (
     <div className={styles.navContainer}>
-      <Link href="/home" className={styles.iconBtn} title="홈으로">
+      <Link
+        href="/home"
+        className={styles.iconBtn}
+        title="홈으로"
+      >
         <FiHome />
       </Link>
       <button

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { loadSpotifySdk } from "@/lib/loadSpotifySdk";
-import { usePlayerStore } from "@/store/playerStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
 import { transferToDevice } from "@/apis/playbackApi";
 import toast from "react-hot-toast";
 import {
@@ -81,7 +81,10 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                   gap: "0.8rem",
                 }}
               >
-                <FiWifiOff size="1.6rem" color="#ff5555" />
+                <FiWifiOff
+                  size="1.6rem"
+                  color="#ff5555"
+                />
                 <span>플레이어 연결 실패 (네트워크 확인)</span>
               </div>
             ),
@@ -95,7 +98,10 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
           toast(
             (t) => (
               <div className="toast-message">
-                <FiLock size="1.6rem" color="#ff5555" />
+                <FiLock
+                  size="1.6rem"
+                  color="#ff5555"
+                />
                 <span>인증에 실패하였습니다. 다시 로그인해주세요.</span>
               </div>
             ),
@@ -110,7 +116,10 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
             (t) => (
               <div className="toast-content">
                 <div className="toast-message">
-                  <FiUserX size="1.6rem" color="#4f7df3c5" />
+                  <FiUserX
+                    size="1.6rem"
+                    color="#4f7df3c5"
+                  />
                   <span>프리미엄 계정이 필요합니다.</span>
                 </div>
                 <div className="toast-divider"></div>
@@ -144,7 +153,10 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
                   gap: "0.8rem",
                 }}
               >
-                <FiAlertCircle size="1.6rem" color="#ff5555" />
+                <FiAlertCircle
+                  size="1.6rem"
+                  color="#ff5555"
+                />
                 <span>일시적인 재생 오류가 발생했습니다.</span>
               </div>
             ),
@@ -183,7 +195,6 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
 
           if (!state.loading) {
             syncStateFromSdk(state); // 현재 재생 중인 트랙 정보 동기화
-            setIsPlaying(isPlaying);
           }
 
           if (isPlaying) startPolling();

@@ -1,7 +1,7 @@
 // 재생 상태 관련 Web API (JSDoc 포함)
 
 import { createSpotifyClient } from "@/lib/spotifyClient";
-import { RepeatMode } from "@/types/spotify";
+import { RepeatMode } from "@/types/player";
 
 /**
  * [기기 등록] 내 웹 브라우저의 SDK(스피커)를 스포티파이 서버의 '현재 재생 기기'로 등록

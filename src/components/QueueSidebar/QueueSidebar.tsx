@@ -1,11 +1,11 @@
 "use client";
-import { usePlayerStore } from "@/store/playerStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
 import styles from "./QueueSidebar.module.css";
 import { useEffect, useRef } from "react";
-import { usePlayControl } from "@/hooks/usePlaybackActions";
+import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useUIStore } from "@/store/uiStore";
+import { useUIStore } from "@/store/useUiStore";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
@@ -39,7 +39,10 @@ export default function QueueSidebar() {
               router.push(`/song/${currentTrack.id}`);
             }}
           >
-            <img src={currentTrack.image} className={styles.thumb} />
+            <img
+              src={currentTrack.image}
+              className={styles.thumb}
+            />
 
             <div className={styles.textGroup}>
               <div className={styles.titleText}>{currentTrack.name}</div>
@@ -71,7 +74,10 @@ export default function QueueSidebar() {
               onClick={() => playFromPlaylist(queue, index, token!)}
               className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
             >
-              <img src={track.image} className={styles.thumb} />
+              <img
+                src={track.image}
+                className={styles.thumb}
+              />
 
               <div className={styles.textGroup}>
                 <div className={styles.titleText}>{track.name}</div>

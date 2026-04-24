@@ -1,7 +1,7 @@
-import { UIState } from "@/types/ui";
+import { UiState } from "@/types/ui";
 import { create } from "zustand";
 
-export const useUIStore = create<UIState>((set) => ({
+export const useUIStore = create<UiState>((set) => ({
   isRelaxMode: false,
   toggleRelaxMode: () => set((state) => ({ isRelaxMode: !state.isRelaxMode })),
 

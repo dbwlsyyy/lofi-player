@@ -8,8 +8,8 @@ import {
   type SearchResult,
   type SearchFilter,
 } from "@/apis/userApi";
-import { usePlayControl } from "@/hooks/usePlaybackActions";
-import { useUIStore } from "@/store/uiStore";
+import { usePlayControl } from "@/hooks/usePlayTracks";
+import { useUIStore } from "@/store/useUiStore";
 import toast from "react-hot-toast";
 
 import styles from "./Digging.module.css";
@@ -122,7 +122,10 @@ export default function DiggingPage() {
           />
 
           {/* 2. 필터바 컴포넌트 */}
-          <FilterBar filter={filter} setFilter={setFilter} />
+          <FilterBar
+            filter={filter}
+            setFilter={setFilter}
+          />
 
           {/* 3. 결과 렌더링 (조건부) */}
           <div className={styles.resultSection}>
