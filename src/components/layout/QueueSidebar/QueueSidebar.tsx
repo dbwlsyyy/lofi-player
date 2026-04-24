@@ -6,6 +6,7 @@ import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/useUiStore";
+import Image from "next/image";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
@@ -39,16 +40,19 @@ export default function QueueSidebar() {
               router.push(`/song/${currentTrack.id}`);
             }}
           >
-            <img
-              src={currentTrack.image}
-              className={styles.thumb}
-            />
-
+            <div className={styles.thumbWrapper}>
+              <Image
+                src={currentTrack.image || "/default_playlist.png"}
+                alt={currentTrack.name}
+                fill
+                priority
+                sizes="4rem"
+                className={styles.thumb}
+              />
+            </div>
             <div className={styles.textGroup}>
               <div className={styles.titleText}>{currentTrack.name}</div>
-              <div className={styles.artistText}>
-                {currentTrack.artists.join(", ")}
-              </div>
+              <div className={styles.artistText}>{currentTrack.artists.join(", ")}</div>
             </div>
 
             <div className={styles.eqWrapper}>
@@ -74,16 +78,19 @@ export default function QueueSidebar() {
               onClick={() => playFromPlaylist(queue, index, token!)}
               className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
             >
-              <img
-                src={track.image}
-                className={styles.thumb}
-              />
+              <div className={styles.thumbWrapper}>
+                <Image
+                  src={track.image || "/default_album.png"}
+                  alt={track.name}
+                  fill
+                  sizes="4rem"
+                  className={styles.thumb}
+                />
+              </div>
 
               <div className={styles.textGroup}>
                 <div className={styles.titleText}>{track.name}</div>
-                <div className={styles.artistText}>
-                  {track.artists.join(", ")}
-                </div>
+                <div className={styles.artistText}>{track.artists.join(", ")}</div>
               </div>
               {isActive && (
                 <div className={styles.eqWrapper}>

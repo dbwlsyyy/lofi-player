@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import { formatTime } from "@/lib/formatTime";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 export default function SongDetailPage() {
   const { data: session } = useSession();
@@ -76,10 +77,13 @@ export default function SongDetailPage() {
 
         <div className={styles.mainVisual}>
           <div className={styles.albumWrapper}>
-            <img
+            <Image
               key={currentTrack.id}
-              src={currentTrack.image}
+              src={currentTrack.image || "/default-playlist.jpg"}
               alt={currentTrack.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 37.8rem"
               className={`${styles.albumArt} ${isPlaying ? styles.playing : ""}`}
             />
           </div>

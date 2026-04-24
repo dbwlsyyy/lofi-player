@@ -7,12 +7,13 @@ import { fetchPlaylistTracks, removeTrackFromPlaylist, updatePlaylistName } from
 import { useSession } from "next-auth/react";
 import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useUIStore } from "@/store/useUiStore";
-import { FaPlay, FaMusic, FaRegEdit, FaCheck, FaTimes, FaRegTrashAlt } from "react-icons/fa";
+import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaRegTrashAlt } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTime, formatTotalDuration } from "@/lib/formatTime";
 import ConfirmModal from "@/components/modal/ConfirmModal/ConfirmModal";
 import { Track } from "@/types/player";
 import { uiToast } from "@/lib/toasts";
+import Image from "next/image";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -25,11 +26,11 @@ export default function PlaylistDetailPage() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const initialName = searchParams.get("name") || "Your Selection";
+  const playlistName = searchParams.get("name") || "Your Selection";
   const playlistImg = searchParams.get("img");
 
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(initialName);
+  const [title, setTitle] = useState(playlistName);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTrackUri, setSelectedTrackUri] = useState<string | null>(null);
@@ -57,8 +58,8 @@ export default function PlaylistDetailPage() {
   }, [id, token]);
 
   const handleUpdateName = async () => {
-    if (!title.trim() || title === initialName) {
-      setTitle(initialName);
+    if (!title.trim() || title === playlistName) {
+      setTitle(playlistName);
       setIsEditing(false);
       return;
     }
@@ -90,7 +91,7 @@ export default function PlaylistDetailPage() {
     if (e.key === "Enter") {
       handleUpdateName();
     } else if (e.key === "Escape") {
-      setTitle(initialName);
+      setTitle(playlistName);
       setIsEditing(false);
     }
   };
@@ -131,17 +132,14 @@ export default function PlaylistDetailPage() {
 
             <header className={styles.hero}>
               <div className={styles.heroArtWrapper}>
-                {playlistImg ? (
-                  <img
-                    src={playlistImg}
-                    alt="Cover"
-                    className={styles.heroArt}
-                  />
-                ) : (
-                  <div className={styles.emptyArt}>
-                    <FaMusic size={40} />
-                  </div>
-                )}
+                <Image
+                  src={playlistImg || "/default_playlist.png"}
+                  alt={`${playlistName} 앨범 커버`}
+                  fill
+                  priority
+                  sizes="24rem"
+                  className={styles.heroArt}
+                />
               </div>
               <div className={styles.heroText}>
                 <span className={styles.label}>PLAYLIST</span>
@@ -167,7 +165,7 @@ export default function PlaylistDetailPage() {
                         </button>
                         <button
                           onMouseDown={() => {
-                            setTitle(initialName);
+                            setTitle(playlistName);
                             setIsEditing(false);
                           }}
                           className={`${styles.editActionBtn} ${styles.cancel}`}
@@ -227,12 +225,18 @@ export default function PlaylistDetailPage() {
                     >
                       <span className={styles.number}>{i + 1}</span>
                       <div className={styles.trackMain}>
-                        <img
-                          src={t.image}
-                          alt={t.name}
-                          className={styles.art}
+                        <div
+                          className={styles.artWrapper}
                           onClick={() => router.push(`/song/${t.id}`)}
-                        />
+                        >
+                          <Image
+                            src={t.image || "/default_album.png"}
+                            alt={t.name}
+                            fill
+                            sizes="4.4rem"
+                            className={styles.art}
+                          />
+                        </div>
                         <p className={styles.name}>{t.name}</p>
                       </div>
                       <span className={styles.artist}>{t.artists.join(", ")}</span>
