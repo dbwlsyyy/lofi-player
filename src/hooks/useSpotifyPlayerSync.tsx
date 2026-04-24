@@ -4,14 +4,8 @@ import { useEffect, useRef } from "react";
 import { loadSpotifySdk } from "@/lib/loadSpotifySdk";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { transferToDevice } from "@/apis/playbackApi";
-import toast from "react-hot-toast";
-import {
-  FiAlertCircle,
-  FiExternalLink,
-  FiLock,
-  FiUserX,
-  FiWifiOff,
-} from "react-icons/fi";
+import { FiExternalLink, FiLock, FiUserX, FiWifiOff } from "react-icons/fi";
+import { uiToast } from "@/lib/toasts";
 
 export function useSpotifySDK(accessToken: string | null | undefined) {
   const {
@@ -72,96 +66,57 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
 
         player.on("initialization_error", (message) => {
           console.error("player 초기화 실패", message);
-          toast(
-            (t) => (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.8rem",
-                }}
-              >
-                <FiWifiOff
-                  size="1.6rem"
-                  color="#ff5555"
-                />
-                <span>플레이어 연결 실패 (네트워크 확인)</span>
-              </div>
-            ),
-            { className: "minimal-toast" },
+          uiToast.custom(
+            "플레이어 연결 실패 (네트워크 확인)",
+            <FiWifiOff
+              size="1.6rem"
+              color="#ff5555"
+            />,
+            "net-error",
           );
         });
 
         player.on("authentication_error", ({ message }) => {
           console.error("인증 실패:", message);
-
-          toast(
-            (t) => (
-              <div className="toast-message">
-                <FiLock
-                  size="1.6rem"
-                  color="#ff5555"
-                />
-                <span>인증에 실패하였습니다. 다시 로그인해주세요.</span>
-              </div>
-            ),
-            { className: "minimal-toast", id: "auth-error" },
+          uiToast.custom(
+            "인증에 실패하였습니다. 다시 로그인해주세요.",
+            <FiLock
+              size="1.6rem"
+              color="#ff5555"
+            />,
+            "auth-error",
           );
         });
 
         player.on("account_error", ({ message }) => {
           console.error("계정 오류:", message);
 
-          toast(
-            (t) => (
-              <div className="toast-content">
-                <div className="toast-message">
-                  <FiUserX
-                    size="1.6rem"
-                    color="#4f7df3c5"
-                  />
-                  <span>프리미엄 계정이 필요합니다.</span>
-                </div>
-                <div className="toast-divider"></div>
-                <a
-                  href="https://www.spotify.com/kr-ko/premium/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="icon-btn"
-                  onClick={() => toast.dismiss(t.id)}
-                  title="스포티파이 프리미엄 결제하기"
-                >
-                  <FiExternalLink size="1.4rem" />
-                </a>
-              </div>
-            ),
-            {
-              className: "minimal-toast",
-              duration: 4000,
-              id: "account-error",
-            },
+          const premiumLink = (
+            <a
+              href="https://www.spotify.com/kr-ko/premium/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon-btn"
+              title="스포티파이 프리미엄 결제하기"
+            >
+              <FiExternalLink size="1.4rem" />
+            </a>
+          );
+
+          uiToast.action(
+            "프리미엄 계정이 필요합니다.",
+            <FiUserX
+              size="1.6rem"
+              color="#4f7df3c5"
+            />,
+            premiumLink,
+            "account-error",
           );
         });
+
         player.on("playback_error", ({ message }) => {
           console.error("재생 실패:", message);
-          toast(
-            (t) => (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.8rem",
-                }}
-              >
-                <FiAlertCircle
-                  size="1.6rem"
-                  color="#ff5555"
-                />
-                <span>일시적인 재생 오류가 발생했습니다.</span>
-              </div>
-            ),
-            { className: "minimal-toast" },
-          );
+          uiToast.error("일시적인 재생 오류가 발생했습니다.");
         });
 
         player.addListener("ready", async ({ device_id }) => {
@@ -203,7 +158,7 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
 
         player.connect();
       } catch (err) {
-        console.error("Spotify Player Init Error:", err);
+        console.error("Spotify Player 초기화 에러:", err);
       }
     };
 

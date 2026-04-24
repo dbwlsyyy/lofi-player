@@ -1,0 +1,54 @@
+.searchHeader {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4rem;
+  animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.searchBoxMinimal {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem 0.5rem;
+  width: 100%;
+  max-width: 60rem;
+  transition: all 0.3s ease;
+}
+
+.searchBoxMinimal:focus-within {
+  border-bottom-color: #fff;
+  transform: translateY(-2px);
+}
+
+.searchIcon {
+  font-size: 2.4rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 300;
+  width: 100%;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

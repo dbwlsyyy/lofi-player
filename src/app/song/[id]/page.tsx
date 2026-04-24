@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import { formatTime } from "@/lib/formatTime";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 export default function SongDetailPage() {
   const { data: session } = useSession();
@@ -52,7 +53,7 @@ export default function SongDetailPage() {
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const width = rect.width;
-    const newPosition = (clickX / width) * duration;
+    const newPosition = Math.floor((clickX / width) * duration);
     seekTo(newPosition);
   };
 
@@ -76,10 +77,13 @@ export default function SongDetailPage() {
 
         <div className={styles.mainVisual}>
           <div className={styles.albumWrapper}>
-            <img
+            <Image
               key={currentTrack.id}
-              src={currentTrack.image}
+              src={currentTrack.image || "/default-playlist.jpg"}
               alt={currentTrack.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 37.8rem"
               className={`${styles.albumArt} ${isPlaying ? styles.playing : ""}`}
             />
           </div>
@@ -129,11 +133,7 @@ export default function SongDetailPage() {
                 className={styles.playToggle}
                 onClick={togglePlay}
               >
-                {isPlaying ? (
-                  <FaPause />
-                ) : (
-                  <FaPlay style={{ marginLeft: "4px" }} />
-                )}
+                {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
               </button>
 
               <button
@@ -148,9 +148,7 @@ export default function SongDetailPage() {
                 onClick={() => token && cycleRepeatMode(token)}
               >
                 <FaRetweet size={25} />
-                {repeatMode === "track" && (
-                  <span className={styles.repeatOne}>1</span>
-                )}
+                {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}
               </button>
             </div>
           </div>

@@ -46,17 +46,27 @@
   gap: 1.2rem;
   min-width: 0;
 }
+
+.albumArtWrapper {
+  position: relative;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  /* 회전 애니메이션은 래퍼에 주는 것이 이미지 렌더링에 더 안정적 */
+  animation: spin 10s linear infinite;
+  animation-play-state: paused;
+}
+
 .albumArt {
   border-radius: 50%;
   border: 12px solid rgba(255, 255, 255, 0.08);
   object-fit: cover;
-  box-shadow: 0 0 12px;
-  animation: spin 10s linear infinite;
-  animation-play-state: paused;
-  cursor: pointer;
 }
 
-.playingArt {
+.albumArtWrapper:has(.playingArt) {
   animation-play-state: running;
 }
 

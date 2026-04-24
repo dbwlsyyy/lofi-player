@@ -1,13 +1,13 @@
-import PlayerBar from "../components/PlayerBar/PlayerBar";
+import PlayerBar from "../components/layout/PlayerBar/PlayerBar";
 import "./globals.css";
 import SDKProvider from "./SDKProvider";
 import { NextAuthProvider } from "./providers";
 import { ReactNode } from "react";
-import QueueSidebar from "@/components/QueueSidebar/QueueSidebar";
+import QueueSidebar from "@/components/layout/QueueSidebar/QueueSidebar";
 import { Toaster } from "react-hot-toast";
-import ToggleBtn from "@/components/ToggleBtn/ToggleBtn";
-import GlobalBackground from "@/components/GlobalBackground/GlobalBackground";
-import TopNav from "@/components/TopNav/TopNav";
+import ToggleBtn from "@/components/layout/ToggleBtn/ToggleBtn";
+import GlobalBackground from "@/components/layout/GlobalBackground/GlobalBackground";
+import TopNav from "@/components/layout/TopNav/TopNav";
 
 export const metadata = {
   title: "Lofi Player",

@@ -53,6 +53,10 @@
   box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.3);
 }
 
+.playlistImage {
+  object-fit: cover;
+}
+
 .playlistInfo h4 {
   font-size: 1.7rem;
   font-weight: 600;

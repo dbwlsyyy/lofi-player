@@ -3,28 +3,17 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import {
-  fetchPlaylistTracks,
-  removeTrackFromPlaylist,
-  updatePlaylistName,
-} from "@/apis/userApi";
+import { fetchPlaylistTracks, removeTrackFromPlaylist, updatePlaylistName } from "@/apis/userApi";
 import { useSession } from "next-auth/react";
 import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useUIStore } from "@/store/useUiStore";
-import {
-  FaPlay,
-  FaMusic,
-  FaRegEdit,
-  FaCheck,
-  FaTimes,
-  FaRegTrashAlt,
-} from "react-icons/fa";
-import toast from "react-hot-toast";
-import LoadingDots from "@/components/LoadingDots/LoadingDots";
+import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaRegTrashAlt } from "react-icons/fa";
+import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTime, formatTotalDuration } from "@/lib/formatTime";
-import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
-import Modal from "@/components/Modal/Modal";
+import ConfirmModal from "@/components/modal/ConfirmModal/ConfirmModal";
 import { Track } from "@/types/player";
+import { uiToast } from "@/lib/toasts";
+import Image from "next/image";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -37,11 +26,11 @@ export default function PlaylistDetailPage() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const initialName = searchParams.get("name") || "Your Selection";
+  const playlistName = searchParams.get("name") || "Your Selection";
   const playlistImg = searchParams.get("img");
 
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(initialName);
+  const [title, setTitle] = useState(playlistName);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTrackUri, setSelectedTrackUri] = useState<string | null>(null);
@@ -60,18 +49,7 @@ export default function PlaylistDetailPage() {
         setTracks(tracksWithKey);
       } catch (err) {
         console.error("로드 실패:", err);
-        toast(
-          (t) => (
-            <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
-              <span>트랙 정보를 불러오지 못했습니다.</span>
-            </div>
-          ),
-          { className: "minimal-toast" },
-        );
+        uiToast.error("트랙 정보를 불러오지 못했습니다.");
       } finally {
         setLoading(false);
       }
@@ -79,9 +57,13 @@ export default function PlaylistDetailPage() {
     load();
   }, [id, token]);
 
+  useEffect(() => {
+    setTitle(playlistName); // URL 변경 시 로컬 상태(title)를 최신 정보로 동기화
+  }, [playlistName]);
+
   const handleUpdateName = async () => {
-    if (!title.trim() || title === initialName) {
-      setTitle(initialName);
+    if (!title.trim() || title === playlistName) {
+      setTitle(playlistName);
       setIsEditing(false);
       return;
     }
@@ -90,24 +72,7 @@ export default function PlaylistDetailPage() {
 
     try {
       setIsEditing(false);
-      toast(
-        (t) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.8rem",
-            }}
-          >
-            <FiCheckCircle
-              size="1.6rem"
-              color="#3b82f6"
-            />
-            <span>플레이리스트 이름이 변경되었습니다.</span>
-          </div>
-        ),
-        { className: "minimal-toast" },
-      );
+      uiToast.success("플레이리스트 이름이 변경되었습니다.");
 
       await updatePlaylistName(token!, id as string, title);
 
@@ -119,31 +84,9 @@ export default function PlaylistDetailPage() {
     } catch (err: any) {
       setTitle(previousTitle);
       if (err.response?.status === 403) {
-        toast(
-          (t) => (
-            <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
-              <span>이름을 수정할 권한이 없습니다. 다시 로그인해주세요.</span>
-            </div>
-          ),
-          { className: "minimal-toast" },
-        );
+        uiToast.error("이름을 수정할 권한이 없습니다. 다시 로그인해주세요.");
       } else {
-        toast(
-          (t) => (
-            <div className="toast-message">
-              <FiAlertTriangle
-                size="1.6rem"
-                color="#ff5555"
-              />
-              <span>이름 수정 중 오류가 발생했습니다.</span>
-            </div>
-          ),
-          { className: "minimal-toast" },
-        );
+        uiToast.error("이름 수정 중 오류가 발생했습니다.");
       }
     }
   };
@@ -152,15 +95,12 @@ export default function PlaylistDetailPage() {
     if (e.key === "Enter") {
       handleUpdateName();
     } else if (e.key === "Escape") {
-      setTitle(initialName);
+      setTitle(playlistName);
       setIsEditing(false);
     }
   };
 
-  const totalMs = tracks.reduce(
-    (acc, track) => acc + (track.durationMs || 0),
-    0,
-  );
+  const totalMs = tracks.reduce((acc, track) => acc + (track.durationMs || 0), 0);
 
   const handleRemoveClick = (e: React.MouseEvent, trackUri: string) => {
     e.stopPropagation();
@@ -178,38 +118,10 @@ export default function PlaylistDetailPage() {
 
     try {
       await removeTrackFromPlaylist(token!, id as string, selectedTrackUri);
-      toast(
-        (t) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.8rem",
-            }}
-          >
-            <FiCheckCircle
-              size="1.6rem"
-              color="#3b82f6"
-            />
-            <span>곡이 삭제되었습니다.</span>
-          </div>
-        ),
-        { className: "minimal-toast" },
-      );
+      uiToast.success("곡이 삭제되었습니다.");
     } catch (err) {
       setTracks(previousTracks); // 실패 시 복구
-      toast(
-        (t) => (
-          <div className="toast-message">
-            <FiAlertTriangle
-              size="1.6rem"
-              color="#ff5555"
-            />
-            <span>곡 삭제에 실패했습니다.</span>
-          </div>
-        ),
-        { className: "minimal-toast" },
-      );
+      uiToast.error("곡 삭제에 실패했습니다.");
     } finally {
       setSelectedTrackUri(null);
     }
@@ -224,17 +136,14 @@ export default function PlaylistDetailPage() {
 
             <header className={styles.hero}>
               <div className={styles.heroArtWrapper}>
-                {playlistImg ? (
-                  <img
-                    src={playlistImg}
-                    alt="Cover"
-                    className={styles.heroArt}
-                  />
-                ) : (
-                  <div className={styles.emptyArt}>
-                    <FaMusic size={40} />
-                  </div>
-                )}
+                <Image
+                  src={playlistImg || "/default_playlist.png"}
+                  alt={`${playlistName} 앨범 커버`}
+                  fill
+                  priority
+                  sizes="24rem"
+                  className={styles.heroArt}
+                />
               </div>
               <div className={styles.heroText}>
                 <span className={styles.label}>PLAYLIST</span>
@@ -260,7 +169,7 @@ export default function PlaylistDetailPage() {
                         </button>
                         <button
                           onMouseDown={() => {
-                            setTitle(initialName);
+                            setTitle(playlistName);
                             setIsEditing(false);
                           }}
                           className={`${styles.editActionBtn} ${styles.cancel}`}
@@ -283,9 +192,7 @@ export default function PlaylistDetailPage() {
                   <span className={styles.dot}>•</span>
                   <span>{tracks.length} tracks</span>
                   <span className={styles.dot}>•</span>
-                  <span>
-                    {loading ? "0시간 00분" : formatTotalDuration(totalMs)}
-                  </span>
+                  <span>{loading ? "0시간 00분" : formatTotalDuration(totalMs)}</span>
                 </div>
                 <button
                   className={styles.playBtn}
@@ -322,20 +229,22 @@ export default function PlaylistDetailPage() {
                     >
                       <span className={styles.number}>{i + 1}</span>
                       <div className={styles.trackMain}>
-                        <img
-                          src={t.image}
-                          alt={t.name}
-                          className={styles.art}
+                        <div
+                          className={styles.artWrapper}
                           onClick={() => router.push(`/song/${t.id}`)}
-                        />
+                        >
+                          <Image
+                            src={t.image || "/default_album.png"}
+                            alt={t.name}
+                            fill
+                            sizes="4.4rem"
+                            className={styles.art}
+                          />
+                        </div>
                         <p className={styles.name}>{t.name}</p>
                       </div>
-                      <span className={styles.artist}>
-                        {t.artists.join(", ")}
-                      </span>
-                      <span className={styles.time}>
-                        {formatTime(t.durationMs)}
-                      </span>
+                      <span className={styles.artist}>{t.artists.join(", ")}</span>
+                      <span className={styles.time}>{formatTime(t.durationMs)}</span>
                       <button
                         className={styles.removeBtn}
                         onClick={(e) => handleRemoveClick(e, t.uri)}
@@ -352,7 +261,7 @@ export default function PlaylistDetailPage() {
         )}
       </div>
 
-      <Modal
+      <ConfirmModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmDelete}

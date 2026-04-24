@@ -19,7 +19,7 @@ import { useSession } from "next-auth/react";
 import { formatTime } from "@/lib/formatTime";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import LoadingDots from "../LoadingDots/LoadingDots";
+import LoadingDots from "../../loading/LoadingDots/LoadingDots";
 import { useUIStore } from "@/store/useUiStore";
 
 export default function PlayerBar() {
@@ -51,14 +51,11 @@ export default function PlayerBar() {
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!duration) return;
 
-    const progressBar = e.currentTarget;
-    const clickX = e.nativeEvent.offsetX;
-    const width = progressBar.clientWidth;
-
-    const seekPercent = clickX / width;
-    const seekMs = Math.floor(seekPercent * duration);
-
-    seekTo(seekMs);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
+    const newPosition = Math.floor((clickX / width) * duration);
+    seekTo(newPosition);
   };
 
   const lastVolumeRef = useRef(volume || 0.5);
@@ -104,19 +101,21 @@ export default function PlayerBar() {
                   }}
                   className={styles.trackInfo}
                 >
-                  <Image
-                    src={currentTrack.image}
-                    alt={currentTrack.name}
-                    width={60}
-                    height={60}
-                    className={`${styles.albumArt} ${isPlaying ? styles.playingArt : ""}`}
+                  <div
+                    className={styles.albumArtWrapper}
                     onClick={() => router.push(`/song/${currentTrack.id}`)}
-                  />
+                  >
+                    <Image
+                      src={currentTrack.image}
+                      alt={currentTrack.name}
+                      fill
+                      sizes="6rem"
+                      className={`${styles.albumArt} ${isPlaying ? styles.playingArt : ""}`}
+                    />
+                  </div>
                   <div className={styles.textInfo}>
                     <p className={styles.trackName}>{currentTrack.name}</p>
-                    <p className={styles.trackArtist}>
-                      {currentTrack.artists.join(", ")}
-                    </p>
+                    <p className={styles.trackArtist}>{currentTrack.artists.join(", ")}</p>
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -155,16 +154,12 @@ export default function PlayerBar() {
                       <FaStepForward style={{ marginRight: "2rem" }} />
                     </button>
                     <button
-                      onClick={() =>
-                        accessToken && cycleRepeatMode(accessToken)
-                      }
+                      onClick={() => accessToken && cycleRepeatMode(accessToken)}
                       className={`${styles.controlBtn} ${repeatMode !== "off" ? styles.activeBtn : ""}`}
                       title={`반복 모드: ${repeatMode}`}
                     >
                       <FaRedo size={17} />
-                      {repeatMode === "track" && (
-                        <span className={styles.repeatSpan}>1</span>
-                      )}
+                      {repeatMode === "track" && <span className={styles.repeatSpan}>1</span>}
                     </button>
                   </>
                 )}

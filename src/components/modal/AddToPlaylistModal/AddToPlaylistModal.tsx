@@ -55,6 +55,7 @@ export default function AddToPlaylistModal({
                   src={pl.images?.[0]?.url || "/default_playlist.png"}
                   alt={pl.name}
                   fill
+                  sizes="4.4rem"
                 />
               </div>
               <span className={styles.name}>{pl.name}</span>

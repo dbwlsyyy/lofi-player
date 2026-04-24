@@ -1,0 +1,44 @@
+.filterBar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5rem;
+  animation: slideUp 0.8s ease-out backwards;
+  animation-delay: 0.1s;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 3rem;
+}
+
+.filterBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.6rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid transparent;
+}
+
+.filterBtn:hover {
+  color: #fff;
+}
+
+.filterBtn.active {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

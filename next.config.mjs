@@ -4,11 +4,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.spotifycdn.com", // 👈 모든 spotifycdn 서브도메인 허용 (fa, ak 등)
+        hostname: "*.spotifycdn.com", // 모든 spotifycdn 서브도메인 허용 (fa, ak 등)
       },
       {
         protocol: "https",
-        hostname: "*.scdn.co", // 👈 i.scdn.co, mosaic.scdn.co 등 모두 허용
+        hostname: "*.scdn.co", // 일반 앨범/아티스트 이미지, 플레이리스트 모자이크 이미지
       },
     ],
   },
