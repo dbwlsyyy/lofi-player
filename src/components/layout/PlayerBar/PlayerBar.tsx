@@ -51,14 +51,11 @@ export default function PlayerBar() {
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!duration) return;
 
-    const progressBar = e.currentTarget;
-    const clickX = e.nativeEvent.offsetX;
-    const width = progressBar.clientWidth;
-
-    const seekPercent = clickX / width;
-    const seekMs = Math.floor(seekPercent * duration);
-
-    seekTo(seekMs);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
+    const newPosition = Math.floor((clickX / width) * duration);
+    seekTo(newPosition);
   };
 
   const lastVolumeRef = useRef(volume || 0.5);

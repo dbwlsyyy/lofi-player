@@ -52,7 +52,7 @@ export default function SongDetailPage() {
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const width = rect.width;
-    const newPosition = (clickX / width) * duration;
+    const newPosition = Math.floor((clickX / width) * duration);
     seekTo(newPosition);
   };
 
@@ -129,11 +129,7 @@ export default function SongDetailPage() {
                 className={styles.playToggle}
                 onClick={togglePlay}
               >
-                {isPlaying ? (
-                  <FaPause />
-                ) : (
-                  <FaPlay style={{ marginLeft: "4px" }} />
-                )}
+                {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
               </button>
 
               <button
@@ -148,9 +144,7 @@ export default function SongDetailPage() {
                 onClick={() => token && cycleRepeatMode(token)}
               >
                 <FaRetweet size={25} />
-                {repeatMode === "track" && (
-                  <span className={styles.repeatOne}>1</span>
-                )}
+                {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}
               </button>
             </div>
           </div>
