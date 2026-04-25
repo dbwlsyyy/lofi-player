@@ -5,7 +5,7 @@ import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
 import { fetchPlaylistTracks, removeTrackFromPlaylist, updatePlaylistName } from "@/apis/userApi";
 import { useSession } from "next-auth/react";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaRegTrashAlt } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTime, formatTotalDuration } from "@/lib/formatTime";
@@ -24,7 +24,7 @@ export default function PlaylistDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { isRelaxMode } = useUIStore();
+  const { isRelaxMode } = useUiStore();
   const playFromPlaylist = usePlayerStore((state) => state.playFromPlaylist);
 
   const [tracks, setTracks] = useState<Track[]>([]);

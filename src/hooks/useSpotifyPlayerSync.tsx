@@ -8,7 +8,7 @@ import { FiExternalLink, FiLock, FiUserX, FiWifiOff } from "react-icons/fi";
 import { uiToast } from "@/lib/toasts";
 import { useShallow } from "zustand/shallow";
 
-export function useSpotifySDK(accessToken: string | null | undefined) {
+export function useSpotifyPlayerSync(accessToken: string | null | undefined) {
   const {
     setPlayerInstance,
     setIsPlaying,

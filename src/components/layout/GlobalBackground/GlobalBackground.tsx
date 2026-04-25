@@ -1,10 +1,10 @@
 "use client";
 
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import styles from "./GlobalBackground.module.css";
 
 export default function GlobalBackground() {
-  const { isRelaxMode } = useUIStore();
+  const { isRelaxMode } = useUiStore();
 
   return (
     <>

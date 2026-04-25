@@ -19,7 +19,7 @@ import { useSession } from "next-auth/react";
 import { formatTime } from "@/lib/formatTime";
 import { useRef } from "react";
 import LoadingDots from "../../loading/LoadingDots/LoadingDots";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import Link from "next/link";
 import { useShallow } from "zustand/shallow";
 
@@ -88,7 +88,7 @@ export default function PlayerBar() {
       toggleShuffle: state.toggleShuffle,
     })),
   );
-  const { toggleSidebar } = useUIStore();
+  const { toggleSidebar } = useUiStore();
   const lastVolumeRef = useRef(volume || 0.5);
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
