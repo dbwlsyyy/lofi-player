@@ -21,6 +21,7 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import LoadingDots from "../../loading/LoadingDots/LoadingDots";
 import { useUIStore } from "@/store/useUiStore";
+import Link from "next/link";
 
 export default function PlayerBar() {
   const { data: session } = useSession();
@@ -101,9 +102,9 @@ export default function PlayerBar() {
                   }}
                   className={styles.trackInfo}
                 >
-                  <div
+                  <Link
+                    href={`/song/${currentTrack.id}`}
                     className={styles.albumArtWrapper}
-                    onClick={() => router.push(`/song/${currentTrack.id}`)}
                   >
                     <Image
                       src={currentTrack.image}
@@ -112,7 +113,7 @@ export default function PlayerBar() {
                       sizes="6rem"
                       className={`${styles.albumArt} ${isPlaying ? styles.playingArt : ""}`}
                     />
-                  </div>
+                  </Link>
                   <div className={styles.textInfo}>
                     <p className={styles.trackName}>{currentTrack.name}</p>
                     <p className={styles.trackArtist}>{currentTrack.artists.join(", ")}</p>

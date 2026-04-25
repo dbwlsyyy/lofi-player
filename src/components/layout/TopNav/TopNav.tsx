@@ -22,6 +22,7 @@ export default function TopNav() {
         href="/home"
         className={styles.iconBtn}
         title="홈으로"
+        prefetch={true}
       >
         <FiHome />
       </Link>

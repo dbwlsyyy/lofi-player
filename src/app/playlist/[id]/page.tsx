@@ -14,6 +14,7 @@ import ConfirmModal from "@/components/modal/ConfirmModal/ConfirmModal";
 import { Track } from "@/types/player";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -78,9 +79,9 @@ export default function PlaylistDetailPage() {
 
     try {
       setIsEditing(false);
-      uiToast.success("플레이리스트 이름이 변경되었습니다.");
 
       await updatePlaylistName(token!, id as string, title);
+      uiToast.success("플레이리스트 이름이 변경되었습니다.");
 
       const newParams = new URLSearchParams(searchParams.toString());
       newParams.set("name", title);
@@ -166,6 +167,7 @@ export default function PlaylistDetailPage() {
                         autoFocus
                         spellCheck={false}
                       />
+
                       <div className={styles.editBtnGroup}>
                         <button
                           onMouseDown={handleUpdateName}
@@ -194,12 +196,14 @@ export default function PlaylistDetailPage() {
                     </h2>
                   )}
                 </div>
+
                 <div className={styles.metaRow}>
                   <span className={styles.dot}>•</span>
                   <span>{tracks.length} tracks</span>
                   <span className={styles.dot}>•</span>
                   <span>{loading ? "0시간 00분" : formatTotalDuration(totalMs)}</span>
                 </div>
+
                 <button
                   className={styles.playBtn}
                   onClick={() => playFromPlaylist(tracks, 0, token!)}
@@ -235,9 +239,9 @@ export default function PlaylistDetailPage() {
                     >
                       <span className={styles.number}>{i + 1}</span>
                       <div className={styles.trackMain}>
-                        <div
+                        <Link
+                          href={`/song/${t.id}`}
                           className={styles.artWrapper}
-                          onClick={() => router.push(`/song/${t.id}`)}
                         >
                           <Image
                             src={t.image || "/default_album.png"}
@@ -246,11 +250,13 @@ export default function PlaylistDetailPage() {
                             sizes="4.4rem"
                             className={styles.art}
                           />
-                        </div>
+                        </Link>
                         <p className={styles.name}>{t.name}</p>
                       </div>
+
                       <span className={styles.artist}>{t.artists.join(", ")}</span>
                       <span className={styles.time}>{formatTime(t.durationMs)}</span>
+
                       <button
                         className={styles.removeBtn}
                         onClick={(e) => handleRemoveClick(e, t.uri)}

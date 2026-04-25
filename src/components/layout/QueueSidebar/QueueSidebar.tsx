@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/useUiStore";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
@@ -33,12 +34,11 @@ export default function QueueSidebar() {
         <>
           <div className={styles.sectionTitle}>지금 재생 중</div>
 
-          <div
+          <Link
+            href={`/song/${currentTrack.id}`}
             className={`${styles.item} ${styles.active}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push(`/song/${currentTrack.id}`);
-            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ textDecoration: "none", color: "inherit" }}
           >
             <div className={styles.thumbWrapper}>
               <Image
@@ -60,7 +60,7 @@ export default function QueueSidebar() {
               <div className={styles.eqBar}></div>
               <div className={styles.eqBar}></div>
             </div>
-          </div>
+          </Link>
         </>
       )}
       <div className={styles.sectionTitle}>현재 재생목록</div>
