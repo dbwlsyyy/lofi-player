@@ -52,8 +52,10 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
 
     const init = async () => {
       try {
+        if (cancelled) return; // 로드 전 체크
+
         await loadSpotifySdk();
-        if (cancelled) return;
+        if (cancelled) return; // 로드 후 체크
 
         const player = new window.Spotify.Player({
           name: "Lofi Web Player",
@@ -168,6 +170,14 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
       cancelled = true;
       stopPolling();
       if (playerRef.current) {
+        playerRef.current.removeListener("initialization_error");
+        playerRef.current.removeListener("authentication_error");
+        playerRef.current.removeListener("account_error");
+        playerRef.current.removeListener("playback_error");
+        playerRef.current.removeListener("ready");
+        playerRef.current.removeListener("not_ready");
+        playerRef.current.removeListener("player_state_changed");
+
         playerRef.current.disconnect();
       }
       setPlayerInstance(null);

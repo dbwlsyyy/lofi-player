@@ -29,23 +29,33 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!accessToken) return;
+    let cancelled = false;
 
-    (async () => {
+    const initUserData = async () => {
       try {
         const [profile, list] = await Promise.all([
           fetchMe(accessToken),
           fetchPlaylists(accessToken),
         ]);
+        if (cancelled) return;
+
         setMe(profile);
         setPlaylists(list);
       } catch (e: any) {
+        if (cancelled) return;
+
         if (e.response?.status === 401) {
           handleLogin();
         } else {
           setError("Spotify 데이터를 불러오는 중 오류가 발생했습니다.");
         }
       }
-    })();
+    };
+
+    initUserData();
+    return () => {
+      cancelled = true;
+    };
   }, [accessToken]);
 
   if (status === "loading" || (status === "authenticated" && !me)) {
