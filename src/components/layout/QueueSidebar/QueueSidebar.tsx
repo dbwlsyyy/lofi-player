@@ -2,9 +2,7 @@
 import { usePlayerStore } from "@/store/usePlayerStore";
 import styles from "./QueueSidebar.module.css";
 import { useEffect, useRef } from "react";
-import { usePlayControl } from "@/hooks/usePlayTracks";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useUIStore } from "@/store/useUiStore";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,10 +12,9 @@ export default function QueueSidebar() {
   const token = session?.accessToken;
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const router = useRouter();
-  const { queue, currentIndex, currentTrack } = usePlayerStore();
   const { isSidebarOpen } = useUIStore();
-  const { playFromPlaylist } = usePlayControl();
+  const { queue, currentIndex, currentTrack } = usePlayerStore();
+  const playFromPlaylist = usePlayerStore((state) => state.playFromPlaylist);
 
   useEffect(() => {
     itemRefs.current[currentIndex] &&
