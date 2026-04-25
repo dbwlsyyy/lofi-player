@@ -1,41 +1,65 @@
 "use client";
 
 import Image from "next/image";
-import { FiPlay, FiPlus } from "react-icons/fi";
+import { FiHeart, FiPlay, FiPlus } from "react-icons/fi";
 import { SearchResult } from "@/types/api";
 import styles from "./TrackList.module.css";
 import { useSession } from "next-auth/react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
 import { formatTime } from "@/lib/formatTime";
+import TrackDropdown from "@/components/common/TrackDropdown/TrackDropdown";
+import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
+import { addTrackToPlaylist } from "@/apis/userApi";
+import { uiToast } from "@/lib/toasts";
+import { useState } from "react";
 
-interface TrackListProps {
-  tracks: SearchResult[];
-  onAdd: (uri: string) => void;
-}
-
-export default function TrackList({ tracks, onAdd }: TrackListProps) {
+export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
   const { data: session } = useSession();
-  const { playSingleTrack } = usePlayerStore(
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [targetTrackUri, setTargetTrackUri] = useState("");
+
+  const { playSingleTrack, addTrackToNext } = usePlayerStore(
     useShallow((state) => ({
       playSingleTrack: state.playSingleTrack,
+      addTrackToNext: state.addTrackToNext,
     })),
   );
 
+  // [리팩토링] API 응답(SearchResult)을 스토어 규격(Track)으로 변환하는 헬퍼 함수
+  const convertToTrack = (item: SearchResult) => ({
+    id: item.id,
+    name: item.name,
+    artists: item.artists || [],
+    image: item.image,
+    uri: item.uri,
+    durationMs: item.durationMs || 0,
+  });
+
   const handlePlayClick = (item: SearchResult) => {
     if (!session?.accessToken) return;
+    playSingleTrack(convertToTrack(item), session.accessToken);
+  };
 
-    // API 응답 데이터를 스토어 규격(Track)에 맞춰 변환
-    const trackToPlay = {
-      id: item.id,
-      name: item.name,
-      artists: item.artists || [],
-      image: item.image,
-      uri: item.uri,
-      durationMs: item.durationMs || 0,
-    };
+  const handleAddNextClick = (item: SearchResult) => {
+    addTrackToNext(convertToTrack(item));
+  };
 
-    playSingleTrack(trackToPlay, session.accessToken);
+  const handleAddClick = (uri: string) => {
+    setTargetTrackUri(uri);
+    setIsModalOpen(true);
+  };
+
+  const handleSelectPlaylist = async (playlistId: string) => {
+    if (!session?.accessToken) return;
+    try {
+      await addTrackToPlaylist(session.accessToken, playlistId, targetTrackUri);
+      setIsModalOpen(false);
+      uiToast.success("내 플리에 추가 완료");
+    } catch (error) {
+      uiToast.error("곡 추가 실패");
+    }
   };
 
   return (
@@ -73,15 +97,28 @@ export default function TrackList({ tracks, onAdd }: TrackListProps) {
               </button>
               <button
                 className={styles.actionBtn}
-                onClick={() => onAdd(item.uri)}
-                title="추가"
+                // onClick={() => }
+                title="하트"
               >
-                <FiPlus />
+                <FiHeart />
               </button>
+              <div className={styles.dropdownWrapper}>
+                <TrackDropdown
+                  type="digging"
+                  onPlayNext={() => handleAddNextClick(item)}
+                  onSavePlaylist={() => handleAddClick(item.uri)}
+                />
+              </div>
             </div>
           </div>
         </div>
       ))}
+      <AddToPlaylistModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleSelectPlaylist}
+        accessToken={session?.accessToken || ""}
+      />
     </div>
   );
 }
