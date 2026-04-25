@@ -244,19 +244,18 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
   // 3. 바로 다음에 재생 (재생 없이 큐에 예약만 추가)
   addTrackToNext: (track) => {
-    const { queue, currentIndex } = get();
-    const newQueue = [...queue];
+    set((state) => {
+      // 새 곡에 신분증(UUID) 발급
+      const newTrackWithKey = { ...track, uniqueKey: crypto.randomUUID() };
+      const newQueue = [...state.queue];
 
-    const trackWithKey = { ...track, uniqueKey: crypto.randomUUID() };
+      // 끼워넣을 위치 계산: 현재 곡의 '바로 다음(+1)'
+      const insertIndex = state.queue.length > 0 ? state.currentIndex + 1 : 0;
+      newQueue.splice(insertIndex, 0, newTrackWithKey);
 
-    if (newQueue.length === 0) {
-      set({ queue: [trackWithKey], currentIndex: 0 });
-    } else {
-      newQueue.splice(currentIndex + 1, 0, trackWithKey);
-      set({ queue: newQueue });
-    }
-
-    uiToast.success(`'${track.name}' 곡이 다음 순서로 추가되었습니다.`);
+      // 뒤에 끼워 넣은 거라 currentIndex는 변함없음
+      return { queue: newQueue };
+    });
   },
 
   jumpTo: async (index, token) => {
@@ -285,23 +284,50 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   },
 
   // --- [큐 사이드바 관리 전용 액션] ---
+  removeTrackFromQueue: async (targetIndex, token) => {
+    const { queue, currentIndex, jumpTo } = get();
 
-  removeTrackFromQueue: (index) => {
-    const { queue, currentIndex } = get();
-    const newQueue = [...queue];
+    // 1. 만약 삭제하려는 곡이 '현재 재생 중인 곡'이라면
+    if (targetIndex === currentIndex) {
+      // 큐에 이 곡 딱 하나뿐이었다면? 큐 비우고 초기화
+      if (queue.length === 1) {
+        set({
+          queue: [],
+          currentIndex: 0,
+          currentTrack: null,
+          activeUniqueKey: null,
+          isPlaying: false,
+        });
+        return;
+      }
 
-    newQueue.splice(index, 1);
+      // 일단 큐에서 해당 곡을 삭제한 새로운 배열 생성
+      const newQueue = queue.filter((_, i) => i !== targetIndex);
 
-    // 지우는 곡이 현재 곡보다 앞쪽이면 인덱스를 한 칸 당겨서 흐름 유지
-    let newIndex = currentIndex;
-    if (index < currentIndex) {
-      newIndex = currentIndex - 1;
-    } else if (index === currentIndex && newQueue.length > 0) {
-      // (선택 사항) 현재 곡 삭제 시 UI 강제 변경 방지 (여기선 인덱스 유지)
-      newIndex = Math.min(currentIndex, newQueue.length - 1);
+      // 다음 곡 결정: 마지막 곡을 삭제했다면 다시 0번으로, 아니면 그 자리에 새로 들어온 곡으로
+      const nextIndex = targetIndex < newQueue.length ? targetIndex : 0;
+
+      // [중요] 상태를 먼저 업데이트하여 큐를 줄인 뒤, 재생 함수 호출
+      set({ queue: newQueue });
+
+      // playTrackFromQueue가 다음 곡의 불빛(activeUniqueKey)과 스포티파이 재생을 모두 처리해줍니다.
+      await jumpTo(nextIndex, token);
+    } else {
+      // 2. 현재 재생 중이 '아닌' 다른 곡을 삭제하는 경우 (기존 로직 유지)
+      set((state) => {
+        const newQueue = [...state.queue];
+        newQueue.splice(targetIndex, 1);
+
+        let nextCurrentIndex = state.currentIndex;
+
+        // 삭제한 곡이 지금 듣는 곡보다 '앞'에 있었다면 인덱스를 하나 당겨줘야 함
+        if (targetIndex < state.currentIndex) {
+          nextCurrentIndex -= 1;
+        }
+
+        return { queue: newQueue, currentIndex: nextCurrentIndex };
+      });
     }
-
-    set({ queue: newQueue, currentIndex: newIndex });
   },
 
   clearQueue: () => {
