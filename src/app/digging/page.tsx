@@ -17,6 +17,8 @@ import ArtistGrid from "./components/ArtistGrid/ArtistGrid";
 import AlbumGrid from "./components/AlbumGrid/AlbumGrid";
 import PlaylistList from "./components/PlaylistList/PlaylistList";
 import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
+import { useDebounce } from "@/hooks/useDebounce";
+import axios from "axios";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
@@ -32,34 +34,41 @@ export default function DiggingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [targetTrackUri, setTargetTrackUri] = useState("");
 
+  const debouncedSearchTerm = useDebounce(query, 500);
+
   // 검색 로직
   useEffect(() => {
     const token = session?.accessToken;
-    if (!query.trim() || !token) {
+    if (!debouncedSearchTerm.trim() || !token) {
       // setResults([]); 기획 문제
       setIsLoading(false);
       return;
     }
 
-    let cancelled = false;
+    const controller = new AbortController();
     setIsLoading(true);
 
-    const timer = setTimeout(async () => {
+    const fetchSearchResults = async () => {
       try {
-        const data = await searchSpotify(token, query, filter);
-        if (!cancelled) setResults(data);
+        const data = await searchSpotify(token, debouncedSearchTerm, filter, controller.signal);
+        setResults(data);
       } catch (error) {
-        if (!cancelled) console.error(error);
+        if (axios.isCancel(error)) {
+          return;
+        }
+
+        console.error(error);
       } finally {
-        if (!cancelled) setIsLoading(false);
+        setIsLoading(false);
       }
-    }, 500);
+    };
+
+    fetchSearchResults();
 
     return () => {
-      cancelled = true;
-      clearTimeout(timer);
+      controller.abort();
     };
-  }, [query, filter, session?.accessToken]);
+  }, [debouncedSearchTerm, filter, session?.accessToken]);
 
   // 핸들러들
   const handlePlayNow = (item: SearchResult) => {
