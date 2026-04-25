@@ -18,13 +18,11 @@ import PlaylistList from "./components/PlaylistList/PlaylistList";
 import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
 import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
-import { usePlayerStore } from "@/store/usePlayerStore";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
   const accessToken = session?.accessToken as string | undefined;
   const { isRelaxMode } = useUiStore();
-  const playFromPlaylist = usePlayerStore((state) => state.playFromPlaylist);
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<SearchFilter>("track"); // 기본값 '곡'
@@ -75,21 +73,6 @@ export default function DiggingPage() {
     };
   }, [debouncedSearchTerm, filter, accessToken]);
 
-  // 핸들러들
-  const handlePlayNow = (item: SearchResult) => {
-    if (!session?.accessToken) return;
-    const trackToPlay = {
-      id: item.id,
-      name: item.name,
-      artists: item.artists || [],
-      image: item.image,
-      uri: item.uri,
-      durationMs: item.durationMs || 0,
-    };
-    playFromPlaylist([trackToPlay], 0, session.accessToken);
-    uiToast.custom("준비 중인 기능", null);
-  };
-
   const handleAddClick = (uri: string) => {
     setTargetTrackUri(uri);
     setIsModalOpen(true);
@@ -138,7 +121,6 @@ export default function DiggingPage() {
                 {filter === "track" && (
                   <TrackList
                     tracks={results}
-                    onPlay={handlePlayNow}
                     onAdd={handleAddClick}
                   />
                 )}

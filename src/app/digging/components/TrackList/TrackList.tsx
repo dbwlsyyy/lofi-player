@@ -4,22 +4,40 @@ import Image from "next/image";
 import { FiPlay, FiPlus } from "react-icons/fi";
 import { SearchResult } from "@/types/api";
 import styles from "./TrackList.module.css";
+import { useSession } from "next-auth/react";
+import { usePlayerStore } from "@/store/usePlayerStore";
+import { useShallow } from "zustand/shallow";
+import { formatTime } from "@/lib/formatTime";
 
 interface TrackListProps {
   tracks: SearchResult[];
-  onPlay: (item: SearchResult) => void;
   onAdd: (uri: string) => void;
 }
 
-// ms -> mm:ss 변환 함수
-const formatDuration = (ms?: number) => {
-  if (!ms) return "0:00";
-  const minutes = Math.floor(ms / 60000);
-  const seconds = ((ms % 60000) / 1000).toFixed(0);
-  return `${minutes}:${Number(seconds) < 10 ? "0" : ""}${seconds}`;
-};
+export default function TrackList({ tracks, onAdd }: TrackListProps) {
+  const { data: session } = useSession();
+  const { playSingleTrack } = usePlayerStore(
+    useShallow((state) => ({
+      playSingleTrack: state.playSingleTrack,
+    })),
+  );
 
-export default function TrackList({ tracks, onPlay, onAdd }: TrackListProps) {
+  const handlePlayClick = (item: SearchResult) => {
+    if (!session?.accessToken) return;
+
+    // API 응답 데이터를 스토어 규격(Track)에 맞춰 변환
+    const trackToPlay = {
+      id: item.id,
+      name: item.name,
+      artists: item.artists || [],
+      image: item.image,
+      uri: item.uri,
+      durationMs: item.durationMs || 0,
+    };
+
+    playSingleTrack(trackToPlay, session.accessToken);
+  };
+
   return (
     <div className={styles.listContainer}>
       {tracks.map((item) => (
@@ -44,11 +62,11 @@ export default function TrackList({ tracks, onPlay, onAdd }: TrackListProps) {
           </div>
 
           <div className={styles.trackTrailing}>
-            <span className={styles.duration}>{formatDuration(item.durationMs)}</span>
+            <span className={styles.duration}>{formatTime(item.durationMs)}</span>
             <div className={styles.trackActions}>
               <button
                 className={styles.actionBtn}
-                onClick={() => onPlay(item)}
+                onClick={() => handlePlayClick(item)}
                 title="재생"
               >
                 <FiPlay />

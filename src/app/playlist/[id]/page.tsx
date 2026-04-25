@@ -16,6 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useShallow } from "zustand/shallow";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -25,7 +26,12 @@ export default function PlaylistDetailPage() {
   const searchParams = useSearchParams();
 
   const { isRelaxMode } = useUiStore();
-  const playFromPlaylist = usePlayerStore((state) => state.playFromPlaylist);
+  const { playAllTracks, playSingleTrack } = usePlayerStore(
+    useShallow((state) => ({
+      playAllTracks: state.playAllTracks,
+      playSingleTrack: state.playSingleTrack,
+    })),
+  );
 
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
@@ -211,7 +217,7 @@ export default function PlaylistDetailPage() {
 
                 <button
                   className={styles.playBtn}
-                  onClick={() => playFromPlaylist(tracks, 0, token!)}
+                  onClick={() => playAllTracks(tracks, 0, token!)}
                 >
                   <FaPlay size={12} /> Play All
                 </button>
@@ -237,7 +243,7 @@ export default function PlaylistDetailPage() {
                     <div
                       key={t.uniqueKey}
                       className={styles.row}
-                      onClick={() => playFromPlaylist(tracks, i, token!)}
+                      onClick={() => playSingleTrack(t, token!)}
                       style={{
                         animationDelay: `${i * 0.05}s`,
                       }}

@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useUiStore } from "@/store/useUiStore";
 import Image from "next/image";
 import Link from "next/link";
+import { useShallow } from "zustand/shallow";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
@@ -13,9 +14,25 @@ export default function QueueSidebar() {
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { isSidebarOpen } = useUiStore();
-  const { queue, currentIndex, currentTrack } = usePlayerStore();
-  const playFromPlaylist = usePlayerStore((state) => state.playFromPlaylist);
-
+  const {
+    queue,
+    currentIndex,
+    currentTrack,
+    activeUniqueKey,
+    jumpTo,
+    removeTrackFromQueue,
+    clearQueue,
+  } = usePlayerStore(
+    useShallow((state) => ({
+      queue: state.queue,
+      currentIndex: state.currentIndex,
+      currentTrack: state.currentTrack,
+      jumpTo: state.jumpTo,
+      removeTrackFromQueue: state.removeTrackFromQueue,
+      clearQueue: state.clearQueue,
+      activeUniqueKey: state.activeUniqueKey,
+    })),
+  );
   useEffect(() => {
     itemRefs.current[currentIndex] &&
       itemRefs.current[currentIndex].scrollIntoView({
@@ -29,8 +46,9 @@ export default function QueueSidebar() {
       <h2 className={styles.title}>Playlist</h2>
       {currentTrack && (
         <>
-          <div className={styles.sectionTitle}>지금 재생 중</div>
-
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionTitle}>지금 재생 중</div>
+          </div>
           <Link
             href={`/song/${currentTrack.id}`}
             className={`${styles.item} ${styles.active}`}
@@ -59,19 +77,27 @@ export default function QueueSidebar() {
           </Link>
         </>
       )}
-      <div className={styles.sectionTitle}>현재 재생목록</div>
+      <div className={styles.sectionHeader}>
+        <div className={styles.sectionTitle}>현재 재생목록</div>
+        <button
+          onClick={clearQueue}
+          className={styles.clearBtn}
+        >
+          비우기
+        </button>
+      </div>
 
       <div className={styles.list}>
         {queue.map((track, index) => {
-          const isActive = index === currentIndex;
+          const isActive = track.uniqueKey === activeUniqueKey;
 
           return (
             <div
-              key={track.id + index}
+              key={track.uniqueKey}
               ref={(el) => {
                 itemRefs.current[index] = el;
               }}
-              onClick={() => playFromPlaylist(queue, index, token!)}
+              onClick={() => jumpTo(index, token!)}
               className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
             >
               <div className={styles.thumbWrapper}>
