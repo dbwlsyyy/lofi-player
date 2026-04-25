@@ -1,16 +1,23 @@
 "use client";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import styles from "./QueueSidebar.module.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useUiStore } from "@/store/useUiStore";
 import Image from "next/image";
 import Link from "next/link";
 import { useShallow } from "zustand/shallow";
+import TrackDropdown from "@/components/common/TrackDropdown/TrackDropdown";
+import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
+import { uiToast } from "@/lib/toasts";
+import { addTrackToPlaylist } from "@/apis/userApi";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
   const token = session?.accessToken;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [targetTrackUri, setTargetTrackUri] = useState("");
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { isSidebarOpen } = useUiStore();
@@ -33,6 +40,7 @@ export default function QueueSidebar() {
       activeUniqueKey: state.activeUniqueKey,
     })),
   );
+
   useEffect(() => {
     itemRefs.current[currentIndex] &&
       itemRefs.current[currentIndex].scrollIntoView({
@@ -40,6 +48,22 @@ export default function QueueSidebar() {
         block: "center",
       });
   }, [currentIndex]);
+
+  const handleAddClick = (uri: string) => {
+    setTargetTrackUri(uri);
+    setIsModalOpen(true);
+  };
+
+  const handleSelectPlaylist = async (playlistId: string) => {
+    if (!session?.accessToken) return;
+    try {
+      await addTrackToPlaylist(session.accessToken, playlistId, targetTrackUri);
+      setIsModalOpen(false);
+      uiToast.success("내 플리에 추가 완료!");
+    } catch (error) {
+      uiToast.error("곡 추가 실패!");
+    }
+  };
 
   return (
     <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
@@ -114,17 +138,24 @@ export default function QueueSidebar() {
                 <div className={styles.titleText}>{track.name}</div>
                 <div className={styles.artistText}>{track.artists.join(", ")}</div>
               </div>
-              {isActive && (
-                <div className={styles.eqWrapper}>
-                  <div className={styles.eqBarBlack}></div>
-                  <div className={styles.eqBarBlack}></div>
-                  <div className={styles.eqBarBlack}></div>
-                </div>
-              )}
+
+              <div className={styles.dropdownWrapper}>
+                <TrackDropdown
+                  type="queue"
+                  onRemove={() => removeTrackFromQueue(index, token!)}
+                  onSavePlaylist={() => handleAddClick(track.uri)}
+                />
+              </div>
             </div>
           );
         })}
       </div>
+      <AddToPlaylistModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleSelectPlaylist}
+        accessToken={session?.accessToken || ""}
+      />
     </aside>
   );
 }
