@@ -22,9 +22,25 @@ export default function AddToPlaylistModal({
   const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
 
   useEffect(() => {
-    if (isOpen && accessToken) {
-      fetchPlaylists(accessToken).then(setPlaylists).catch(console.error);
-    }
+    if (!isOpen || !accessToken) return;
+
+    let cancelled = false;
+
+    const refreshPlaylists = async () => {
+      try {
+        const list = await fetchPlaylists(accessToken);
+
+        if (!cancelled) setPlaylists(list);
+      } catch (error) {
+        if (!cancelled) console.error(error);
+      }
+    };
+
+    refreshPlaylists();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, accessToken]);
 
   if (!isOpen) return null;

@@ -39,19 +39,25 @@ export default function PlaylistDetailPage() {
 
   useEffect(() => {
     if (!token || !id) return;
+    let cancelled = false;
+
     const load = async () => {
       try {
         const lists = await fetchPlaylistTracks(token, id as string);
+        if (cancelled) return;
+
         const tracksWithKey = lists.map((track) => ({
           ...track,
           uniqueKey: crypto.randomUUID(),
         }));
         setTracks(tracksWithKey);
       } catch (err) {
+        if (cancelled) return;
+
         console.error("로드 실패:", err);
         uiToast.error("트랙 정보를 불러오지 못했습니다.");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
     load();

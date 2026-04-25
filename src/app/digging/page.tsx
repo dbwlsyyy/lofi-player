@@ -36,27 +36,29 @@ export default function DiggingPage() {
   useEffect(() => {
     const token = session?.accessToken;
     if (!query.trim() || !token) {
-      setResults([]); // 검색어 없을 때만 비움
+      // setResults([]); 기획 문제
+      setIsLoading(false);
       return;
     }
 
-    // isLoading만 true로 하고 results는 유지 (이전 결과 보여주다가 교체)
-    // 2. 검색 시작 시 이전 결과 즉시 삭제 & 로딩 시작 (화면 깜빡임 해결)
-    setResults([]);
+    let cancelled = false;
     setIsLoading(true);
 
     const timer = setTimeout(async () => {
       try {
         const data = await searchSpotify(token, query, filter);
-        setResults(data); // 데이터 도착 시 교체
+        if (!cancelled) setResults(data);
       } catch (error) {
-        console.error(error);
+        if (!cancelled) console.error(error);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
-    }, 500); // 디바운스 0.5초
+    }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [query, filter, session?.accessToken]);
 
   // 핸들러들

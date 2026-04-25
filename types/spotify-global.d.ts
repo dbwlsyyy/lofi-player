@@ -1,9 +1,9 @@
 declare global {
-    interface Window {
-        onSpotifyWebPlaybackSDKReady?: () => void;
-        Spotify?: any;
-        _spotifySdkLoadPromise?: Promise<void>;
-    }
+  interface Window {
+    onSpotifyWebPlaybackSDKReady?: () => void;
+    Spotify?: typeof Spotify;
+    _spotifySdkLoadPromise?: Promise<void>;
+  }
 }
 
 export {};
