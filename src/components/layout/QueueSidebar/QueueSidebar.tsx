@@ -1,5 +1,6 @@
 "use client";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { createPortal } from "react-dom";
 import styles from "./QueueSidebar.module.css";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -66,96 +67,103 @@ export default function QueueSidebar() {
   };
 
   return (
-    <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
-      <h2 className={styles.title}>Playlist</h2>
-      {currentTrack && (
-        <>
-          <div className={styles.sectionHeader}>
-            <div className={styles.sectionTitle}>지금 재생 중</div>
-          </div>
-          <Link
-            href={`/song/${currentTrack.id}`}
-            className={`${styles.item} ${styles.active}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.thumbWrapper}>
-              <Image
-                src={currentTrack.image || "/default_playlist.png"}
-                alt={currentTrack.name}
-                fill
-                priority
-                sizes="4rem"
-                className={styles.thumb}
-              />
+    <>
+      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
+        <h2 className={styles.title}>Playlist</h2>
+        {currentTrack && (
+          <>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionTitle}>지금 재생 중</div>
             </div>
-            <div className={styles.textGroup}>
-              <div className={styles.titleText}>{currentTrack.name}</div>
-              <div className={styles.artistText}>{currentTrack.artists.join(", ")}</div>
-            </div>
-
-            <div className={styles.eqWrapper}>
-              <div className={styles.eqBar}></div>
-              <div className={styles.eqBar}></div>
-              <div className={styles.eqBar}></div>
-            </div>
-          </Link>
-        </>
-      )}
-      <div className={styles.sectionHeader}>
-        <div className={styles.sectionTitle}>현재 재생목록</div>
-        <button
-          onClick={clearQueue}
-          className={styles.clearBtn}
-        >
-          비우기
-        </button>
-      </div>
-
-      <div className={styles.list}>
-        {queue.map((track, index) => {
-          const isActive = track.uniqueKey === activeUniqueKey;
-
-          return (
-            <div
-              key={track.uniqueKey}
-              ref={(el) => {
-                itemRefs.current[index] = el;
-              }}
-              onClick={() => jumpTo(index, token!)}
-              className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
+            <Link
+              href={`/song/${currentTrack.id}`}
+              className={`${styles.item} ${styles.active}`}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className={styles.thumbWrapper}>
                 <Image
-                  src={track.image || "/default_album.png"}
-                  alt={track.name}
+                  src={currentTrack.image || "/default_playlist.png"}
+                  alt={currentTrack.name}
                   fill
+                  priority
                   sizes="4rem"
                   className={styles.thumb}
                 />
               </div>
-
               <div className={styles.textGroup}>
-                <div className={styles.titleText}>{track.name}</div>
-                <div className={styles.artistText}>{track.artists.join(", ")}</div>
+                <div className={styles.titleText}>{currentTrack.name}</div>
+                <div className={styles.artistText}>{currentTrack.artists.join(", ")}</div>
               </div>
 
-              <div className={styles.dropdownWrapper}>
-                <TrackDropdown
-                  type="queue"
-                  onRemove={() => removeTrackFromQueue(index, token!)}
-                  onSavePlaylist={() => handleAddClick(track.uri)}
-                />
+              <div className={styles.eqWrapper}>
+                <div className={styles.eqBar}></div>
+                <div className={styles.eqBar}></div>
+                <div className={styles.eqBar}></div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-      <AddToPlaylistModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSelect={handleSelectPlaylist}
-        accessToken={session?.accessToken || ""}
-      />
-    </aside>
+            </Link>
+          </>
+        )}
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionTitle}>현재 재생목록</div>
+          <button
+            onClick={clearQueue}
+            className={styles.clearBtn}
+          >
+            비우기
+          </button>
+        </div>
+
+        <div className={styles.list}>
+          {queue.map((track, index) => {
+            const isActive = track.uniqueKey === activeUniqueKey;
+
+            return (
+              <div
+                key={track.uniqueKey}
+                ref={(el) => {
+                  itemRefs.current[index] = el;
+                }}
+                onClick={() => jumpTo(index, token!)}
+                className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
+              >
+                <div className={styles.thumbWrapper}>
+                  <Image
+                    src={track.image || "/default_album.png"}
+                    alt={track.name}
+                    fill
+                    sizes="4rem"
+                    className={styles.thumb}
+                  />
+                </div>
+
+                <div className={styles.textGroup}>
+                  <div className={styles.titleText}>{track.name}</div>
+                  <div className={styles.artistText}>{track.artists.join(", ")}</div>
+                </div>
+
+                <div className={styles.dropdownWrapper}>
+                  <TrackDropdown
+                    type="queue"
+                    onRemove={() => removeTrackFromQueue(index, token!)}
+                    onSavePlaylist={() => handleAddClick(track.uri)}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </aside>
+      {typeof window !== "undefined" &&
+        isModalOpen &&
+        createPortal(
+          <AddToPlaylistModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSelect={handleSelectPlaylist}
+            accessToken={session?.accessToken || ""}
+          />,
+          document.body, // body 태그 바로 아래에 렌더링
+        )}
+    </>
   );
 }
