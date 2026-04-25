@@ -14,6 +14,9 @@ export type Track = {
 export type RepeatMode = "off" | "context" | "track";
 
 export type PlayerState = {
+  activeUniqueKey: string | null;
+  isTransitioning: boolean;
+
   playerInstance: Spotify.Player | null;
   currentTrack: Track | null;
   queue: Track[];
@@ -35,7 +38,16 @@ export type PlayerState = {
 
   setPlayerInstance: (player: Spotify.Player | null) => void;
 
-  optimisticPlay: (tracks: Track[], index: number) => void;
+  setQueueAndPlay: (tracks: Track[], index: number) => void;
+
+  playAllTracks: (tracks: any[], startIndex: number, token: string) => Promise<void>;
+  playSingleTrack: (track: any, token: string) => Promise<void>;
+  addTrackToNext: (track: any) => void;
+  jumpTo: (index: number, token: string) => Promise<void>;
+
+  removeTrackFromQueue: (index: number) => void;
+  clearQueue: () => void;
+
   togglePlay: () => Promise<void>;
   nextTrack: () => Promise<void>;
   prevTrack: () => Promise<void>;
@@ -53,6 +65,4 @@ export type PlayerState = {
   setIsReady: (ready: boolean) => void;
   setPosition: (pos: number) => void;
   setDuration: (dur: number) => void;
-
-  playFromPlaylist: (tracks: Track[], startIndex: number, token: string) => Promise<void>;
 };

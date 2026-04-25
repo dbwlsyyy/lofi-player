@@ -1,4 +1,4 @@
-export const formatTime = (ms: number) => {
+export const formatTime = (ms: number | undefined) => {
   if (!ms || ms < 0) return "0:00";
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
