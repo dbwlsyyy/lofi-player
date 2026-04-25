@@ -16,6 +16,44 @@ import {
 import { formatTime } from "@/lib/formatTime";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useShallow } from "zustand/shallow";
+
+const DetailProgressBar = () => {
+  const position = usePlayerStore((state) => state.position);
+  const duration = usePlayerStore((state) => state.duration);
+  const seekTo = usePlayerStore((state) => state.seekTo);
+
+  const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const newPosition = Math.floor((clickX / rect.width) * duration);
+    seekTo(newPosition);
+  };
+
+  return (
+    <div className={styles.progressSection}>
+      <div
+        className={styles.progressBar}
+        onClick={handleSeek}
+      >
+        <div
+          className={styles.progressFill}
+          style={{ width: `${progressPercent}%` }}
+        />
+        <div
+          className={styles.progressHandle}
+          style={{ left: `${progressPercent}%` }}
+        />
+      </div>
+      <div className={styles.timeRow}>
+        <span>{formatTime(position)}</span>
+        <span>{formatTime(duration)}</span>
+      </div>
+    </div>
+  );
+};
 
 export default function SongDetailPage() {
   const { data: session } = useSession();
@@ -26,17 +64,26 @@ export default function SongDetailPage() {
   const {
     currentTrack,
     isPlaying,
-    position,
-    duration,
     togglePlay,
     nextTrack,
     prevTrack,
-    seekTo,
     isShuffled,
     repeatMode,
     toggleShuffle,
     cycleRepeatMode,
-  } = usePlayerStore();
+  } = usePlayerStore(
+    useShallow((state) => ({
+      currentTrack: state.currentTrack,
+      isPlaying: state.isPlaying,
+      togglePlay: state.togglePlay,
+      nextTrack: state.nextTrack,
+      prevTrack: state.prevTrack,
+      isShuffled: state.isShuffled,
+      repeatMode: state.repeatMode,
+      toggleShuffle: state.toggleShuffle,
+      cycleRepeatMode: state.cycleRepeatMode,
+    })),
+  );
 
   if (!currentTrack) return null;
 
@@ -45,16 +92,6 @@ export default function SongDetailPage() {
     setTimeout(() => {
       router.back();
     }, 300);
-  };
-
-  const progressPercent = (position / duration) * 100 || 0;
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const width = rect.width;
-    const newPosition = Math.floor((clickX / width) * duration);
-    seekTo(newPosition);
   };
 
   return (
@@ -94,25 +131,7 @@ export default function SongDetailPage() {
               <p className={styles.artist}>{currentTrack.artists.join(", ")}</p>
             </div>
 
-            <div className={styles.progressSection}>
-              <div
-                className={styles.progressBar}
-                onClick={handleSeek}
-              >
-                <div
-                  className={styles.progressFill}
-                  style={{ width: `${progressPercent}%` }}
-                />
-                <div
-                  className={styles.progressHandle}
-                  style={{ left: `${progressPercent}%` }}
-                />
-              </div>
-              <div className={styles.timeRow}>
-                <span>{formatTime(position)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
-            </div>
+            <DetailProgressBar />
 
             <div className={styles.controls}>
               <button

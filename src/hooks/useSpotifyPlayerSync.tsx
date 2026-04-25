@@ -6,6 +6,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { transferToDevice } from "@/apis/playbackApi";
 import { FiExternalLink, FiLock, FiUserX, FiWifiOff } from "react-icons/fi";
 import { uiToast } from "@/lib/toasts";
+import { useShallow } from "zustand/shallow";
 
 export function useSpotifySDK(accessToken: string | null | undefined) {
   const {
@@ -16,7 +17,17 @@ export function useSpotifySDK(accessToken: string | null | undefined) {
     setPosition,
     setDuration,
     syncStateFromSdk,
-  } = usePlayerStore();
+  } = usePlayerStore(
+    useShallow((state) => ({
+      setPlayerInstance: state.setPlayerInstance,
+      setIsPlaying: state.setIsPlaying,
+      setDeviceId: state.setDeviceId,
+      setIsReady: state.setIsReady,
+      setPosition: state.setPosition,
+      setDuration: state.setDuration,
+      syncStateFromSdk: state.syncStateFromSdk,
+    })),
+  );
 
   const playerRef = useRef<Spotify.Player | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
