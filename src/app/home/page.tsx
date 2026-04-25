@@ -11,6 +11,7 @@ import LoadingSpinner from "@/components/loading/LoadingSpinner/LoadingSpinner";
 import NavToggle from "../../components/common/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";
 import { SpotifyPlaylistItem, SpotifyUser } from "@/types/api";
+import Link from "next/link";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -78,14 +79,10 @@ export default function HomePage() {
                 <>
                   <div className={styles.playlistGrid}>
                     {playlists.map((pl) => (
-                      <div
+                      <Link
                         key={pl.id}
+                        href={`/playlist/${pl.id}?name=${encodeURIComponent(pl.name)}&img=${pl.images[0]?.url}`}
                         className={styles.playlistCard}
-                        onClick={() =>
-                          router.push(
-                            `/playlist/${pl.id}?name=${encodeURIComponent(pl.name)}&img=${pl.images[0]?.url}`,
-                          )
-                        }
                       >
                         <div className={styles.imageWrapper}>
                           <Image
@@ -100,7 +97,7 @@ export default function HomePage() {
                           <h4>{pl.name}</h4>
                           <p>{pl.tracks.total} Tracks</p>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </>

@@ -17,6 +17,13 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko">
+      <head>
+        <link
+          rel="preload"
+          href="https://sdk.scdn.co/spotify-player.js"
+          as="script"
+        />
+      </head>
       <body>
         <NextAuthProvider>
           <GlobalBackground />

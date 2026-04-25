@@ -18,7 +18,6 @@ export default function PlaylistList({ playlists, onClick }: PlaylistListProps) 
           key={item.id}
           className={styles.trackRow}
           onClick={() => onClick(item.id)}
-          style={{ cursor: "pointer" }}
         >
           <div className={styles.trackLeading}>
             <div className={styles.trackImgWrapper}>

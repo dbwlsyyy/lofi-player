@@ -35,6 +35,8 @@
   padding: 1.6rem;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  text-decoration: none;
+  color: inherit;
 }
 
 .playlistCard:hover {

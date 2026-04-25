@@ -12,10 +12,7 @@ export default function NavToggle() {
 
   if (isRelaxMode) return null;
 
-  const isHomeActive =
-    pathname === "/home" ||
-    pathname === "/" ||
-    pathname.startsWith("/playlist");
+  const isHomeActive = pathname === "/home" || pathname === "/" || pathname.startsWith("/playlist");
 
   const isDiggingActive = pathname === "/digging";
 
@@ -25,6 +22,7 @@ export default function NavToggle() {
         <Link
           href="/home"
           className={`${styles.navItem} ${isHomeActive ? styles.active : ""}`}
+          prefetch={true}
         >
           <div className={styles.iconWrapper}>
             <FiMusic size="2.4rem" />
@@ -37,6 +35,7 @@ export default function NavToggle() {
         <Link
           href="/digging"
           className={`${styles.navItem} ${isDiggingActive ? styles.active : ""}`}
+          prefetch={true}
         >
           <div className={styles.iconWrapper}>
             <FiDisc size="2.4rem" />
