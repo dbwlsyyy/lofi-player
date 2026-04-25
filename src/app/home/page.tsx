@@ -83,7 +83,6 @@ export default function HomePage() {
                         key={pl.id}
                         href={`/playlist/${pl.id}?name=${encodeURIComponent(pl.name)}&img=${pl.images[0]?.url}`}
                         className={styles.playlistCard}
-                        style={{ textDecoration: "none", color: "inherit" }}
                       >
                         <div className={styles.imageWrapper}>
                           <Image

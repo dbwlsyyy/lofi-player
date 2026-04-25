@@ -38,7 +38,6 @@ export default function QueueSidebar() {
             href={`/song/${currentTrack.id}`}
             className={`${styles.item} ${styles.active}`}
             onClick={(e) => e.stopPropagation()}
-            style={{ textDecoration: "none", color: "inherit" }}
           >
             <div className={styles.thumbWrapper}>
               <Image
