@@ -22,6 +22,7 @@ import axios from "axios";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
+  const accessToken = session?.accessToken as string | undefined;
   const { isRelaxMode } = useUIStore();
   const { playFromPlaylist } = usePlayControl();
 
@@ -38,8 +39,7 @@ export default function DiggingPage() {
 
   // 검색 로직
   useEffect(() => {
-    const token = session?.accessToken;
-    if (!debouncedSearchTerm.trim() || !token) {
+    if (!debouncedSearchTerm.trim() || !accessToken) {
       // setResults([]); 기획 문제
       setIsLoading(false);
       return;
@@ -50,7 +50,12 @@ export default function DiggingPage() {
 
     const fetchSearchResults = async () => {
       try {
-        const data = await searchSpotify(token, debouncedSearchTerm, filter, controller.signal);
+        const data = await searchSpotify(
+          accessToken,
+          debouncedSearchTerm,
+          filter,
+          controller.signal,
+        );
         setResults(data);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -68,7 +73,7 @@ export default function DiggingPage() {
     return () => {
       controller.abort();
     };
-  }, [debouncedSearchTerm, filter, session?.accessToken]);
+  }, [debouncedSearchTerm, filter, accessToken]);
 
   // 핸들러들
   const handlePlayNow = (item: SearchResult) => {
