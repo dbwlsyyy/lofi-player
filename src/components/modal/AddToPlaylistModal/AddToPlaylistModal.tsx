@@ -5,6 +5,7 @@ import { fetchPlaylists } from "@/apis/userApi";
 import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
 import { SpotifyPlaylistItem } from "@/types/api";
+import axios from "axios";
 
 interface AddModalProps {
   isOpen: boolean;
@@ -24,22 +25,23 @@ export default function AddToPlaylistModal({
   useEffect(() => {
     if (!isOpen || !accessToken) return;
 
-    let cancelled = false;
+    const controller = new AbortController();
 
     const refreshPlaylists = async () => {
       try {
-        const list = await fetchPlaylists(accessToken);
+        const list = await fetchPlaylists(accessToken, controller.signal);
 
-        if (!cancelled) setPlaylists(list);
+        setPlaylists(list);
       } catch (error) {
-        if (!cancelled) console.error(error);
+        if (axios.isCancel(error)) return;
+        console.error(error);
       }
     };
 
     refreshPlaylists();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [isOpen, accessToken]);
 

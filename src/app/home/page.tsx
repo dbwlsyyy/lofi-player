@@ -12,6 +12,7 @@ import NavToggle from "../../components/common/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";
 import { SpotifyPlaylistItem, SpotifyUser } from "@/types/api";
 import Link from "next/link";
+import axios from "axios";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -30,21 +31,19 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!accessToken) return;
-    let cancelled = false;
+    const controller = new AbortController();
 
     const initUserData = async () => {
       try {
         const [profile, list] = await Promise.all([
-          fetchMe(accessToken),
-          fetchPlaylists(accessToken),
+          fetchMe(accessToken, controller.signal),
+          fetchPlaylists(accessToken, controller.signal),
         ]);
-        if (cancelled) return;
 
         setMe(profile);
         setPlaylists(list);
       } catch (e: any) {
-        if (cancelled) return;
-
+        if (axios.isCancel(e)) return;
         if (e.response?.status === 401) {
           handleLogin();
         } else {
@@ -55,7 +54,7 @@ export default function HomePage() {
 
     initUserData();
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [accessToken]);
 

@@ -9,16 +9,20 @@ import {
   SpotifyPlaylistResponse,
   SpotifyUser,
 } from "@/types/api";
+import axios from "axios";
 
 /**
  * [내 정보 가져오기]
  */
-export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
+export async function fetchMe(accessToken: string, signal?: AbortSignal): Promise<SpotifyUser> {
   try {
     const api = createSpotifyClient(accessToken);
-    const { data } = await api.get<SpotifyUser>("/me");
+    const { data } = await api.get<SpotifyUser>("/me", { ...(signal ? { signal } : {}) });
     return data;
   } catch (e: any) {
+    if (axios.isCancel(e)) {
+      throw e;
+    }
     console.error("fetchMe API 에러:", e.response?.status, e.message);
     throw e; // 다시 던짐 (호출부에서 처리)
   }
@@ -29,12 +33,18 @@ export async function fetchMe(accessToken: string): Promise<SpotifyUser> {
  */
 export async function fetchPlaylists(
   accessToken: string,
+  signal?: AbortSignal,
 ): Promise<SpotifyPlaylistItem[]> {
   try {
     const api = createSpotifyClient(accessToken);
-    const { data } = await api.get<SpotifyPlaylistResponse>("/me/playlists");
+    const { data } = await api.get<SpotifyPlaylistResponse>("/me/playlists", {
+      ...(signal ? { signal } : {}),
+    });
     return data.items;
   } catch (e: any) {
+    if (axios.isCancel(e)) {
+      throw e;
+    }
     console.error("fetchPlaylist API 에러:", e.response?.status, e.message);
     throw e;
   }
@@ -47,10 +57,13 @@ export async function fetchPlaylists(
 export async function fetchPlaylistTracks(
   accessToken: string,
   playlistId: string,
+  signal?: AbortSignal,
 ): Promise<Track[]> {
   try {
     const api = createSpotifyClient(accessToken);
-    const { data } = await api.get(`/playlists/${playlistId}/tracks`);
+    const { data } = await api.get(`/playlists/${playlistId}/tracks`, {
+      ...(signal ? { signal } : {}),
+    });
 
     // Spotify API의 응답 구조는 { items: [{ track: { ... } }] } 형태
     return data.items
@@ -65,11 +78,10 @@ export async function fetchPlaylistTracks(
         previewUrl: item.track.preview_url ?? undefined,
       }));
   } catch (e: any) {
-    console.error(
-      `fetchPlaylistTracks(${playlistId}) 에러:`,
-      e.response?.status,
-      e.message,
-    );
+    if (axios.isCancel(e)) {
+      throw e;
+    }
+    console.error(`fetchPlaylistTracks(${playlistId}) 에러:`, e.response?.status, e.message);
     throw e;
   }
 }
@@ -77,11 +89,7 @@ export async function fetchPlaylistTracks(
 /**
  * [플리 이름 수정]
  */
-export async function updatePlaylistName(
-  accessToken: string,
-  playlistId: string,
-  newName: string,
-) {
+export async function updatePlaylistName(accessToken: string, playlistId: string, newName: string) {
   try {
     const api = createSpotifyClient(accessToken);
     await api.put(`/playlists/${playlistId}`, {
@@ -144,64 +152,74 @@ export async function searchSpotify(
   accessToken: string,
   query: string,
   filter: SearchFilter,
+  signal?: AbortSignal,
 ): Promise<SearchResult[]> {
   if (!query.trim()) return [];
 
   const api = createSpotifyClient(accessToken);
 
-  // 필터에 맞는 type으로 요청
-  const { data } = await api.get("/search", {
-    params: { q: query, type: filter, limit: 30 },
-  });
+  try {
+    // 필터에 맞는 type으로 요청
+    const { data } = await api.get("/search", {
+      params: { q: query, type: filter, limit: 30 },
+      ...(signal ? { signal } : {}),
+    });
 
-  // 1. 아티스트
-  if (filter === "artist") {
-    return data.artists.items.map((a: any) => ({
-      id: a.id,
-      name: a.name,
-      image: a.images?.[0]?.url || "/default_artist.png",
-      type: "artist",
-      uri: a.uri,
-    }));
-  }
-
-  // 2. 앨범
-  if (filter === "album") {
-    return data.albums.items.map((al: any) => ({
-      id: al.id,
-      name: al.name,
-      artists: al.artists.map((a: any) => a.name),
-      image: al.images?.[0]?.url || "/default_album.png",
-      type: "album",
-      uri: al.uri,
-      releaseDate: al.release_date, // 연도 파싱을 위해 필요
-    }));
-  }
-
-  // 3. 플레이리스트 (NEW)
-  if (filter === "playlist") {
-    return data.playlists.items
-      .filter((pl: any) => pl !== null)
-      .map((pl: any) => ({
-        id: pl.id,
-        name: pl.name,
-        image: pl.images?.[0]?.url || "/default_playlist.png",
-        type: "playlist",
-        uri: pl.uri,
-        owner: pl.owner.display_name || "Unknown", // 제작자 이름
-        tracksTotal: pl.tracks.total || 0,
-        description: pl.description || "알 수 없음",
+    // 1. 아티스트
+    if (filter === "artist") {
+      return data.artists.items.map((a: any) => ({
+        id: a.id,
+        name: a.name,
+        image: a.images?.[0]?.url || "/default_artist.png",
+        type: "artist",
+        uri: a.uri,
       }));
-  }
+    }
 
-  // 4. 곡 (기본)
-  return data.tracks.items.map((t: any) => ({
-    id: t.id,
-    name: t.name,
-    artists: t.artists.map((a: any) => a.name),
-    image: t.album.images?.[0]?.url || "/default_album.png",
-    type: "track",
-    uri: t.uri,
-    durationMs: t.duration_ms, // 시간 표시용
-  }));
+    // 2. 앨범
+    if (filter === "album") {
+      return data.albums.items.map((al: any) => ({
+        id: al.id,
+        name: al.name,
+        artists: al.artists.map((a: any) => a.name),
+        image: al.images?.[0]?.url || "/default_album.png",
+        type: "album",
+        uri: al.uri,
+        releaseDate: al.release_date, // 연도 파싱을 위해 필요
+      }));
+    }
+
+    // 3. 플레이리스트 (NEW)
+    if (filter === "playlist") {
+      return data.playlists.items
+        .filter((pl: any) => pl !== null)
+        .map((pl: any) => ({
+          id: pl.id,
+          name: pl.name,
+          image: pl.images?.[0]?.url || "/default_playlist.png",
+          type: "playlist",
+          uri: pl.uri,
+          owner: pl.owner.display_name || "Unknown", // 제작자 이름
+          tracksTotal: pl.tracks.total || 0,
+          description: pl.description || "알 수 없음",
+        }));
+    }
+
+    // 4. 곡 (기본)
+    return data.tracks.items.map((t: any) => ({
+      id: t.id,
+      name: t.name,
+      artists: t.artists.map((a: any) => a.name),
+      image: t.album.images?.[0]?.url || "/default_album.png",
+      type: "track",
+      uri: t.uri,
+      durationMs: t.duration_ms, // 시간 표시용
+    }));
+  } catch (e: any) {
+    if (axios.isCancel(e)) {
+      throw e;
+    }
+    console.error("searchSpotify API 에러:", e);
+    throw e;
+  }
 }

@@ -15,6 +15,7 @@ import { Track } from "@/types/player";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -40,12 +41,13 @@ export default function PlaylistDetailPage() {
 
   useEffect(() => {
     if (!token || !id) return;
-    let cancelled = false;
+
+    const controller = new AbortController();
+    setLoading(true);
 
     const load = async () => {
       try {
-        const lists = await fetchPlaylistTracks(token, id as string);
-        if (cancelled) return;
+        const lists = await fetchPlaylistTracks(token, id as string, controller.signal);
 
         const tracksWithKey = lists.map((track) => ({
           ...track,
@@ -53,15 +55,18 @@ export default function PlaylistDetailPage() {
         }));
         setTracks(tracksWithKey);
       } catch (err) {
-        if (cancelled) return;
-
+        if (axios.isCancel(err)) return;
         console.error("로드 실패:", err);
         uiToast.error("트랙 정보를 불러오지 못했습니다.");
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     };
     load();
+
+    return () => {
+      controller.abort();
+    };
   }, [id, token]);
 
   useEffect(() => {
