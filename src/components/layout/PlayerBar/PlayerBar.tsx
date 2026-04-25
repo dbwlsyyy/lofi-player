@@ -18,47 +18,77 @@ import { FiMenu } from "react-icons/fi";
 import { useSession } from "next-auth/react";
 import { formatTime } from "@/lib/formatTime";
 import { useRef } from "react";
-import { useRouter } from "next/navigation";
 import LoadingDots from "../../loading/LoadingDots/LoadingDots";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import Link from "next/link";
+import { useShallow } from "zustand/shallow";
 
-export default function PlayerBar() {
-  const { data: session } = useSession();
-  const accessToken = session?.accessToken;
-  const router = useRouter();
-
-  const {
-    currentTrack,
-    isPlaying,
-    position,
-    duration,
-    isShuffled,
-    repeatMode,
-    volume,
-    cycleRepeatMode,
-    togglePlay,
-    nextTrack,
-    prevTrack,
-    seekTo,
-    setVolume,
-    toggleShuffle,
-    isLoadingTrack,
-  } = usePlayerStore();
-  const { toggleSidebar } = useUIStore();
+const PlayerProgressBar = () => {
+  const position = usePlayerStore((state) => state.position);
+  const duration = usePlayerStore((state) => state.duration);
+  const seekTo = usePlayerStore((state) => state.seekTo);
 
   const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!duration) return;
-
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
-    const width = rect.width;
-    const newPosition = Math.floor((clickX / width) * duration);
+    const newPosition = Math.floor((clickX / rect.width) * duration);
     seekTo(newPosition);
   };
 
+  return (
+    <div className={styles.progressContainer}>
+      <span className={styles.timeText}>{formatTime(position)}</span>
+      <div
+        className={styles.progressBar}
+        onClick={handleSeek}
+      >
+        <div
+          className={styles.progressFill}
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+      <span className={styles.timeText}>{formatTime(duration)}</span>
+    </div>
+  );
+};
+
+export default function PlayerBar() {
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
+
+  const {
+    currentTrack,
+    isPlaying,
+    isShuffled,
+    repeatMode,
+    volume,
+    isLoadingTrack,
+    cycleRepeatMode,
+    togglePlay,
+    nextTrack,
+    prevTrack,
+    setVolume,
+    toggleShuffle,
+  } = usePlayerStore(
+    useShallow((state) => ({
+      currentTrack: state.currentTrack,
+      isPlaying: state.isPlaying,
+      isShuffled: state.isShuffled,
+      repeatMode: state.repeatMode,
+      volume: state.volume,
+      isLoadingTrack: state.isLoadingTrack,
+      cycleRepeatMode: state.cycleRepeatMode,
+      togglePlay: state.togglePlay,
+      nextTrack: state.nextTrack,
+      prevTrack: state.prevTrack,
+      setVolume: state.setVolume,
+      toggleShuffle: state.toggleShuffle,
+    })),
+  );
+  const { toggleSidebar } = useUiStore();
   const lastVolumeRef = useRef(volume || 0.5);
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,19 +196,7 @@ export default function PlayerBar() {
                 )}
               </div>
 
-              <div className={styles.progressContainer}>
-                <span className={styles.timeText}>{formatTime(position)}</span>
-                <div
-                  className={styles.progressBar}
-                  onClick={handleSeek}
-                >
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-                <span className={styles.timeText}>{formatTime(duration)}</span>
-              </div>
+              <PlayerProgressBar />
             </div>
 
             <div className={styles.rightArea}>

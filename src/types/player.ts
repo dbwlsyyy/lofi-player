@@ -53,4 +53,6 @@ export type PlayerState = {
   setIsReady: (ready: boolean) => void;
   setPosition: (pos: number) => void;
   setDuration: (dur: number) => void;
+
+  playFromPlaylist: (tracks: Track[], startIndex: number, token: string) => Promise<void>;
 };

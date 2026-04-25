@@ -1,10 +1,10 @@
 "use client";
 
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import styles from "./ToggleBtn.module.css";
 
 export default function ToggleBtn() {
-  const { isRelaxMode, toggleRelaxMode } = useUIStore();
+  const { isRelaxMode, toggleRelaxMode } = useUiStore();
   return (
     <div
       className={styles.glassToggle}

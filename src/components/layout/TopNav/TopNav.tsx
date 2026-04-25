@@ -5,11 +5,11 @@ import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { FiHome, FiLogOut } from "react-icons/fi";
 import styles from "./TopNav.module.css";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 
 export default function TopNav() {
   const pathname = usePathname();
-  const { isRelaxMode } = useUIStore();
+  const { isRelaxMode } = useUiStore();
 
   const { status } = useSession();
 

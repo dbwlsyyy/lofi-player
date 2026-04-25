@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { searchSpotify, addTrackToPlaylist } from "@/apis/userApi";
-import { usePlayControl } from "@/hooks/usePlayTracks";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import { SearchFilter, SearchResult } from "@/types/api";
 import { uiToast } from "@/lib/toasts";
 import styles from "./Digging.module.css";
@@ -19,12 +18,13 @@ import PlaylistList from "./components/PlaylistList/PlaylistList";
 import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
 import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
+import { usePlayerStore } from "@/store/usePlayerStore";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
   const accessToken = session?.accessToken as string | undefined;
-  const { isRelaxMode } = useUIStore();
-  const { playFromPlaylist } = usePlayControl();
+  const { isRelaxMode } = useUiStore();
+  const playFromPlaylist = usePlayerStore((state) => state.playFromPlaylist);
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<SearchFilter>("track"); // 기본값 '곡'

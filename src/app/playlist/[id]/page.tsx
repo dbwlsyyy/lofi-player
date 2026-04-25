@@ -5,8 +5,7 @@ import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
 import { fetchPlaylistTracks, removeTrackFromPlaylist, updatePlaylistName } from "@/apis/userApi";
 import { useSession } from "next-auth/react";
-import { usePlayControl } from "@/hooks/usePlayTracks";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaRegTrashAlt } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTime, formatTotalDuration } from "@/lib/formatTime";
@@ -16,6 +15,7 @@ import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
+import { usePlayerStore } from "@/store/usePlayerStore";
 
 export default function PlaylistDetailPage() {
   const { data: session } = useSession();
@@ -24,7 +24,9 @@ export default function PlaylistDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { isRelaxMode } = useUIStore();
+  const { isRelaxMode } = useUiStore();
+  const playFromPlaylist = usePlayerStore((state) => state.playFromPlaylist);
+
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,8 +38,6 @@ export default function PlaylistDetailPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTrackUri, setSelectedTrackUri] = useState<string | null>(null);
-
-  const { playFromPlaylist } = usePlayControl();
 
   useEffect(() => {
     if (!token || !id) return;

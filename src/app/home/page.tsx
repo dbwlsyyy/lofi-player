@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchMe, fetchPlaylists } from "@/apis/userApi";
 import styles from "./Home.module.css";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 import LoadingSpinner from "@/components/loading/LoadingSpinner/LoadingSpinner";
 import NavToggle from "../../components/common/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";
@@ -17,9 +16,8 @@ import axios from "axios";
 export default function HomePage() {
   const { data: session, status } = useSession();
   const accessToken = session?.accessToken;
-  const router = useRouter();
 
-  const { isRelaxMode } = useUIStore();
+  const { isRelaxMode } = useUiStore();
 
   const [me, setMe] = useState<SpotifyUser | null>(null);
   const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);

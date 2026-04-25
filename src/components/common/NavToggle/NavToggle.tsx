@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiDisc, FiMusic } from "react-icons/fi";
 import styles from "./NavToggle.module.css";
-import { useUIStore } from "@/store/useUiStore";
+import { useUiStore } from "@/store/useUiStore";
 
 export default function NavToggle() {
   const pathname = usePathname();
-  const { isRelaxMode } = useUIStore();
+  const { isRelaxMode } = useUiStore();
 
   if (isRelaxMode) return null;
 
