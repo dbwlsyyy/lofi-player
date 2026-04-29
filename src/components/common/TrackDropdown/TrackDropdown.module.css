@@ -1,0 +1,73 @@
+.dropdownContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kebabBtn {
+  background: transparent;
+  border: none;
+  color: #565656;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.kebabBtn:hover {
+  color: #ffffff;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background-color: #282828;
+  border-radius: 6px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  min-width: 160px;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dropdownMenu button {
+  background: transparent;
+  border: none;
+  color: #e5e5e5;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  font-family: inherit;
+}
+
+.dropdownMenu button:hover {
+  background-color: #3e3e3e;
+  color: #ffffff;
+}
+
+.primaryBtn {
+  color: #3b82f6 !important;
+}
+
+.primaryBtn:hover {
+  background: rgba(59, 130, 246, 0.15) !important;
+}
+
+.deleteBtn {
+  color: #ff4d4f !important;
+}
+
+.deleteBtn:hover {
+  background-color: rgba(255, 77, 79, 0.1) !important;
+}

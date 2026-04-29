@@ -153,6 +153,16 @@
   border-radius: 0.2rem;
 }
 
+.dropdownWrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.dropdownWrapper button {
+  z-index: 10;
+}
+
 .eqWrapper {
   margin-left: auto;
   display: flex;

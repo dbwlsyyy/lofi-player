@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { searchSpotify, addTrackToPlaylist } from "@/apis/userApi";
+import { searchSpotify } from "@/apis/userApi";
 import { useUiStore } from "@/store/useUiStore";
 import { SearchFilter, SearchResult } from "@/types/api";
 import { uiToast } from "@/lib/toasts";
@@ -15,7 +15,7 @@ import TrackList from "./components/TrackList/TrackList";
 import ArtistGrid from "./components/ArtistGrid/ArtistGrid";
 import AlbumGrid from "./components/AlbumGrid/AlbumGrid";
 import PlaylistList from "./components/PlaylistList/PlaylistList";
-import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
+
 import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
 
@@ -28,10 +28,6 @@ export default function DiggingPage() {
   const [filter, setFilter] = useState<SearchFilter>("track"); // 기본값 '곡'
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  // 모달 상태
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [targetTrackUri, setTargetTrackUri] = useState("");
 
   const debouncedSearchTerm = useDebounce(query, 500);
 
@@ -73,22 +69,6 @@ export default function DiggingPage() {
     };
   }, [debouncedSearchTerm, filter, accessToken]);
 
-  const handleAddClick = (uri: string) => {
-    setTargetTrackUri(uri);
-    setIsModalOpen(true);
-  };
-
-  const handleSelectPlaylist = async (playlistId: string) => {
-    if (!session?.accessToken) return;
-    try {
-      await addTrackToPlaylist(session.accessToken, playlistId, targetTrackUri);
-      setIsModalOpen(false);
-      uiToast.success("내 플리에 추가 완료!");
-    } catch (error) {
-      uiToast.error("곡 추가 실패!");
-    }
-  };
-
   const handlePending = (msg: string) => {
     uiToast.custom("준비 중인 기능", null);
   };
@@ -118,12 +98,7 @@ export default function DiggingPage() {
             ) : results.length > 0 ? (
               /* 로딩 끝나고 데이터 있을 때만 렌더링 */
               <>
-                {filter === "track" && (
-                  <TrackList
-                    tracks={results}
-                    onAdd={handleAddClick}
-                  />
-                )}
+                {filter === "track" && <TrackList tracks={results} />}
                 {filter === "artist" && (
                   <ArtistGrid
                     artists={results}
@@ -154,12 +129,6 @@ export default function DiggingPage() {
       )}
 
       <NavBar />
-      <AddToPlaylistModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSelect={handleSelectPlaylist}
-        accessToken={session?.accessToken || ""}
-      />
     </main>
   );
 }

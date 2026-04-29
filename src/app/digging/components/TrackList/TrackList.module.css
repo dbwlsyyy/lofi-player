@@ -103,6 +103,16 @@
   transform: scale(1.1);
 }
 
+.dropdownWrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.dropdownWrapper button {
+  z-index: 10;
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;

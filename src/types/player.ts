@@ -45,7 +45,7 @@ export type PlayerState = {
   addTrackToNext: (track: any) => void;
   jumpTo: (index: number, token: string) => Promise<void>;
 
-  removeTrackFromQueue: (index: number) => void;
+  removeTrackFromQueue: (index: number, token: string) => void;
   clearQueue: () => void;
 
   togglePlay: () => Promise<void>;
