@@ -102,6 +102,9 @@ export const usePlayerStore = create<PlayerState>()(
       position: 0,
       isLoadingTrack: false,
 
+      stopAtEntry: false, // 진입 시 정지 예약 깃발
+      setStopAtEntry: (val) => set({ stopAtEntry: val }),
+
       // --- [상태 변경 단순 액션들] ---
       setIsLoadingTrack: (loading) => set({ isLoadingTrack: loading }),
       setPlayerInstance: (player) => set({ playerInstance: player }),
@@ -156,7 +159,7 @@ export const usePlayerStore = create<PlayerState>()(
         // 4. 스토어 상태 업데이트 (큐 교체 + 시작 인덱스 설정)
         setQueueAndPlay(tracksWithKeys, startIndex);
 
-        // [추가] 사이드바 불빛을 위해 현재 재생할 곡의 키를 저장
+        // 사이드바 불빛을 위해 현재 재생할 곡의 키를 저장
         set({ activeUniqueKey: tracksWithKeys[startIndex]?.uniqueKey ?? null });
 
         const uris = tracksWithKeys.map((t) => `spotify:track:${t.id}`);
@@ -175,7 +178,7 @@ export const usePlayerStore = create<PlayerState>()(
             setDuration,
           );
         } finally {
-          // 6. [추가] 서버가 상태를 반영할 시간을 벌어준 뒤 방어막 해제
+          // 6. 서버가 상태를 반영할 시간을 벌어준 뒤 방어막 해제
           setTimeout(() => {
             set({ isTransitioning: false });
           }, 1500);
@@ -183,65 +186,82 @@ export const usePlayerStore = create<PlayerState>()(
       },
 
       playSingleTrack: async (track, token) => {
-        const { deviceId, setIsPlaying, setPosition, setDuration } = get();
+        const { deviceId, playerInstance, setIsPlaying, setPosition, setDuration } = get();
+
         if (!deviceId || !token) return;
 
         set({ isTransitioning: true });
 
-        // 1. 롤백을 위해 현재 상태 미리 백업 (함수 시작 시점의 스냅샷)
+        const { queue: currentQueue, currentIndex: currentIdx } = get();
         const rollbackState = {
-          queue: get().queue,
-          currentIndex: get().currentIndex,
+          queue: [...currentQueue],
+          currentIndex: currentIdx,
           isPlaying: get().isPlaying,
         };
 
-        // 2. 함수형 업데이트 (set(state => ...)) 사용
-        // 이 블록 안에서 state는 무조건 '가장 최신'의 큐 상태임을 보장
+        // 1. 새 트랙 생성 및 고유 키 부여
         const newTrackWithKey = { ...track, uniqueKey: crypto.randomUUID() };
 
-        set((state) => {
-          const newQueue = [...state.queue];
-          // 현재 곡 바로 다음 인덱스 계산 (큐가 비었으면 0)
-          const nextIndex = newQueue.length > 0 ? state.currentIndex + 1 : 0;
-          // 큐에 새 곡 끼워넣기
-          newQueue.splice(nextIndex, 0, newTrackWithKey);
+        // 2. 새로운 큐 및 삽입 위치 계산
+        let newQueue: any[];
+        let playIndex: number;
 
-          return {
-            queue: newQueue,
-            currentIndex: nextIndex,
-            currentTrack: newTrackWithKey,
-            activeUniqueKey: newTrackWithKey.uniqueKey, // UI 동기화를 위한 핵심 키
-            isPlaying: true,
-            position: 0,
-            isLoadingTrack: false,
-          };
+        if (currentQueue.length === 0) {
+          newQueue = [newTrackWithKey];
+          playIndex = 0;
+        } else {
+          newQueue = [...currentQueue];
+          playIndex = currentIdx + 1;
+          newQueue.splice(playIndex, 0, newTrackWithKey);
+        }
+
+        // 3. 낙관적 업데이트
+        set({
+          queue: newQueue,
+          currentIndex: playIndex,
+          currentTrack: newTrackWithKey,
+          activeUniqueKey: newTrackWithKey.uniqueKey,
+          isPlaying: true,
+          position: 0,
         });
 
-        // 3. API 요청 준비 (위에서 set으로 바뀐 최신 큐를 다시 get으로 가져옴)
-        const { queue, currentIndex } = get();
-
-        // 스포티파이 서버 부하를 줄이기 위해 현재 곡부터 최대 100곡만 잘라서 보냄
-        const contextTracks = queue.slice(0, 100);
-        const uris = contextTracks.map((t) => `spotify:track:${t.id}`);
-
         try {
-          // 4. 실제 재생 명령 (슬라이스된 배열의 0번째 곡부터 재생)
-          await startPlayback(uris, deviceId, token, currentIndex);
-        } catch (error) {
-          // 5. 실패 시 아까 정의한 헬퍼 함수로 안전하게 롤백
-          handlePlaybackError(
-            error,
-            rollbackState,
-            (q, i) => set({ queue: q, currentIndex: i }), // 낙관적 업데이트 롤백용 함수
-            setIsPlaying,
-            setPosition,
-            setDuration,
-          );
+          // 스포티파이 형식으로 URI 정제
+          const uris = newQueue
+            .slice(0, 100)
+            .map((t) => {
+              // 1. 이미 정식 uri가 있다면 그대로 사용
+              if (t.uri && t.uri.includes("spotify:track:")) return t.uri;
+              // 2. id만 있다면 spotify:track: 붙여줌 (중복 방지 체크)
+              const cleanId = t.id.replace("spotify:track:", "");
+              return `spotify:track:${cleanId}`;
+            })
+            .filter(Boolean); // 혹시 모를 null/undefined 제거
+
+          // [방어막] 일시정지 후 서버 상태가 안정될 때까지 대기
+
+          // [최종 확인] uris가 비어있지 않고, 인덱스가 유효할 때만 전송
+          if (uris.length > 0 && playIndex < uris.length) {
+            await startPlayback(uris, deviceId, token, playIndex);
+          }
+        } catch (error: any) {
+          console.error("playSingleTrack 에러 상세:", error.response?.data || error);
+
+          // 최후의 보루: 현재 물려있는 곡이라도 그냥 재생 시킴
+          if (error.response?.status === 400) {
+            await playerInstance?.resume();
+          } else {
+            handlePlaybackError(
+              error,
+              rollbackState,
+              (q, i) => set({ queue: q, currentIndex: i }),
+              setIsPlaying,
+              setPosition,
+              setDuration,
+            );
+          }
         } finally {
-          // 2. 1.5초 정도 여유를 두고 방어막 해제 (서버가 새 곡 정보를 반영할 시간)
-          setTimeout(() => {
-            set({ isTransitioning: false });
-          }, 1500);
+          setTimeout(() => set({ isTransitioning: false }), 1500);
         }
       },
 
@@ -272,6 +292,7 @@ export const usePlayerStore = create<PlayerState>()(
           activeUniqueKey: queue[index].uniqueKey ?? null,
           isPlaying: true,
           isTransitioning: true, // 낡은 서버 정보 차단용
+          stopAtEntry: false,
         });
 
         // 2. 소리(API) 재생 명령
@@ -288,113 +309,186 @@ export const usePlayerStore = create<PlayerState>()(
 
       // --- [큐 사이드바 관리 전용 액션] ---
       removeTrackFromQueue: async (targetIndex, token) => {
-        const { queue, currentIndex, jumpTo } = get();
+        const { queue, currentIndex, deviceId, clearQueue } = get();
+        if (!token || !deviceId) return;
 
-        // 1. 만약 삭제하려는 곡이 '현재 재생 중인 곡'이라면
+        // 1. [Clear Queue] 남은 곡이 1개일 때 삭제하면 완전히 초기화
+        if (queue.length <= 1) {
+          clearQueue();
+          return; // 여기서 함수 종료 아래 로직 안 탐
+        }
+
+        // 2. 새로운 큐 계산 (로컬에서 즉시 실행)
+        const newQueue = queue.filter((_, i) => i !== targetIndex);
+
+        // 3. [Case A] 현재 재생 중인 곡을 삭제하는 경우
         if (targetIndex === currentIndex) {
-          // 큐에 이 곡 딱 하나뿐이었다면? 큐 비우고 초기화
-          if (queue.length === 1) {
-            set({
-              queue: [],
-              currentIndex: 0,
-              currentTrack: null,
-              activeUniqueKey: null,
-              isPlaying: false,
-            });
-            return;
-          }
-
-          // 일단 큐에서 해당 곡을 삭제한 새로운 배열 생성
-          const newQueue = queue.filter((_, i) => i !== targetIndex);
-
-          // 다음 곡 결정: 마지막 곡을 삭제했다면 다시 0번으로, 아니면 그 자리에 새로 들어온 곡으로
+          // 다음 곡 결정: 마지막 곡이면 0번으로, 아니면 그 자리 그대로
           const nextIndex = targetIndex < newQueue.length ? targetIndex : 0;
+          const nextTrack = newQueue[nextIndex];
 
-          // [중요] 상태를 먼저 업데이트하여 큐를 줄인 뒤, 재생 함수 호출
-          set({ queue: newQueue });
-
-          // playTrackFromQueue가 다음 곡의 불빛(activeUniqueKey)과 스포티파이 재생을 모두 처리해줍니다.
-          await jumpTo(nextIndex, token);
-        } else {
-          // 2. 현재 재생 중이 '아닌' 다른 곡을 삭제하는 경우 (기존 로직 유지)
-          set((state) => {
-            const newQueue = [...state.queue];
-            newQueue.splice(targetIndex, 1);
-
-            let nextCurrentIndex = state.currentIndex;
-
-            // 삭제한 곡이 지금 듣는 곡보다 '앞'에 있었다면 인덱스를 하나 당겨줘야 함
-            if (targetIndex < state.currentIndex) {
-              nextCurrentIndex -= 1;
-            }
-
-            return { queue: newQueue, currentIndex: nextCurrentIndex };
+          // 로컬 상태 먼저 반영
+          set({
+            queue: newQueue,
+            currentIndex: nextIndex,
+            currentTrack: nextTrack ?? null,
+            activeUniqueKey: nextTrack?.uniqueKey ?? null,
           });
+
+          // 서버에 새로운 리스트를 쏴서 다음 곡으로 강제 전환
+          const uris = newQueue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
+          await startPlayback(uris, deviceId, token, nextIndex);
+        }
+
+        // 4. [Case B] 현재 재생 중이 아닌 다른 곡을 삭제하는 경우
+        else {
+          // 인덱스 보정: 삭제된 곡이 현재 곡보다 앞에 있었다면 현재 인덱스를 하나 당겨줌
+          const nextCurrentIndex = targetIndex < currentIndex ? currentIndex - 1 : currentIndex;
+
+          set({
+            queue: newQueue,
+            currentIndex: nextCurrentIndex,
+          });
+
+          console.log("다른 곡 삭제: UI만 업데이트했습니다. 다음 곡 전환 시 싱크가 맞춰집니다.");
         }
       },
 
       clearQueue: () => {
-        const { currentTrack } = get();
-        // 큐를 비워도 현재 나오는 곡은 하나 남기기
-        if (currentTrack) {
-          set({ queue: [currentTrack], currentIndex: 0 });
-        } else {
-          set({ queue: [], currentIndex: 0 });
-        }
+        set({
+          queue: [],
+          currentIndex: 0,
+        });
       },
 
       // --- [비즈니스 로직 및 API 통신] ---
 
-      togglePlay: async () => {
-        const { isPlaying, playerInstance } = get();
+      togglePlay: async (token?: string) => {
+        const {
+          isPlaying,
+          playerInstance,
+          queue,
+          position,
+          currentTrack,
+          playSingleTrack,
+          stopAtEntry,
+          deviceId,
+          currentIndex,
+        } = get();
+
         if (!playerInstance) return;
 
-        // 낙관적 업데이트: UI 먼저 즉각 변경 후 SDK 명령
+        // [낙관적 업데이트]
         set({ isPlaying: !isPlaying });
-        await playerInstance.togglePlay();
+
+        try {
+          if (isPlaying) {
+            // 재생 중이면 멈춤
+            await playerInstance.pause();
+            return;
+          }
+
+          // --- (재생 버튼을 누른 경우) ---
+
+          // [예외] 비우기 상태(queue: [])에서 곡이 끝나 0초에 머물러 있을 때
+          if (queue.length === 0 && position === 0 && currentTrack && token) {
+            await playSingleTrack(currentTrack, token);
+            return;
+          }
+
+          // 리스트가 끝나서 0번에서 대기 중(stopAtEntry)일 때
+          if (stopAtEntry && token && deviceId) {
+            console.log("🔄 재생 버튼 클릭: 밀린 서버 동기화를 진행하며 0번 곡을 틉니다.");
+
+            // 밀린 숙제 해결했으니 깃발 내림 (UI는 위에서 이미 true가 되었으므로 냅둠)
+
+            const uris = queue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
+
+            // 단순 resume()이 아니라 서버에 최신 리스트를 쏘면서 재생
+            await startPlayback(uris, deviceId, token, currentIndex);
+            return;
+          }
+          set({ stopAtEntry: false });
+          // [일반 상황] 평소에는 그냥 resume
+          await playerInstance.resume();
+        } catch (error) {
+          console.error("재생 토글 에러:", error);
+          // 에러 나면 UI 원상복구 (낙관적 업데이트 롤백)
+          set({ isPlaying });
+        }
       },
 
-      nextTrack: async () => {
-        const { playerInstance, queue, currentIndex, isShuffled } = get();
-        if (!playerInstance || queue.length === 0) return;
-
-        // [FLOW 0] 다음 곡 클릭시 로딩 UI(스피너/닷)
-        // set({ isLoadingTrack: true }); ux를 위해 셔플모드에서만
+      nextTrack: async (token?: string, isAuto = false) => {
+        const { playerInstance, queue, currentIndex, isShuffled, deviceId, repeatMode } = get();
+        if (!playerInstance || queue.length === 0 || !deviceId || !token) return;
 
         try {
           if (!isShuffled) {
-            // [FLOW 1-A] 일반 모드: 다음 곡이 뭔지 아니까 UI 정보 즉시 변경
             const nextIndex = currentIndex + 1;
+            const uris = queue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
+
             if (nextIndex < queue.length) {
+              // [1. 일반 다음 곡]
               set({
                 currentIndex: nextIndex,
                 currentTrack: queue[nextIndex] ?? null,
                 activeUniqueKey: queue[nextIndex]?.uniqueKey ?? null,
                 position: 0,
-                duration: 0,
                 isPlaying: true,
                 isTransitioning: true,
+                stopAtEntry: false,
               });
-              setTimeout(() => set({ isTransitioning: false }), 1500);
-            }
-          } else {
-            // [FLOW 1-B] 셔플 모드: 스포티파이 서버가 무슨 곡을 줄지 모름
-            // 앨범 아트는 놔두고 프로그레스 바(position)만 0으로 밀어서 곡이 전환 중임을 암시
-            set({ isLoadingTrack: true, position: 0 });
-          }
+              await startPlayback(uris, deviceId, token, nextIndex);
+            } else {
+              // [2. 마지막 곡에서 다음으로 넘어갈 때]
+              // nextTrack 함수 내부의 마지막 곡(isAuto) 처리 부분
+              if (isAuto && repeatMode === "off") {
+                set({
+                  currentIndex: 0,
+                  currentTrack: queue[0] ?? null,
+                  activeUniqueKey: queue[0]?.uniqueKey ?? null,
+                  position: 0,
+                  isPlaying: false,
+                  isTransitioning: true, // SDK 이벤트 무시
+                  stopAtEntry: true, // 소리 차단용 깃발
+                });
 
-          // [FLOW 2] 스포티파이 서버로 다음 곡 재생 명령 전달 (로딩은 syncStateFromSdk에서 꺼짐)
-          await playerInstance.nextTrack();
+                await startPlayback(uris, deviceId, token, 0);
+
+                setTimeout(() => {
+                  set({ isTransitioning: false, stopAtEntry: false });
+                }, 2000);
+              } else {
+                // 수동 클릭이거나 반복이 켜져있다면 -> 0번으로 가고 재생
+                set({
+                  currentIndex: 0,
+                  currentTrack: queue[0] ?? null,
+                  activeUniqueKey: queue[0]?.uniqueKey ?? null,
+                  position: 0,
+                  isPlaying: true,
+                  isTransitioning: true,
+                  stopAtEntry: false,
+                });
+                await startPlayback(uris, deviceId, token, 0);
+              }
+            }
+
+            setTimeout(() => set({ isTransitioning: false }), 1500);
+          } else {
+            // 셔플 모드
+            set({ isLoadingTrack: true, position: 0, stopAtEntry: false });
+            await playerInstance.nextTrack();
+          }
         } catch (e) {
           console.error("다음 곡 넘기기 실패:", e);
-          set({ isLoadingTrack: false });
+          set({ isLoadingTrack: false, isTransitioning: false });
         }
       },
 
       prevTrack: async () => {
         const { playerInstance, position, queue, currentIndex, isShuffled } = get();
         if (!playerInstance || queue.length === 0) return;
-
+        set({ stopAtEntry: false });
         if (position > 5000) {
           set({ position: 0 });
           await playerInstance.seek(0);
@@ -437,58 +531,105 @@ export const usePlayerStore = create<PlayerState>()(
       },
 
       // [SDK 이벤트 리스너] 스포티파이 서버에서 상태 변경 알림이 올 때마다 실행됨 (타 기기에서 변경 대비)
-      syncStateFromSdk: (state) => {
-        // 1. 필요한 현재 상태들을 가져옴
-        const { isTransitioning, queue, currentIndex, currentTrack } = get();
+      syncStateFromSdk: async (state, token) => {
+        const {
+          queue,
+          currentIndex,
+          currentTrack,
+          deviceId,
+          playerInstance,
+          isTransitioning,
+          stopAtEntry,
+          nextTrack,
+        } = get();
+
         const sdkTrack = state.track_window.current_track;
 
-        // [핵심 방어] 곡 전환 중(isTransitioning)일 때는
-        // 서버가 보내는 낡은 곡 정보와 인덱스 정보를 무시
+        if (!token || !deviceId || queue.length === 0 || !sdkTrack) return;
+
+        // 1. [소리 차단기] SDK 상태 묻지도 따지지도 않고 그냥 멈춤
+        if (stopAtEntry) {
+          playerInstance?.pause();
+          return;
+        }
+
+        // 2.
+        // isTransitioning이 켜져 있는 2초 동안은 스포티파이가 무슨 헛소리를 보내든
+        // 여기서 무조건 return 시켜서 아래의 UI 변경 로직(isPlaying)을 절대 못 타게
         if (isTransitioning) {
           set({
             isShuffled: state.shuffle,
-            repeatMode: ["off", "context", "track"][state.repeat_mode] as RepeatMode,
+            repeatMode: (["off", "context", "track"][state.repeat_mode] as RepeatMode) ?? "off",
             isPlaying: !state.paused,
-            // currentIndex, currentTrack, activeUniqueKey는 건드리지 않음
           });
           return;
         }
 
-        // 2. 곡 정보가 실제로 바뀌었는지 확인 (ID 기준)
-        if (currentTrack?.id !== sdkTrack.id) {
-          set((prevState) => {
-            // [중복 곡 방어] 큐에 같은 곡이 여러 개일 때
-            // 현재 인덱스(currentIndex)와 가장 가까운 다음 곡을 먼저 찾음
-            let nextIdx = prevState.queue.findIndex(
-              (t, i) => t.id === sdkTrack.id && i >= prevState.currentIndex,
-            );
+        // 3. [유령 트랙 감지]
+        if (currentTrack && sdkTrack.id !== currentTrack.id) {
+          const expectedNextTrack = queue[currentIndex + 1] ?? queue[0];
 
-            // 만약 뒤쪽에서 못 찾았다면(유저가 강제로 이전 곡으로 돌렸을 때 등) 전체에서 찾음
-            if (nextIdx === -1) {
-              nextIdx = prevState.queue.findIndex((t) => t.id === sdkTrack.id);
+          // [공통] 스포티파이가 튼 곡이 큐에 존재하는지 먼저 검사
+          const isTrackInQueue = queue.some((t) => t.id === sdkTrack.id);
+
+          // [우선순위 1: 삭제된 유령 곡 검문]
+          if (!isTrackInQueue) {
+            console.log("👻 큐에 없는 유령 곡 감지");
+
+            const isGoingToZero = expectedNextTrack?.id === queue[0]?.id;
+
+            if (isGoingToZero) {
+              console.log("⏹️ 리스트 종료: UI만 0번으로 초기화하고 재생 대기.");
+              set({
+                currentIndex: 0,
+                currentTrack: queue[0] ?? null,
+                activeUniqueKey: queue[0]?.uniqueKey ?? null,
+                position: 0,
+                isPlaying: false,
+                stopAtEntry: true,
+              });
+              return;
             }
 
-            // 최종적으로 찾은 인덱스와 곡 정보로 업데이트
-            const foundTrack = prevState.queue[nextIdx >= 0 ? nextIdx : 0];
+            // 중간에 있는 곡이 삭제된 거라면
+            else {
+              set({ stopAtEntry: true });
+              await nextTrack(token, true);
+              set({ stopAtEntry: false });
 
-            return {
-              currentIndex: nextIdx >= 0 ? nextIdx : 0,
-              currentTrack: mapSdkTrackToLocalTrack(sdkTrack),
-              // activeUniqueKey도 해당 인덱스의 고유 키로 맞춰줌
-              activeUniqueKey: foundTrack?.uniqueKey || null,
-              isLoadingTrack: false,
-            };
-          });
+              return;
+            }
+          }
+
+          // [우선순위 2: 끼워넣은 곡(순서 꼬임) 검문]
+          // 큐에 있긴 한데 예상한 바로 다음 곡이 아닐 경우
+          if (!state.shuffle && expectedNextTrack && sdkTrack.id !== expectedNextTrack.id) {
+            console.log("🔄 끼워넣은 곡 감지. 다음 곡을 덮어씌우ㅁ");
+
+            await nextTrack(token, true);
+            return;
+          }
         }
 
-        // 3. 곡 정보 외의 공통 상태 동기화 (셔플, 반복, 재생여부 등)
-        const repeatModes: RepeatMode[] = ["off", "context", "track"];
+        // 4. 정상 상태 동기화
+        set((prevState: PlayerState) => {
+          let nextIdx = prevState.queue.findIndex(
+            (t, i) => t.id === sdkTrack.id && i >= prevState.currentIndex,
+          );
+          if (nextIdx === -1) nextIdx = prevState.queue.findIndex((t) => t.id === sdkTrack.id);
 
-        set({
-          isShuffled: state.shuffle,
-          repeatMode: repeatModes[state.repeat_mode] ?? "off",
-          isPlaying: !state.paused,
-          isLoadingTrack: false, // 정보가 왔으므로 로딩 해제
+          const foundInQueue = nextIdx !== -1 ? prevState.queue[nextIdx] : null;
+          const finalTrack = foundInQueue ?? mapSdkTrackToLocalTrack(sdkTrack);
+
+          return {
+            currentIndex: nextIdx !== -1 ? nextIdx : 0,
+            currentTrack: finalTrack ?? null,
+            activeUniqueKey: finalTrack?.uniqueKey ?? null,
+            isShuffled: state.shuffle,
+            repeatMode: (["off", "context", "track"][state.repeat_mode] as RepeatMode) ?? "off",
+            isPlaying: !state.paused, // 2초가 지났을 때만 여기서 UI를 업데이트
+            isLoadingTrack: false,
+          };
         });
       },
 

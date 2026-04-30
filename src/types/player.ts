@@ -36,6 +36,9 @@ export type PlayerState = {
   position: number;
   duration: number;
 
+  stopAtEntry: boolean;
+  setStopAtEntry: (val: boolean) => void;
+
   setPlayerInstance: (player: Spotify.Player | null) => void;
 
   setQueueAndPlay: (tracks: Track[], index: number) => void;
@@ -48,8 +51,8 @@ export type PlayerState = {
   removeTrackFromQueue: (index: number, token: string) => void;
   clearQueue: () => void;
 
-  togglePlay: () => Promise<void>;
-  nextTrack: () => Promise<void>;
+  togglePlay: (token?: string) => Promise<void>;
+  nextTrack: (token?: string, isAuto?: boolean) => Promise<void>;
   prevTrack: () => Promise<void>;
   seekTo: (pos: number) => Promise<void>;
 
@@ -57,7 +60,7 @@ export type PlayerState = {
   toggleShuffle: (token: string) => Promise<void>;
   cycleRepeatMode: (token: string) => Promise<void>;
 
-  syncStateFromSdk: (state: Spotify.PlaybackState) => void;
+  syncStateFromSdk: (state: Spotify.PlaybackState, token?: string) => void;
 
   setQueue: (tracks: Track[]) => void;
   setDeviceId: (id: string | null) => void;

@@ -150,14 +150,14 @@ export default function SongDetailPage() {
 
               <button
                 className={styles.playToggle}
-                onClick={togglePlay}
+                onClick={() => togglePlay(token)}
               >
                 {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
               </button>
 
               <button
                 className={styles.mainBtn}
-                onClick={nextTrack}
+                onClick={() => nextTrack(token)}
               >
                 <FaStepForward />
               </button>

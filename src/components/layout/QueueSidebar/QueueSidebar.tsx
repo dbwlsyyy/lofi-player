@@ -60,9 +60,9 @@ export default function QueueSidebar() {
     try {
       await addTrackToPlaylist(session.accessToken, playlistId, targetTrackUri);
       setIsModalOpen(false);
-      uiToast.success("내 플리에 추가 완료!");
+      uiToast.success("내 플리에 추가 완료");
     } catch (error) {
-      uiToast.error("곡 추가 실패!");
+      uiToast.error("곡 추가 실패");
     }
   };
 

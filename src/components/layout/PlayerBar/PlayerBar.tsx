@@ -88,6 +88,14 @@ export default function PlayerBar() {
       toggleShuffle: state.toggleShuffle,
     })),
   );
+  const isLastTrack = usePlayerStore(
+    (state) => state.queue.length === 0 && state.currentIndex === 0,
+  );
+  const repeatModeName = {
+    context: "전체 반복",
+    track: "한 곡 반복",
+    off: "반복 꺼짐",
+  };
   const { toggleSidebar } = useUiStore();
   const lastVolumeRef = useRef(volume || 0.5);
 
@@ -173,13 +181,14 @@ export default function PlayerBar() {
                     </button>
                     <button
                       disabled={isLoadingTrack}
-                      onClick={togglePlay}
+                      onClick={() => togglePlay(accessToken)}
                       className={`${styles.controlBtn} ${styles.playBtn}`}
                     >
                       {isPlaying ? <FaPause /> : <FaPlay />}
                     </button>
                     <button
-                      onClick={nextTrack}
+                      onClick={() => nextTrack(accessToken)}
+                      disabled={isLastTrack}
                       className={styles.controlBtn}
                     >
                       <FaStepForward style={{ marginRight: "2rem" }} />
@@ -187,7 +196,7 @@ export default function PlayerBar() {
                     <button
                       onClick={() => accessToken && cycleRepeatMode(accessToken)}
                       className={`${styles.controlBtn} ${repeatMode !== "off" ? styles.activeBtn : ""}`}
-                      title={`반복 모드: ${repeatMode}`}
+                      title={repeatModeName[repeatMode]}
                     >
                       <FaRedo size={17} />
                       {repeatMode === "track" && <span className={styles.repeatSpan}>1</span>}
@@ -241,7 +250,7 @@ export default function PlayerBar() {
             transition={{ duration: 0.3 }}
             className={styles.emptyState}
           >
-            <p>🎧 현재 재생 중인 곡이 없습니다.</p>
+            <p>현재 재생 중인 곡이 없습니다.</p>
             <p className={styles.hint}>플레이리스트에서 곡을 선택하세요.</p>
           </motion.div>
         )}
