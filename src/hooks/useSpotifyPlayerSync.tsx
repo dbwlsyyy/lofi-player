@@ -162,7 +162,7 @@ export function useSpotifyPlayerSync(accessToken: string | null | undefined) {
           setIsPlaying(isPlaying);
 
           if (!state.loading) {
-            syncStateFromSdk(state); // 현재 재생 중인 트랙 정보 동기화
+            syncStateFromSdk(state, accessToken); // 현재 재생 중인 트랙 정보 동기화
           }
 
           if (isPlaying) startPolling();

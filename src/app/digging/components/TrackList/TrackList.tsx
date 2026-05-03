@@ -13,6 +13,7 @@ import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlayl
 import { addTrackToPlaylist } from "@/apis/userApi";
 import { uiToast } from "@/lib/toasts";
 import { useState } from "react";
+import { mapSdkTrackToLocalTrack, mapSearchResultToTrack } from "@/lib/spotifyMapper";
 
 export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
   const { data: session } = useSession();
@@ -27,23 +28,13 @@ export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
     })),
   );
 
-  // [리팩토링] API 응답(SearchResult)을 스토어 규격(Track)으로 변환하는 헬퍼 함수
-  const convertToTrack = (item: SearchResult) => ({
-    id: item.id,
-    name: item.name,
-    artists: item.artists || [],
-    image: item.image,
-    uri: item.uri,
-    durationMs: item.durationMs || 0,
-  });
-
   const handlePlayClick = (item: SearchResult) => {
     if (!session?.accessToken) return;
-    playSingleTrack(convertToTrack(item), session.accessToken);
+    playSingleTrack(mapSearchResultToTrack(item), session.accessToken);
   };
 
   const handleAddNextClick = (item: SearchResult) => {
-    addTrackToNext(convertToTrack(item));
+    addTrackToNext(mapSearchResultToTrack(item));
   };
 
   const handleAddClick = (uri: string) => {

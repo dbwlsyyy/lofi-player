@@ -142,6 +142,13 @@
   transform: scale(0.9);
 }
 
+.controlBtn:disabled {
+  opacity: 0.5;
+  transform: none;
+  color: #e6ebff;
+  cursor: not-allowed;
+}
+
 .activeBtn {
   color: #4f7df3;
   position: relative;
