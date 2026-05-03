@@ -174,7 +174,7 @@ export default function PlayerBar() {
                       <FaRandom size={17} />
                     </button>
                     <button
-                      onClick={prevTrack}
+                      onClick={() => prevTrack(accessToken)}
                       className={styles.controlBtn}
                     >
                       <FaStepBackward style={{ marginLeft: "2rem" }} />

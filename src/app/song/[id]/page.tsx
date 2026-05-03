@@ -143,7 +143,7 @@ export default function SongDetailPage() {
 
               <button
                 className={styles.mainBtn}
-                onClick={prevTrack}
+                onClick={() => prevTrack(token)}
               >
                 <FaStepBackward />
               </button>

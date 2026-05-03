@@ -223,6 +223,7 @@ export const usePlayerStore = create<PlayerState>()(
           activeUniqueKey: newTrackWithKey.uniqueKey,
           isPlaying: true,
           position: 0,
+          stopAtEntry: false,
         });
 
         try {
@@ -283,7 +284,7 @@ export const usePlayerStore = create<PlayerState>()(
 
       jumpTo: async (index, token) => {
         const { queue, deviceId } = get();
-        if (!deviceId || !queue[index]) return;
+        if (!deviceId || !queue[index] || !token) return;
 
         // 1. 화면(UI)과 방어막 즉시 업데이트
         set({
@@ -297,8 +298,8 @@ export const usePlayerStore = create<PlayerState>()(
 
         // 2. 소리(API) 재생 명령
         const contextTracks = queue.slice(0, 100);
-        const uris = contextTracks.map((t) => `spotify:track:${t.id}`);
-
+        // 안전한 처리
+        const uris = queue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
         try {
           await startPlayback(uris, deviceId, token, index);
         } finally {
@@ -485,10 +486,10 @@ export const usePlayerStore = create<PlayerState>()(
         }
       },
 
-      prevTrack: async () => {
-        const { playerInstance, position, queue, currentIndex, isShuffled } = get();
-        if (!playerInstance || queue.length === 0) return;
-        set({ stopAtEntry: false });
+      prevTrack: async (token?: string) => {
+        const { playerInstance, position, queue, deviceId, currentIndex, isShuffled } = get();
+        if (!playerInstance || queue.length === 0 || !deviceId || !token) return;
+
         if (position > 5000) {
           set({ position: 0 });
           await playerInstance.seek(0);
@@ -499,23 +500,26 @@ export const usePlayerStore = create<PlayerState>()(
 
         try {
           if (!isShuffled) {
-            const prevIndex = currentIndex - 1;
-            if (prevIndex >= 0) {
-              set({
-                currentIndex: prevIndex,
-                currentTrack: queue[prevIndex] ?? null,
-                activeUniqueKey: queue[prevIndex]?.uniqueKey ?? null,
-                position: 0,
-                duration: 0,
-                isPlaying: true,
-                isTransitioning: true,
-              });
-              setTimeout(() => set({ isTransitioning: false }), 1500);
-            }
+            const prevIndex = currentIndex === 0 ? queue.length - 1 : currentIndex - 1;
+            set({
+              currentIndex: prevIndex,
+              currentTrack: queue[prevIndex] ?? null,
+              activeUniqueKey: queue[prevIndex]?.uniqueKey ?? null,
+              position: 0,
+              duration: 0,
+              isPlaying: true,
+              isTransitioning: true,
+              stopAtEntry: false,
+            });
+
+            const uris = queue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
+            await startPlayback(uris, deviceId, token, prevIndex);
+
+            setTimeout(() => set({ isTransitioning: false }), 1500);
           } else {
             set({ isLoadingTrack: true, position: 0 });
+            await playerInstance.previousTrack();
           }
-          await playerInstance.previousTrack();
         } catch (e) {
           console.error("이전 곡 넘기기 실패:", e);
           set({ isLoadingTrack: false });
@@ -560,7 +564,6 @@ export const usePlayerStore = create<PlayerState>()(
           set({
             isShuffled: state.shuffle,
             repeatMode: (["off", "context", "track"][state.repeat_mode] as RepeatMode) ?? "off",
-            isPlaying: !state.paused,
           });
           return;
         }

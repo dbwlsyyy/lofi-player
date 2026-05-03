@@ -53,7 +53,7 @@ export type PlayerState = {
 
   togglePlay: (token?: string) => Promise<void>;
   nextTrack: (token?: string, isAuto?: boolean) => Promise<void>;
-  prevTrack: () => Promise<void>;
+  prevTrack: (token?: string) => Promise<void>;
   seekTo: (pos: number) => Promise<void>;
 
   setVolume: (val: number) => Promise<void>;
