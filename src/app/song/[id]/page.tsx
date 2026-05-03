@@ -136,35 +136,35 @@ export default function SongDetailPage() {
             <div className={styles.controls}>
               <button
                 className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`}
-                onClick={() => token && toggleShuffle(token)}
+                onClick={toggleShuffle}
               >
                 <FaRandom />
               </button>
 
               <button
                 className={styles.mainBtn}
-                onClick={() => prevTrack(token)}
+                onClick={prevTrack}
               >
                 <FaStepBackward />
               </button>
 
               <button
                 className={styles.playToggle}
-                onClick={() => togglePlay(token)}
+                onClick={togglePlay}
               >
                 {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
               </button>
 
               <button
                 className={styles.mainBtn}
-                onClick={() => nextTrack(token)}
+                onClick={() => nextTrack()}
               >
                 <FaStepForward />
               </button>
 
               <button
                 className={`${styles.subBtn} ${repeatMode !== "off" ? styles.active : ""}`}
-                onClick={() => token && cycleRepeatMode(token)}
+                onClick={cycleRepeatMode}
               >
                 <FaRetweet size={25} />
                 {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}

@@ -217,7 +217,7 @@ export default function PlaylistDetailPage() {
 
                 <button
                   className={styles.playBtn}
-                  onClick={() => playAllTracks(tracks, 0, token!)}
+                  onClick={() => playAllTracks(tracks, 0)}
                 >
                   <FaPlay size={12} /> Play All
                 </button>
@@ -243,7 +243,7 @@ export default function PlaylistDetailPage() {
                     <div
                       key={t.uniqueKey}
                       className={styles.row}
-                      onClick={() => playSingleTrack(t, token!)}
+                      onClick={() => playSingleTrack(t)}
                       style={{
                         animationDelay: `${i * 0.05}s`,
                       }}

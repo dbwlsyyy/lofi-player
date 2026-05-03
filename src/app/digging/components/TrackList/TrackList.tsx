@@ -30,7 +30,7 @@ export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
 
   const handlePlayClick = (item: SearchResult) => {
     if (!session?.accessToken) return;
-    playSingleTrack(mapSearchResultToTrack(item), session.accessToken);
+    playSingleTrack(mapSearchResultToTrack(item));
   };
 
   const handleAddNextClick = (item: SearchResult) => {
