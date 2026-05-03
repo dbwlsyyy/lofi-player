@@ -84,7 +84,10 @@ const handlePlaybackError = (
 export const usePlayerStore = create<PlayerState>()(
   persist(
     (set, get) => ({
-      // --- [상태 초기값] ---
+      // --- [상태 초기값 ---
+      accessToken: null,
+      setAccessToken: (token: string | null) => set({ accessToken: token }),
+
       activeUniqueKey: null,
       isTransitioning: false,
 
@@ -132,9 +135,10 @@ export const usePlayerStore = create<PlayerState>()(
       // --- [음악 재생 제어] ---
 
       // 1. 전체 재생 (덮어쓰기)
-      playAllTracks: async (tracks, startIndex, token) => {
+      playAllTracks: async (tracks, startIndex) => {
         // 1. 필요한 현재 상태들
         const {
+          accessToken,
           deviceId,
           queue,
           currentIndex,
@@ -144,7 +148,7 @@ export const usePlayerStore = create<PlayerState>()(
           setPosition,
           setDuration,
         } = get();
-        if (!deviceId || !token) return;
+        if (!deviceId || !accessToken) return;
 
         // 2. 방어막 가동 & 롤백용 스냅샷 저장
         set({ isTransitioning: true });
@@ -166,7 +170,7 @@ export const usePlayerStore = create<PlayerState>()(
 
         try {
           // 5. 실제 재생 명령 (startIndex부터 재생하도록 서버에 전달)
-          await startPlayback(uris, deviceId, token, startIndex);
+          await startPlayback(uris, deviceId, accessToken, startIndex);
         } catch (error) {
           // 에러 발생 시 기존 롤백 로직 실행
           handlePlaybackError(
@@ -185,10 +189,11 @@ export const usePlayerStore = create<PlayerState>()(
         }
       },
 
-      playSingleTrack: async (track, token) => {
-        const { deviceId, playerInstance, setIsPlaying, setPosition, setDuration } = get();
+      playSingleTrack: async (track) => {
+        const { accessToken, deviceId, playerInstance, setIsPlaying, setPosition, setDuration } =
+          get();
 
-        if (!deviceId || !token) return;
+        if (!deviceId || !accessToken) return;
 
         set({ isTransitioning: true });
 
@@ -239,11 +244,9 @@ export const usePlayerStore = create<PlayerState>()(
             })
             .filter(Boolean); // 혹시 모를 null/undefined 제거
 
-          // [방어막] 일시정지 후 서버 상태가 안정될 때까지 대기
-
           // [최종 확인] uris가 비어있지 않고, 인덱스가 유효할 때만 전송
           if (uris.length > 0 && playIndex < uris.length) {
-            await startPlayback(uris, deviceId, token, playIndex);
+            await startPlayback(uris, deviceId, accessToken, playIndex);
           }
         } catch (error: any) {
           console.error("playSingleTrack 에러 상세:", error.response?.data || error);
@@ -282,9 +285,9 @@ export const usePlayerStore = create<PlayerState>()(
         });
       },
 
-      jumpTo: async (index, token) => {
-        const { queue, deviceId } = get();
-        if (!deviceId || !queue[index] || !token) return;
+      jumpTo: async (index) => {
+        const { accessToken, queue, deviceId } = get();
+        if (!deviceId || !queue[index] || !accessToken) return;
 
         // 1. 화면(UI)과 방어막 즉시 업데이트
         set({
@@ -297,11 +300,10 @@ export const usePlayerStore = create<PlayerState>()(
         });
 
         // 2. 소리(API) 재생 명령
-        const contextTracks = queue.slice(0, 100);
         // 안전한 처리
         const uris = queue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
         try {
-          await startPlayback(uris, deviceId, token, index);
+          await startPlayback(uris, deviceId, accessToken, index);
         } finally {
           // 1.5초 뒤 서버 동기화 허용
           setTimeout(() => set({ isTransitioning: false }), 1500);
@@ -309,9 +311,9 @@ export const usePlayerStore = create<PlayerState>()(
       },
 
       // --- [큐 사이드바 관리 전용 액션] ---
-      removeTrackFromQueue: async (targetIndex, token) => {
-        const { queue, currentIndex, deviceId, clearQueue } = get();
-        if (!token || !deviceId) return;
+      removeTrackFromQueue: async (targetIndex) => {
+        const { accessToken, queue, currentIndex, deviceId, clearQueue } = get();
+        if (!accessToken || !deviceId) return;
 
         // 1. [Clear Queue] 남은 곡이 1개일 때 삭제하면 완전히 초기화
         if (queue.length <= 1) {
@@ -338,7 +340,7 @@ export const usePlayerStore = create<PlayerState>()(
 
           // 서버에 새로운 리스트를 쏴서 다음 곡으로 강제 전환
           const uris = newQueue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
-          await startPlayback(uris, deviceId, token, nextIndex);
+          await startPlayback(uris, deviceId, accessToken, nextIndex);
         }
 
         // 4. [Case B] 현재 재생 중이 아닌 다른 곡을 삭제하는 경우
@@ -364,8 +366,9 @@ export const usePlayerStore = create<PlayerState>()(
 
       // --- [비즈니스 로직 및 API 통신] ---
 
-      togglePlay: async (token?: string) => {
+      togglePlay: async () => {
         const {
+          accessToken,
           isPlaying,
           playerInstance,
           queue,
@@ -391,22 +394,20 @@ export const usePlayerStore = create<PlayerState>()(
 
           // --- (재생 버튼을 누른 경우) ---
 
-          // [예외] 비우기 상태(queue: [])에서 곡이 끝나 0초에 머물러 있을 때
-          if (queue.length === 0 && position === 0 && currentTrack && token) {
-            await playSingleTrack(currentTrack, token);
+          // [예외] 비우기 상태(queue: [)에서 곡이 끝나 0초에 머물러 있을 때
+          if (queue.length === 0 && position === 0 && currentTrack && accessToken) {
+            await playSingleTrack(currentTrack);
             return;
           }
 
           // 리스트가 끝나서 0번에서 대기 중(stopAtEntry)일 때
-          if (stopAtEntry && token && deviceId) {
+          if (stopAtEntry && accessToken && deviceId) {
             console.log("🔄 재생 버튼 클릭: 밀린 서버 동기화를 진행하며 0번 곡을 틉니다.");
-
-            // 밀린 숙제 해결했으니 깃발 내림 (UI는 위에서 이미 true가 되었으므로 냅둠)
 
             const uris = queue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
 
             // 단순 resume()이 아니라 서버에 최신 리스트를 쏘면서 재생
-            await startPlayback(uris, deviceId, token, currentIndex);
+            await startPlayback(uris, deviceId, accessToken, currentIndex);
             return;
           }
           set({ stopAtEntry: false });
@@ -419,9 +420,17 @@ export const usePlayerStore = create<PlayerState>()(
         }
       },
 
-      nextTrack: async (token?: string, isAuto = false) => {
-        const { playerInstance, queue, currentIndex, isShuffled, deviceId, repeatMode } = get();
-        if (!playerInstance || queue.length === 0 || !deviceId || !token) return;
+      nextTrack: async (isAuto = false) => {
+        const {
+          accessToken,
+          playerInstance,
+          queue,
+          currentIndex,
+          isShuffled,
+          deviceId,
+          repeatMode,
+        } = get();
+        if (!playerInstance || queue.length === 0 || !deviceId || !accessToken) return;
 
         try {
           if (!isShuffled) {
@@ -439,10 +448,9 @@ export const usePlayerStore = create<PlayerState>()(
                 isTransitioning: true,
                 stopAtEntry: false,
               });
-              await startPlayback(uris, deviceId, token, nextIndex);
+              await startPlayback(uris, deviceId, accessToken, nextIndex);
             } else {
               // [2. 마지막 곡에서 다음으로 넘어갈 때]
-              // nextTrack 함수 내부의 마지막 곡(isAuto) 처리 부분
               if (isAuto && repeatMode === "off") {
                 set({
                   currentIndex: 0,
@@ -454,7 +462,7 @@ export const usePlayerStore = create<PlayerState>()(
                   stopAtEntry: true, // 소리 차단용 깃발
                 });
 
-                await startPlayback(uris, deviceId, token, 0);
+                await startPlayback(uris, deviceId, accessToken, 0);
 
                 setTimeout(() => {
                   set({ isTransitioning: false, stopAtEntry: false });
@@ -470,7 +478,7 @@ export const usePlayerStore = create<PlayerState>()(
                   isTransitioning: true,
                   stopAtEntry: false,
                 });
-                await startPlayback(uris, deviceId, token, 0);
+                await startPlayback(uris, deviceId, accessToken, 0);
               }
             }
 
@@ -486,17 +494,16 @@ export const usePlayerStore = create<PlayerState>()(
         }
       },
 
-      prevTrack: async (token?: string) => {
-        const { playerInstance, position, queue, deviceId, currentIndex, isShuffled } = get();
-        if (!playerInstance || queue.length === 0 || !deviceId || !token) return;
+      prevTrack: async () => {
+        const { accessToken, playerInstance, position, queue, deviceId, currentIndex, isShuffled } =
+          get();
+        if (!playerInstance || queue.length === 0 || !deviceId || !accessToken) return;
 
         if (position > 5000) {
           set({ position: 0 });
           await playerInstance.seek(0);
           return;
         }
-
-        // set({ isLoadingTrack: true });
 
         try {
           if (!isShuffled) {
@@ -513,7 +520,7 @@ export const usePlayerStore = create<PlayerState>()(
             });
 
             const uris = queue.map((t) => `spotify:track:${t.id.replace("spotify:track:", "")}`);
-            await startPlayback(uris, deviceId, token, prevIndex);
+            await startPlayback(uris, deviceId, accessToken, prevIndex);
 
             setTimeout(() => set({ isTransitioning: false }), 1500);
           } else {
@@ -535,8 +542,9 @@ export const usePlayerStore = create<PlayerState>()(
       },
 
       // [SDK 이벤트 리스너] 스포티파이 서버에서 상태 변경 알림이 올 때마다 실행됨 (타 기기에서 변경 대비)
-      syncStateFromSdk: async (state, token) => {
+      syncStateFromSdk: async (state) => {
         const {
+          accessToken,
           queue,
           currentIndex,
           currentTrack,
@@ -549,7 +557,7 @@ export const usePlayerStore = create<PlayerState>()(
 
         const sdkTrack = state.track_window.current_track;
 
-        if (!token || !deviceId || queue.length === 0 || !sdkTrack) return;
+        if (!accessToken || !deviceId || queue.length === 0 || !sdkTrack) return;
 
         // 1. [소리 차단기] SDK 상태 묻지도 따지지도 않고 그냥 멈춤
         if (stopAtEntry) {
@@ -572,7 +580,7 @@ export const usePlayerStore = create<PlayerState>()(
         if (currentTrack && sdkTrack.id !== currentTrack.id) {
           const expectedNextTrack = queue[currentIndex + 1] ?? queue[0];
 
-          // [공통] 스포티파이가 튼 곡이 큐에 존재하는지 먼저 검사
+          // [공통 스포티파이가 튼 곡이 큐에 존재하는지 먼저 검사
           const isTrackInQueue = queue.some((t) => t.id === sdkTrack.id);
 
           // [우선순위 1: 삭제된 유령 곡 검문]
@@ -597,7 +605,7 @@ export const usePlayerStore = create<PlayerState>()(
             // 중간에 있는 곡이 삭제된 거라면
             else {
               set({ stopAtEntry: true });
-              await nextTrack(token, true);
+              await nextTrack(true);
               set({ stopAtEntry: false });
 
               return;
@@ -607,9 +615,9 @@ export const usePlayerStore = create<PlayerState>()(
           // [우선순위 2: 끼워넣은 곡(순서 꼬임) 검문]
           // 큐에 있긴 한데 예상한 바로 다음 곡이 아닐 경우
           if (!state.shuffle && expectedNextTrack && sdkTrack.id !== expectedNextTrack.id) {
-            console.log("🔄 끼워넣은 곡 감지. 다음 곡을 덮어씌우ㅁ");
+            console.log("🔄 끼워넣은 곡 감지. 다음 곡을 덮어씌움");
 
-            await nextTrack(token, true);
+            await nextTrack(true);
             return;
           }
         }
@@ -646,26 +654,26 @@ export const usePlayerStore = create<PlayerState>()(
         }
       },
 
-      toggleShuffle: async (token) => {
-        const { isShuffled, deviceId } = get();
+      toggleShuffle: async () => {
+        const { accessToken, isShuffled, deviceId } = get();
         // 셔플, 반복 기능은 sdk가 아닌 web API에서 다루기 때문에
         // playerInstance 아닌 deviceId 필요
-        if (!deviceId) return;
+        if (!deviceId || !accessToken) return;
 
         const nextState = !isShuffled;
         set({ isShuffled: nextState });
 
         try {
-          await setShuffle(nextState, deviceId, token);
+          await setShuffle(nextState, deviceId, accessToken);
         } catch (e) {
           console.error("셔플 모드 변경 실패:", e);
           set({ isShuffled: !nextState });
         }
       },
 
-      cycleRepeatMode: async (token) => {
-        const { repeatMode, deviceId } = get();
-        if (!deviceId) return;
+      cycleRepeatMode: async () => {
+        const { accessToken, repeatMode, deviceId } = get();
+        if (!deviceId || !accessToken) return;
 
         const modes: RepeatMode[] = ["off", "context", "track"];
         const nextIndex = (modes.indexOf(repeatMode) + 1) % modes.length;
@@ -674,7 +682,7 @@ export const usePlayerStore = create<PlayerState>()(
         set({ repeatMode: nextMode });
 
         try {
-          await setRepeatMode(nextMode, deviceId, token);
+          await setRepeatMode(nextMode, deviceId, accessToken);
         } catch (e) {
           console.error("반복 모드 변경 실패:", e);
           set({ repeatMode });
@@ -689,6 +697,7 @@ export const usePlayerStore = create<PlayerState>()(
         queue: state.queue,
         currentIndex: state.currentIndex,
         activeUniqueKey: state.activeUniqueKey,
+        currentTrack: state.currentTrack,
       }),
     },
   ),

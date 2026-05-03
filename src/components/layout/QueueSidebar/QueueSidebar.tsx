@@ -15,7 +15,6 @@ import { addTrackToPlaylist } from "@/apis/userApi";
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
-  const token = session?.accessToken;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [targetTrackUri, setTargetTrackUri] = useState("");
@@ -123,7 +122,7 @@ export default function QueueSidebar() {
                 ref={(el) => {
                   itemRefs.current[index] = el;
                 }}
-                onClick={() => jumpTo(index, token!)}
+                onClick={() => jumpTo(index)}
                 className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
               >
                 <div className={styles.thumbWrapper}>
@@ -144,7 +143,7 @@ export default function QueueSidebar() {
                 <div className={styles.dropdownWrapper}>
                   <TrackDropdown
                     type="queue"
-                    onRemove={() => removeTrackFromQueue(index, token!)}
+                    onRemove={() => removeTrackFromQueue(index)}
                     onSavePlaylist={() => handleAddClick(track.uri)}
                   />
                 </div>

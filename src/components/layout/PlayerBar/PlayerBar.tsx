@@ -56,9 +56,6 @@ const PlayerProgressBar = () => {
 };
 
 export default function PlayerBar() {
-  const { data: session } = useSession();
-  const accessToken = session?.accessToken;
-
   const {
     currentTrack,
     isPlaying,
@@ -167,34 +164,34 @@ export default function PlayerBar() {
                 ) : (
                   <>
                     <button
-                      onClick={() => accessToken && toggleShuffle(accessToken)}
+                      onClick={toggleShuffle}
                       className={`${styles.controlBtn}  ${isShuffled ? styles.activeBtn : ""}`}
                       title="셔플 켜기/끄기"
                     >
                       <FaRandom size={17} />
                     </button>
                     <button
-                      onClick={() => prevTrack(accessToken)}
+                      onClick={prevTrack}
                       className={styles.controlBtn}
                     >
                       <FaStepBackward style={{ marginLeft: "2rem" }} />
                     </button>
                     <button
                       disabled={isLoadingTrack}
-                      onClick={() => togglePlay(accessToken)}
+                      onClick={togglePlay}
                       className={`${styles.controlBtn} ${styles.playBtn}`}
                     >
                       {isPlaying ? <FaPause /> : <FaPlay />}
                     </button>
                     <button
-                      onClick={() => nextTrack(accessToken)}
+                      onClick={() => nextTrack()}
                       disabled={isLastTrack}
                       className={styles.controlBtn}
                     >
                       <FaStepForward style={{ marginRight: "2rem" }} />
                     </button>
                     <button
-                      onClick={() => accessToken && cycleRepeatMode(accessToken)}
+                      onClick={cycleRepeatMode}
                       className={`${styles.controlBtn} ${repeatMode !== "off" ? styles.activeBtn : ""}`}
                       title={repeatModeName[repeatMode]}
                     >
