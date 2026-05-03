@@ -14,6 +14,9 @@ export type Track = {
 export type RepeatMode = "off" | "context" | "track";
 
 export type PlayerState = {
+  accessToken: string | null;
+  setAccessToken: (token: string | null) => void;
+
   activeUniqueKey: string | null;
   isTransitioning: boolean;
 
@@ -43,24 +46,24 @@ export type PlayerState = {
 
   setQueueAndPlay: (tracks: Track[], index: number) => void;
 
-  playAllTracks: (tracks: any[], startIndex: number, token: string) => Promise<void>;
-  playSingleTrack: (track: any, token: string) => Promise<void>;
+  playAllTracks: (tracks: any[], startIndex: number) => Promise<void>;
+  playSingleTrack: (track: any) => Promise<void>;
   addTrackToNext: (track: any) => void;
-  jumpTo: (index: number, token: string) => Promise<void>;
+  jumpTo: (index: number) => Promise<void>;
 
-  removeTrackFromQueue: (index: number, token: string) => void;
+  removeTrackFromQueue: (index: number) => void;
   clearQueue: () => void;
 
-  togglePlay: (token?: string) => Promise<void>;
-  nextTrack: (token?: string, isAuto?: boolean) => Promise<void>;
-  prevTrack: (token?: string) => Promise<void>;
+  togglePlay: () => Promise<void>;
+  nextTrack: (isAuto?: boolean) => Promise<void>;
+  prevTrack: () => Promise<void>;
   seekTo: (pos: number) => Promise<void>;
 
   setVolume: (val: number) => Promise<void>;
-  toggleShuffle: (token: string) => Promise<void>;
-  cycleRepeatMode: (token: string) => Promise<void>;
+  toggleShuffle: () => Promise<void>;
+  cycleRepeatMode: () => Promise<void>;
 
-  syncStateFromSdk: (state: Spotify.PlaybackState, token?: string) => void;
+  syncStateFromSdk: (state: Spotify.PlaybackState) => void;
 
   setQueue: (tracks: Track[]) => void;
   setDeviceId: (id: string | null) => void;
