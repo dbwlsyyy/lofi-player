@@ -23,7 +23,7 @@ export const createPlayerStatusSlice: PlayerSliceCreator<PlayerStatusSlice> = (s
   duration: 0,
 
   // ---------------------------------------------------------
-  // 단순 변경 액션 (Setter) 모음 - 비동기 로직 절대 없음
+  // 단순 변경 액션 (Setter) 모음 - 비동기 로직 없음
   // ---------------------------------------------------------
   setAccessToken: (token) => set({ accessToken: token }),
   setDeviceId: (id) => set({ deviceId: id }),

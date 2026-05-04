@@ -32,6 +32,7 @@ export const createQueueSlice: PlayerSliceCreator<QueueSlice> = (set, get) => ({
       // 끼워넣을 위치 계산: 현재 곡의 '바로 다음(+1)'
       const insertIndex = state.queue.length > 0 ? state.currentIndex + 1 : 0;
       newQueue.splice(insertIndex, 0, newTrackWithKey);
+      console.log("곡 추가: UI만 업데이트. 다음 곡 전환 시 싱크 맞춤.");
 
       // 뒤에 끼워 넣은 거라 currentIndex는 변함없음
       return { queue: newQueue };
@@ -81,7 +82,7 @@ export const createQueueSlice: PlayerSliceCreator<QueueSlice> = (set, get) => ({
         currentIndex: nextCurrentIndex,
       });
 
-      console.log("다른 곡 삭제: UI만 업데이트했습니다. 다음 곡 전환 시 싱크가 맞춰집니다.");
+      console.log("다른 곡 삭제: UI만 업데이트. 다음 곡 전환 시 싱크 맞춤.");
     }
   },
 });

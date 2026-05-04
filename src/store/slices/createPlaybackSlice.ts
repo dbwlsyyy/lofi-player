@@ -1,6 +1,6 @@
 import { setRepeatMode, setShuffle, startPlayback } from "@/apis/playbackApi";
 import { mapSdkTrackToLocalTrack } from "@/lib/spotifyMapper";
-import { PlayerSliceCreator, PlaybackSlice, RepeatMode } from "@/types/player";
+import { PlayerSliceCreator, PlaybackSlice, RepeatMode, Track } from "@/types/player";
 import { handlePlaybackError } from "../usePlayerStore";
 
 export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get) => ({
@@ -54,7 +54,7 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
     if (!playerInstance) return;
 
     // [낙관적 업데이트]
-    set({ isPlaying: !isPlaying });
+    set({ isPlaying: !isPlaying, stopAtEntry: false });
 
     try {
       if (isPlaying) {
@@ -110,7 +110,6 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
             position: 0,
             isPlaying: true,
             isTransitioning: true,
-            stopAtEntry: true,
           });
           await startPlayback(uris, deviceId, accessToken, nextIndex);
           setTimeout(() => {
@@ -397,105 +396,95 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
   },
 
   // ---------------------------------------------------------
-  // 🎯 3. 대망의 하이라이트: SDK 상태 동기화 및 방어막
+  // 3. SDK 상태 동기화 및 방어막
   // ---------------------------------------------------------
   syncStateFromSdk: async (state) => {
-    const {
-      accessToken,
-      queue,
-      currentIndex,
-      currentTrack,
-      deviceId,
-      playerInstance,
-      isTransitioning,
-      stopAtEntry,
-      nextTrack,
-    } = get();
+    const store = get();
 
     const sdkTrack = state.track_window.current_track;
 
-    if (!accessToken || !deviceId || queue.length === 0 || !sdkTrack) return;
+    if (!store.accessToken || !store.deviceId || !sdkTrack) return;
 
-    // 1. [소리 차단기] SDK 상태 묻지도 따지지도 않고 그냥 멈춤
-    if (stopAtEntry) {
-      playerInstance?.pause();
+    if (store.stopAtEntry) {
+      store.playerInstance?.pause();
       return;
     }
 
-    // 2.
-    // isTransitioning이 켜져 있는 2초 동안은 스포티파이가 무슨 헛소리를 보내든
-    // 여기서 무조건 return 시켜서 아래의 UI 변경 로직(isPlaying)을 절대 못 타게
-    if (isTransitioning) {
+    if (store.isTransitioning) {
       set({
         isShuffled: state.shuffle,
-        repeatMode: (["off", "context", "track"][state.repeat_mode] as RepeatMode) ?? "off",
+        repeatMode:
+          (["off", "context", "track"][state.repeat_mode] as "off" | "context" | "track") ?? "off",
       });
       return;
     }
 
-    // 3. [유령 트랙 감지]
-    if (currentTrack && sdkTrack.id !== currentTrack.id) {
-      const expectedNextTrack = queue[currentIndex + 1] ?? queue[0];
+    // 유령 트랙 및 비우기 감지 로직
+    if (store.currentTrack && sdkTrack.id !== store.currentTrack.id) {
+      const expectedNextTrack = store.queue[store.currentIndex + 1] ?? store.queue[0];
+      const isTrackInQueue = store.queue.some((t) => t.id === sdkTrack.id);
+      console.log("⏹️ 유령 트랙 및 비우기 감지");
 
-      // [공통 스포티파이가 튼 곡이 큐에 존재하는지 먼저 검사
-      const isTrackInQueue = queue.some((t) => t.id === sdkTrack.id);
-
-      // [우선순위 1: 삭제된 유령 곡 검문]
       if (!isTrackInQueue) {
-        console.log("👻 큐에 없는 유령 곡 감지");
+        // [버그 2 수정] 큐가 아예 비워졌거나, (반복 모드가 꺼져있는데) 리스트의 끝에 도달한 경우에만 멈춤
+        console.log("⏹️ 큐기 비워졌거나 리스트 끝");
 
-        const isGoingToZero = expectedNextTrack?.id === queue[0]?.id;
+        const isEmpty = store.queue.length === 0;
+        const isListEnded =
+          expectedNextTrack?.id === store.queue[0]?.id && store.repeatMode === "off";
 
-        if (isGoingToZero) {
-          console.log("⏹️ 리스트 종료: UI만 0번으로 초기화하고 재생 대기.");
+        if (isEmpty || isListEnded) {
+          console.log("⏹️ 리스트 종료/비우기 감지: UI 0번 초기화 및 재생 대기");
           set({
             currentIndex: 0,
-            currentTrack: queue[0] ?? null,
-            activeUniqueKey: queue[0]?.uniqueKey ?? null,
+            currentTrack: store.queue[0] ?? null,
+            activeUniqueKey: store.queue[0]?.uniqueKey ?? null,
             position: 0,
             isPlaying: false,
             stopAtEntry: true,
           });
           return;
-        }
+        } else {
+          // [버그 1 수정] 삭제된 곡(유령 트랙) 재생 시도 감지
+          console.log("👻 유령 트랙 감지: 즉시 오디오를 차단하고 다음 곡으로 스킵");
 
-        // 중간에 있는 곡이 삭제된 거라면
-        else {
-          set({ stopAtEntry: true });
-          await nextTrack(true);
-          set({ stopAtEntry: false });
+          // 서버 통신(nextTrack)하는 동안 소리가 새어나오지 않게 즉시 pause로 입을 틀어막습니다.
+          store.playerInstance?.pause();
 
+          set({ stopAtEntry: true, isTransitioning: true });
+          await store.nextTrack(true);
+          set({ stopAtEntry: false, isTransitioning: false });
           return;
         }
       }
 
-      // [우선순위 2: 끼워넣은 곡(순서 꼬임) 검문]
-      // 큐에 있긴 한데 예상한 바로 다음 곡이 아닐 경우
+      // 순서 꼬임 감지
       if (!state.shuffle && expectedNextTrack && sdkTrack.id !== expectedNextTrack.id) {
-        console.log("🔄 끼워넣은 곡 감지. 다음 곡을 덮어씌움");
-
-        await nextTrack(true);
+        console.log("🔄 순서 불일치 감지: 지연된 변경사항 서버 반영");
+        set({ isPlaying: true });
+        await store.nextTrack(true);
         return;
       }
     }
 
-    // 4. 정상 상태 동기화
-    set((prevState) => {
+    // 정상 상태 동기화
+    set((prevState: any) => {
       let nextIdx = prevState.queue.findIndex(
-        (t, i) => t.id === sdkTrack.id && i >= prevState.currentIndex,
+        (t: Track, i: number) => t.id === sdkTrack.id && i >= prevState.currentIndex,
       );
-      if (nextIdx === -1) nextIdx = prevState.queue.findIndex((t) => t.id === sdkTrack.id);
+      if (nextIdx === -1) nextIdx = prevState.queue.findIndex((t: any) => t.id === sdkTrack.id);
 
       const foundInQueue = nextIdx !== -1 ? prevState.queue[nextIdx] : null;
-      const finalTrack = foundInQueue ?? mapSdkTrackToLocalTrack(sdkTrack);
+      const finalTrack = foundInQueue ?? mapSdkTrackToLocalTrack(sdkTrack); // 기존 유틸 함수 유지
 
       return {
         currentIndex: nextIdx !== -1 ? nextIdx : 0,
         currentTrack: finalTrack ?? null,
         activeUniqueKey: finalTrack?.uniqueKey ?? null,
         isShuffled: state.shuffle,
-        repeatMode: (["off", "context", "track"][state.repeat_mode] as RepeatMode) ?? "off",
-        isPlaying: !state.paused, // 2초가 지났을 때만 여기서 UI를 업데이트
+        repeatMode:
+          (["off", "context", "track"][state.repeat_mode] as "off" | "context" | "track") ?? "off",
+        isPlaying: !state.paused,
         isLoadingTrack: false,
       };
     });

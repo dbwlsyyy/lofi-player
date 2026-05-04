@@ -94,7 +94,7 @@ export const usePlayerStore = create<PlayerStoreState>()(
       name: "lofi-player-storage", // 로컬 스토리지에 저장될 키 이름
       storage: createJSONStorage(() => localStorage),
 
-      // 💡 partialize: 새로고침해도 날아가지 않고 유지되어야 할 알짜배기 상태들만 골라냅니다.
+      // partialize: 새로고침해도 날아가지 않고 유지되어야 할 상태들
       partialize: (state) => ({
         queue: state.queue,
         currentIndex: state.currentIndex,
