@@ -1,7 +1,7 @@
 import { setRepeatMode, setShuffle, startPlayback } from "@/apis/playbackApi";
 import { mapSdkTrackToLocalTrack } from "@/lib/spotifyMapper";
 import { PlayerSliceCreator, PlaybackSlice, RepeatMode, Track } from "@/types/player";
-import { handlePlaybackError } from "../usePlayerStore";
+import { handlePlaybackError } from "../utils/errorHandlers";
 
 export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get) => ({
   // ---------------------------------------------------------
