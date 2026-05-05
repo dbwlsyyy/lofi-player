@@ -20,7 +20,7 @@ interface MyPlaylistListProps {
 export default function MyPlaylistList({ playlistId, initialTracks }: MyPlaylistListProps) {
   const token = usePlayerStore((state) => state.accessToken);
   const playSingleTrack = usePlayerStore((state) => state.playSingleTrack);
-  
+
   const [tracks, setTracks] = useState<Track[]>(initialTracks);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTrackUri, setSelectedTrackUri] = useState<string | null>(null);
@@ -63,7 +63,7 @@ export default function MyPlaylistList({ playlistId, initialTracks }: MyPlaylist
         <div className={styles.list}>
           {tracks.map((t, i) => (
             <div
-              key={t.uniqueKey || t.id}
+              key={t.uniqueKey}
               className={styles.row}
               onClick={() => playSingleTrack(t)}
               style={{
