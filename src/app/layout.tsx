@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 import ToggleBtn from "@/components/layout/ToggleBtn/ToggleBtn";
 import GlobalBackground from "@/components/layout/GlobalBackground/GlobalBackground";
 import TopNav from "@/components/layout/TopNav/TopNav";
+import PageWrapper from "@/components/layout/PageWrapper";
 
 export const metadata = {
   title: "Lofi Player",
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
           <SDKProvider />
           <TopNav />
-          {children}
+          <PageWrapper>{children}</PageWrapper>
           <ToggleBtn />
           <Toaster position="top-center" />
           <QueueSidebar />
