@@ -1,12 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import styles from "./ArtistDetail.module.css";
-import { fetchArtist, fetchArtistTopTracks } from "@/apis/userApi";
+import { fetchArtist, fetchArtistTopTracks, fetchArtistAlbums } from "@/apis/userApi";
 import { useSession } from "next-auth/react";
 import { useUiStore } from "@/store/useUiStore";
-import { FaPlay } from "react-icons/fa";
+import { FaPlay, FaMicrophone } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTime } from "@/lib/formatTime";
 import { Track } from "@/types/player";
@@ -29,8 +29,15 @@ export default function ArtistDetailPage() {
     })),
   );
 
-  const [artist, setArtist] = useState<any>(null);
-  const [topTracks, setTopTracks] = useState<Track[]>([]);
+  const [data, setData] = useState<{
+    artist: any;
+    topTracks: Track[];
+    albums: any[];
+  }>({
+    artist: null,
+    topTracks: [],
+    albums: [],
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,30 +46,38 @@ export default function ArtistDetailPage() {
     const controller = new AbortController();
     setLoading(true);
 
-    const loadData = async () => {
+    const loadAllData = async () => {
       try {
-        const [artistData, tracksData] = await Promise.all([
+        const [artistData, tracksData, albumsData] = await Promise.all([
           fetchArtist(token, id as string, controller.signal),
           fetchArtistTopTracks(token, id as string, "KR", controller.signal),
+          fetchArtistAlbums(token, id as string, 12, controller.signal),
         ]);
 
-        setArtist(artistData);
-        setTopTracks(tracksData.map(t => ({ ...t, uniqueKey: crypto.randomUUID() })));
+        setData({
+          artist: artistData,
+          topTracks: tracksData.map(t => ({ ...t, uniqueKey: crypto.randomUUID() })),
+          albums: albumsData,
+        });
       } catch (err) {
         if (axios.isCancel(err)) return;
-        console.error("아티스트 정보 로드 실패:", err);
-        uiToast.error("아티스트 정보를 불러오지 못했습니다.");
+        console.error("데이터 로드 실패:", err);
+        uiToast.error("정보를 불러오는 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
+    loadAllData();
 
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, [id, token]);
+
+  // 최적화: 렌더링 시 계산 방지
+  const followerCount = useMemo(() => 
+    data.artist?.followers?.total.toLocaleString() || "0", 
+    [data.artist]
+  );
 
   if (loading) {
     return (
@@ -72,73 +87,106 @@ export default function ArtistDetailPage() {
     );
   }
 
-  if (!artist) return null;
+  if (!data.artist) return null;
 
   return (
     <main className={styles.container}>
       <div className={styles.content}>
         {!isRelaxMode && (
           <>
+            {/* 독창적인 히어로 섹션 */}
             <header className={styles.hero}>
-              <div className={styles.heroArtWrapper}>
+              <div className={styles.heroBg}>
                 <Image
-                  src={artist.images?.[0]?.url || "/default_artist.png"}
-                  alt={artist.name}
+                  src={data.artist.images?.[0]?.url || "/default_artist.png"}
+                  alt=""
                   fill
-                  priority
-                  sizes="24rem"
                   className={styles.heroArt}
+                  priority
                 />
               </div>
-              <div className={styles.heroText}>
-                <span className={styles.label}>ARTIST</span>
-                <h1 className={styles.title}>{artist.name}</h1>
-                <div className={styles.metaRow}>
-                  <span>{artist.followers?.total.toLocaleString()} followers</span>
-                  <span className={styles.dot}>•</span>
-                  <span>{artist.genres?.slice(0, 3).join(", ")}</span>
+              <div className={styles.heroContent}>
+                <div className={styles.heroArtWrapper}>
+                  <Image
+                    src={data.artist.images?.[0]?.url || "/default_artist.png"}
+                    alt={data.artist.name}
+                    fill
+                    priority
+                    sizes="20rem"
+                    className={styles.heroArt}
+                  />
                 </div>
-                <button
-                  className={styles.playBtn}
-                  onClick={() => playAllTracks(topTracks, 0)}
-                >
-                  <FaPlay size={12} /> Play Top Tracks
-                </button>
+                <div className={styles.heroText}>
+                  <span className={styles.label}>
+                    <FaMicrophone style={{ marginRight: '0.5rem' }} /> Verified Artist
+                  </span>
+                  <h1 className={styles.title}>{data.artist.name}</h1>
+                  <div className={styles.metaRow}>
+                    <span>{followerCount} followers</span>
+                    <span className={styles.dot}>•</span>
+                    <span>{data.artist.genres?.slice(0, 2).join(" / ")}</span>
+                  </div>
+                  <div className={styles.actionRow}>
+                    <button
+                      className={styles.playBtn}
+                      onClick={() => playAllTracks(data.topTracks, 0)}
+                    >
+                      <FaPlay size={14} /> Play Popular
+                    </button>
+                  </div>
+                </div>
               </div>
             </header>
 
-            <section className={styles.listSection}>
-              <h2 className={styles.sectionTitle}>Popular</h2>
-              <div className={styles.listHeader}>
-                <span className={styles.hNum}>#</span>
-                <span className={styles.hTitle}>TITLE</span>
-                <span className={styles.hArtist}>ARTIST</span>
-                <span className={styles.hTime}>TIME</span>
-              </div>
-
-              <div className={styles.list}>
-                {topTracks.map((t, i) => (
+            {/* 인기 트랙 섹션 - 새로운 레이아웃 */}
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Popular Tracks</h2>
+              <div className={styles.trackList}>
+                {data.topTracks.slice(0, 6).map((t, i) => (
                   <div
                     key={t.uniqueKey}
-                    className={styles.row}
+                    className={styles.trackRow}
                     onClick={() => playSingleTrack(t)}
-                    style={{ animationDelay: `${i * 0.05}s` }}
                   >
-                    <span className={styles.number}>{i + 1}</span>
-                    <div className={styles.trackMain}>
-                      <div className={styles.artWrapper}>
-                        <Image
-                          src={t.image || "/default_album.png"}
-                          alt={t.name}
-                          fill
-                          sizes="3rem"
-                          className={styles.art}
-                        />
-                      </div>
-                      <p className={styles.name}>{t.name}</p>
+                    <div className={styles.trackArt}>
+                      <Image
+                        src={t.image || "/default_album.png"}
+                        alt={t.name}
+                        fill
+                        sizes="4.5rem"
+                        className={styles.art}
+                      />
                     </div>
-                    <span className={styles.artist}>{t.artists.join(", ")}</span>
-                    <span className={styles.time}>{formatTime(t.durationMs)}</span>
+                    <div className={styles.trackInfo}>
+                      <p className={styles.trackName}>{t.name}</p>
+                      <p className={styles.trackMeta}>{formatTime(t.durationMs)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 앨범 섹션 추가 */}
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Discography</h2>
+              <div className={styles.albumGrid}>
+                {data.albums.map((album) => (
+                  <div key={album.id} className={styles.albumCard}>
+                    <div className={styles.albumArtWrapper}>
+                      <Image
+                        src={album.image}
+                        alt={album.name}
+                        fill
+                        sizes="15rem"
+                        className={styles.art}
+                      />
+                    </div>
+                    <div className={styles.albumInfo}>
+                      <p className={styles.albumName}>{album.name}</p>
+                      <p className={styles.albumMeta}>
+                        {album.releaseDate.split("-")[0]} • {album.type}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

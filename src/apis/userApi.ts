@@ -273,3 +273,34 @@ export async function fetchArtistTopTracks(
   }
 }
 
+/**
+ * [아티스트 앨범 가져오기]
+ */
+export async function fetchArtistAlbums(
+  accessToken: string,
+  artistId: string,
+  limit: number = 20,
+  signal?: AbortSignal,
+) {
+  try {
+    const api = createSpotifyClient(accessToken);
+    const { data } = await api.get(`/artists/${artistId}/albums`, {
+      params: { limit, include_groups: "album,single" },
+      ...(signal ? { signal } : {}),
+    });
+    return data.items.map((al: any) => ({
+      id: al.id,
+      name: al.name,
+      image: al.images?.[0]?.url || "/default_album.png",
+      releaseDate: al.release_date,
+      totalTracks: al.total_tracks,
+      type: al.album_type,
+    }));
+  } catch (e: any) {
+    if (axios.isCancel(e)) throw e;
+    console.error(`fetchArtistAlbums(${artistId}) 에러:`, e.response?.status, e.message);
+    throw e;
+  }
+}
+
+
