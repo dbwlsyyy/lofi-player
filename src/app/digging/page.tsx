@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { searchSpotify } from "@/apis/userApi";
 import { useUiStore } from "@/store/useUiStore";
-import { SearchFilter, SearchResult } from "@/types/api";
+import { SearchFilter, SearchResult } from "@/types/spotify";
 import { uiToast } from "@/lib/toasts";
 import styles from "./Digging.module.css";
 import NavBar from "../../components/common/NavToggle/NavToggle";
@@ -99,12 +99,7 @@ export default function DiggingPage() {
               /* 로딩 끝나고 데이터 있을 때만 렌더링 */
               <>
                 {filter === "track" && <TrackList tracks={results} />}
-                {filter === "artist" && (
-                  <ArtistGrid
-                    artists={results}
-                    onClick={() => handlePending("아티스트 페이지")}
-                  />
-                )}
+                {filter === "artist" && <ArtistGrid artists={results} />}
                 {filter === "album" && (
                   <AlbumGrid
                     albums={results}

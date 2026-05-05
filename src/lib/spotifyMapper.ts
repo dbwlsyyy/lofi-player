@@ -1,4 +1,4 @@
-import { SearchResult } from "@/types/api";
+import { SearchResult } from "@/types/spotify";
 import { Track } from "@/types/player";
 
 // SDK Track → Local Track 변환
@@ -31,3 +31,14 @@ export function mapSearchResultToTrack(item: SearchResult): Track {
     uniqueKey: crypto.randomUUID(),
   };
 }
+
+// Local Track → SearchResult 변환
+export const mapTrackToSearchResult = (track: Track): SearchResult => ({
+  id: track.id,
+  name: track.name,
+  image: track.image,
+  type: "track", // TrackList에서 '트랙'으로 인식하게끔 고정
+  uri: track.uri,
+  artists: track.artists,
+  durationMs: track.durationMs,
+});

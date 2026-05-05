@@ -8,7 +8,7 @@ import {
   SpotifyPlaylistItem,
   SpotifyPlaylistResponse,
   SpotifyUser,
-} from "@/types/api";
+} from "@/types/spotify";
 import axios from "axios";
 
 /**
@@ -220,6 +220,85 @@ export async function searchSpotify(
       throw e;
     }
     console.error("searchSpotify API 에러:", e);
+    throw e;
+  }
+}
+
+/**
+ * [아티스트 상세 정보 가져오기]
+ */
+export async function fetchArtist(accessToken: string, artistId: string, signal?: AbortSignal) {
+  try {
+    const api = createSpotifyClient(accessToken);
+    const { data } = await api.get(`/artists/${artistId}`, {
+      ...(signal ? { signal } : {}),
+    });
+    return data;
+  } catch (e: any) {
+    if (axios.isCancel(e)) throw e;
+    console.error(`fetchArtist(${artistId}) 에러:`, e.response?.status, e.message);
+    throw e;
+  }
+}
+
+/**
+ * [아티스트 인기 트랙 가져오기]
+ */
+export async function fetchArtistTopTracks(
+  accessToken: string,
+  artistId: string,
+  market: string = "KR",
+  signal?: AbortSignal,
+): Promise<Track[]> {
+  try {
+    const api = createSpotifyClient(accessToken);
+    const { data } = await api.get(`/artists/${artistId}/top-tracks`, {
+      params: { market },
+      ...(signal ? { signal } : {}),
+    });
+
+    return data.tracks.map((t: any) => ({
+      id: t.id,
+      name: t.name,
+      artists: t.artists.map((a: any) => a.name),
+      image: t.album.images?.[0]?.url ?? "/default_album.png",
+      durationMs: t.duration_ms,
+      uri: t.uri,
+      previewUrl: t.preview_url ?? undefined,
+    }));
+  } catch (e: any) {
+    if (axios.isCancel(e)) throw e;
+    console.error(`fetchArtistTopTracks(${artistId}) 에러:`, e.response?.status, e.message);
+    throw e;
+  }
+}
+
+/**
+ * [아티스트 앨범 가져오기]
+ */
+export async function fetchArtistAlbums(
+  accessToken: string,
+  artistId: string,
+  limit: number = 20,
+  signal?: AbortSignal,
+) {
+  try {
+    const api = createSpotifyClient(accessToken);
+    const { data } = await api.get(`/artists/${artistId}/albums`, {
+      params: { limit, include_groups: "album,single" },
+      ...(signal ? { signal } : {}),
+    });
+    return data.items.map((al: any) => ({
+      id: al.id,
+      name: al.name,
+      image: al.images?.[0]?.url || "/default_album.png",
+      releaseDate: al.release_date,
+      totalTracks: al.total_tracks,
+      type: al.album_type,
+    }));
+  } catch (e: any) {
+    if (axios.isCancel(e)) throw e;
+    console.error(`fetchArtistAlbums(${artistId}) 에러:`, e.response?.status, e.message);
     throw e;
   }
 }

@@ -1,19 +1,21 @@
 "use client";
 import Image from "next/image";
 import styles from "./ArtistGrid.module.css";
+import Link from "next/link";
+import { SearchResult, SpotifyArtistDetailed } from "@/types/spotify";
 
-export default function ArtistGrid({ artists, onClick }: { artists: any[]; onClick: any }) {
+export default function ArtistGrid({ artists }: { artists: SearchResult[] }) {
   return (
     <div className={styles.gridContainer}>
       {artists.map((item) => (
-        <div
+        <Link
+          href={`/artist/${item.id}`}
           key={item.id}
           className={styles.artistCard}
-          onClick={onClick}
         >
           <div className={styles.artistImgWrapper}>
             <Image
-              src={item.image}
+              src={item.image || "/default_artist.png"}
               alt={item.name}
               fill
               sizes="15rem"
@@ -21,7 +23,7 @@ export default function ArtistGrid({ artists, onClick }: { artists: any[]; onCli
             />
           </div>
           <p className={styles.artistName}>{item.name}</p>
-        </div>
+        </Link>
       ))}
     </div>
   );
