@@ -9,6 +9,7 @@ import {
   SpotifyPlaylistItem,
   SpotifyPlaylistResponse,
   SpotifyUser,
+  SpotifyPlaylistDetailed,
 } from "@/types/spotify";
 import axios from "axios";
 
@@ -343,3 +344,49 @@ export async function fetchAlbum(
     throw e;
   }
 }
+
+/**
+ * [플레이리스트 상세 정보 가져오기]
+ */
+export async function fetchPlaylist(
+  accessToken: string,
+  playlistId: string,
+  signal?: AbortSignal,
+): Promise<SpotifyPlaylistDetailed> {
+  try {
+    const api = createSpotifyClient(accessToken);
+    const { data } = await api.get(`/playlists/${playlistId}`, {
+      ...(signal ? { signal } : {}),
+    });
+
+    return {
+      id: data.id,
+      name: data.name,
+      image: data.images?.[0]?.url || "/default_playlist.png",
+      description: data.description || "",
+      owner: data.owner?.display_name || "Unknown",
+      followers: data.followers?.total || 0,
+      tracksTotal: data.tracks?.total || 0,
+      uri: data.uri,
+      tracks: data.tracks.items
+        .filter((item: any) => item.track) // 트랙이 존재하는 경우만 필터링
+        .map((item: any) => {
+          const t = item.track;
+          return {
+            id: t.id,
+            name: t.name,
+            artists: t.artists.map((a: any) => a.name),
+            image: t.album?.images?.[0]?.url || "/default_track.png",
+            durationMs: t.duration_ms,
+            uri: t.uri,
+            previewUrl: t.preview_url ?? undefined,
+          };
+        }),
+    };
+  } catch (e: any) {
+    if (axios.isCancel(e)) throw e;
+    console.error(`fetchPlaylist(${playlistId}) 에러:`, e.response?.status, e.message);
+    throw e;
+  }
+}
+

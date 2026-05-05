@@ -104,10 +104,7 @@ export default function DiggingPage() {
                   <AlbumGrid albums={results} />
                 )}
                 {filter === "playlist" && (
-                  <PlaylistList
-                    playlists={results}
-                    onClick={() => handlePending("플레이리스트")}
-                  />
+                  <PlaylistList playlists={results} />
                 )}
               </>
             ) : (

@@ -4,20 +4,21 @@ import Image from "next/image";
 import { FiUser, FiDisc } from "react-icons/fi";
 import { SearchResult } from "@/types/spotify";
 import styles from "./PlaylistList.module.css";
+import Link from "next/link";
 
 interface PlaylistListProps {
   playlists: SearchResult[];
-  onClick: (id: string) => void;
+  onClick?: (id: string) => void;
 }
 
 export default function PlaylistList({ playlists, onClick }: PlaylistListProps) {
   return (
     <div className={styles.listContainer}>
       {playlists.map((item) => (
-        <div
+        <Link
+          href={`/playlist/${item.id}`}
           key={item.id}
           className={styles.trackRow}
-          onClick={() => onClick(item.id)}
         >
           <div className={styles.trackLeading}>
             <div className={styles.trackImgWrapper}>
@@ -44,7 +45,7 @@ export default function PlaylistList({ playlists, onClick }: PlaylistListProps) 
               <span>{item.tracksTotal}곡</span>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );
