@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchPlaylists } from "@/apis/userApi";
 import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
-import { SpotifyPlaylistItem } from "@/types/api";
+import { SpotifyPlaylistItem } from "@/types/spotify";
 import axios from "axios";
 
 interface AddModalProps {

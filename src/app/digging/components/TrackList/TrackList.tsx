@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { FiHeart, FiPlay, FiPlus } from "react-icons/fi";
-import { SearchResult } from "@/types/api";
+import { FiHeart, FiPlay } from "react-icons/fi";
+import { SearchResult } from "@/types/spotify";
 import styles from "./TrackList.module.css";
 import { useSession } from "next-auth/react";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -13,7 +13,7 @@ import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlayl
 import { addTrackToPlaylist } from "@/apis/userApi";
 import { uiToast } from "@/lib/toasts";
 import { useState } from "react";
-import { mapSdkTrackToLocalTrack, mapSearchResultToTrack } from "@/lib/spotifyMapper";
+import { mapSearchResultToTrack } from "@/lib/spotifyMapper";
 
 export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
   const { data: session } = useSession();

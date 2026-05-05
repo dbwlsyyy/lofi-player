@@ -1,4 +1,4 @@
-import { SearchResult } from "@/types/api";
+import { SearchResult } from "@/types/spotify";
 import { Track } from "@/types/player";
 
 // SDK Track → Local Track 변환

@@ -9,7 +9,7 @@ import { useUiStore } from "@/store/useUiStore";
 import LoadingSpinner from "@/components/loading/LoadingSpinner/LoadingSpinner";
 import NavToggle from "../../components/common/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";
-import { SpotifyPlaylistItem, SpotifyUser } from "@/types/api";
+import { SpotifyPlaylistItem, SpotifyUser } from "@/types/spotify";
 import Link from "next/link";
 import axios from "axios";
 

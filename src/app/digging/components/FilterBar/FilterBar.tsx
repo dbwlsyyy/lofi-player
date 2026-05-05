@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchFilter } from "@/types/api";
+import { SearchFilter } from "@/types/spotify";
 import styles from "./FilterBar.module.css";
 
 interface FilterBarProps {

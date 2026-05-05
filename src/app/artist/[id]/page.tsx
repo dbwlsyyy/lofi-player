@@ -15,24 +15,23 @@ import Image from "next/image";
 import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
+import { SpotifyAlbumSimplified, SpotifyArtistDetailed } from "@/types/spotify";
 
 export default function ArtistDetailPage() {
-  const { data: session } = useSession();
-  const token = session?.accessToken;
   const { id } = useParams();
-
   const { isRelaxMode } = useUiStore();
-  const { playAllTracks, playSingleTrack } = usePlayerStore(
+  const { token, playAllTracks, playSingleTrack } = usePlayerStore(
     useShallow((state) => ({
+      token: state.accessToken,
       playAllTracks: state.playAllTracks,
       playSingleTrack: state.playSingleTrack,
     })),
   );
 
   const [data, setData] = useState<{
-    artist: any;
+    artist: SpotifyArtistDetailed | null;
     topTracks: Track[];
-    albums: any[];
+    albums: SpotifyAlbumSimplified[];
   }>({
     artist: null,
     topTracks: [],
@@ -56,7 +55,7 @@ export default function ArtistDetailPage() {
 
         setData({
           artist: artistData,
-          topTracks: tracksData.map(t => ({ ...t, uniqueKey: crypto.randomUUID() })),
+          topTracks: tracksData.map((t) => ({ ...t, uniqueKey: crypto.randomUUID() })),
           albums: albumsData,
         });
       } catch (err) {
@@ -73,11 +72,7 @@ export default function ArtistDetailPage() {
     return () => controller.abort();
   }, [id, token]);
 
-  // 최적화: 렌더링 시 계산 방지
-  const followerCount = useMemo(() => 
-    data.artist?.followers?.total.toLocaleString() || "0", 
-    [data.artist]
-  );
+  const followerCount = data.artist?.followers?.total.toLocaleString() || "0";
 
   if (loading) {
     return (
@@ -94,12 +89,11 @@ export default function ArtistDetailPage() {
       <div className={styles.content}>
         {!isRelaxMode && (
           <>
-            {/* 독창적인 히어로 섹션 */}
             <header className={styles.hero}>
               <div className={styles.heroBg}>
                 <Image
                   src={data.artist.images?.[0]?.url || "/default_artist.png"}
-                  alt=""
+                  alt="아티스트 이미지"
                   fill
                   className={styles.heroArt}
                   priority
@@ -118,7 +112,8 @@ export default function ArtistDetailPage() {
                 </div>
                 <div className={styles.heroText}>
                   <span className={styles.label}>
-                    <FaMicrophone style={{ marginRight: '0.5rem' }} /> Verified Artist
+                    <FaMicrophone style={{ marginRight: "0.5rem" }} />
+                    Artist
                   </span>
                   <h1 className={styles.title}>{data.artist.name}</h1>
                   <div className={styles.metaRow}>
@@ -171,7 +166,10 @@ export default function ArtistDetailPage() {
               <h2 className={styles.sectionTitle}>Discography</h2>
               <div className={styles.albumGrid}>
                 {data.albums.map((album) => (
-                  <div key={album.id} className={styles.albumCard}>
+                  <div
+                    key={album.id}
+                    className={styles.albumCard}
+                  >
                     <div className={styles.albumArtWrapper}>
                       <Image
                         src={album.image}

@@ -8,7 +8,7 @@ import {
   SpotifyPlaylistItem,
   SpotifyPlaylistResponse,
   SpotifyUser,
-} from "@/types/api";
+} from "@/types/spotify";
 import axios from "axios";
 
 /**
@@ -302,5 +302,3 @@ export async function fetchArtistAlbums(
     throw e;
   }
 }
-
-

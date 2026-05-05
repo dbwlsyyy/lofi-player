@@ -76,9 +76,10 @@
 
 .label {
   display: inline-block;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 800;
-  color: var(--spotify-green, #1db954);
+  color: #3b82f6;
+
   text-transform: uppercase;
   letter-spacing: 0.2em;
   margin-bottom: 1rem;
@@ -99,7 +100,7 @@
   align-items: center;
   gap: 1rem;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 1.1rem; /* 폰트 사이즈 확대 */
+  font-size: 1.2rem; /* 폰트 사이즈 확대 */
   margin-top: 1.5rem;
   font-weight: 500;
 }
@@ -125,7 +126,7 @@
   padding: 1rem 2.5rem;
   border-radius: 100px;
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -197,7 +198,7 @@
 }
 
 .trackName {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
   margin-bottom: 0.3rem;
@@ -207,7 +208,7 @@
 }
 
 .trackMeta {
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.5);
 }
 
@@ -243,7 +244,7 @@
 }
 
 .albumName {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
   display: -webkit-box;
@@ -253,9 +254,9 @@
 }
 
 .albumMeta {
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.5);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .loading {
@@ -266,15 +267,34 @@
 }
 
 @media (max-width: 1024px) {
-  .title { font-size: 4rem; }
-  .heroContent { flex-direction: column; text-align: center; }
-  .heroArtWrapper { width: 15rem; height: 15rem; transform: none; }
-  .actionRow { justify-content: center; }
-  .trackList { grid-template-columns: 1fr; }
+  .title {
+    font-size: 4rem;
+  }
+  .heroContent {
+    flex-direction: column;
+    text-align: center;
+  }
+  .heroArtWrapper {
+    width: 15rem;
+    height: 15rem;
+    transform: none;
+  }
+  .actionRow {
+    justify-content: center;
+  }
+  .trackList {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .title { font-size: 3rem; }
-  .content { padding: 2rem 1rem; }
-  .hero { padding: 2rem; }
+  .title {
+    font-size: 3rem;
+  }
+  .content {
+    padding: 2rem 1rem;
+  }
+  .hero {
+    padding: 2rem;
+  }
 }
