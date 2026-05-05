@@ -92,7 +92,7 @@ export default function ArtistDetailPage() {
     <main className={styles.container}>
       <div className={styles.content}>
         {!isRelaxMode && (
-          <>
+          <div className={styles.fadeContent}>
             <header className={styles.hero}>
               <div className={styles.heroBg}>
                 <Image
@@ -124,7 +124,8 @@ export default function ArtistDetailPage() {
                   <div className={styles.actionRow}>
                     <button
                       className={styles.playBtn}
-                      onClick={() => playAllTracks(data.topTracks, 0)}
+                      onClick={() => data.topTracks.length > 0 && playAllTracks(data.topTracks, 0)}
+                      disabled={data.topTracks.length === 0}
                     >
                       <FaPlay size={14} /> Play Popular
                     </button>
@@ -136,39 +137,51 @@ export default function ArtistDetailPage() {
             {/* 인기 트랙 섹션 */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Popular Tracks</h2>
-              <TrackList tracks={popularSearchResultTracks} />
+              {data.topTracks.length > 0 ? (
+                <TrackList tracks={popularSearchResultTracks} />
+              ) : (
+                <p style={{ color: "#a7b3d1", fontSize: "1.4rem", padding: "2rem 0" }}>
+                  수록곡 정보가 없습니다.
+                </p>
+              )}
             </section>
 
             {/* 앨범 섹션 추가 */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Discography</h2>
-              <div className={styles.albumGrid}>
-                {data.albums.map((album) => (
-                  <Link
-                    href={`/album/${album.id}`}
-                    key={album.id}
-                    className={styles.albumCard}
-                  >
-                    <div className={styles.albumArtWrapper}>
-                      <Image
-                        src={album.image}
-                        alt={album.name}
-                        fill
-                        sizes="15rem"
-                        className={styles.art}
-                      />
-                    </div>
-                    <div className={styles.albumInfo}>
-                      <p className={styles.albumName}>{album.name}</p>
-                      <p className={styles.albumMeta}>
-                        {album.releaseDate.split("-")[0]} • {album.type}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+              {data.albums.length > 0 ? (
+                <div className={styles.albumGrid}>
+                  {data.albums.map((album) => (
+                    <Link
+                      href={`/album/${album.id}`}
+                      key={album.id}
+                      className={styles.albumCard}
+                    >
+                      <div className={styles.albumArtWrapper}>
+                        <Image
+                          src={album.image}
+                          alt={album.name}
+                          fill
+                          sizes="15rem"
+                          className={styles.art}
+                        />
+                      </div>
+                      <div className={styles.albumInfo}>
+                        <p className={styles.albumName}>{album.name}</p>
+                        <p className={styles.albumMeta}>
+                          {album.releaseDate.split("-")[0]} • {album.type}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: "#a7b3d1", fontSize: "1.4rem", padding: "2rem 0" }}>
+                  앨범 정보가 없습니다.
+                </p>
+              )}
             </section>
-          </>
+          </div>
         )}
       </div>
     </main>

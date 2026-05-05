@@ -16,7 +16,21 @@
   padding: 4rem 2rem;
 }
 
-/* 독창적인 히어로 섹션: 배경에 블러 처리된 아티스트 이미지 */
+.fadeContent {
+  animation: smoothAppear 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes smoothAppear {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .hero {
   position: relative;
   display: flex;
@@ -86,7 +100,7 @@
 }
 
 .title {
-  font-size: 6rem; /* 대담한 폰트 사이즈 */
+  font-size: 6rem;
   font-weight: 900;
   margin: 0;
   color: #fff;
@@ -100,7 +114,7 @@
   align-items: center;
   gap: 1rem;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 1.4rem; /* 폰트 사이즈 확대 */
+  font-size: 1.4rem;
   margin-top: 1.5rem;
   font-weight: 500;
 }
@@ -134,6 +148,17 @@
 .playBtn:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+.playBtn:disabled,
+.playBtn[disabled] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #4a5568 !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none;
 }
 
 /* 섹션 공통 */

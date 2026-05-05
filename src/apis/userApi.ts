@@ -200,7 +200,7 @@ export async function searchSpotify(
           image: pl.images?.[0]?.url || "/default_playlist.png",
           type: "playlist",
           uri: pl.uri,
-          owner: pl.owner.display_name || "Unknown", // 제작자 이름
+          owner: pl.owner.display_name || "정보 없음", // 제작자 이름
           tracksTotal: pl.tracks.total || 0,
           description: pl.description || "알 수 없음",
         }));
