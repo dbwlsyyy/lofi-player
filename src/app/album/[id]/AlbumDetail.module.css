@@ -10,7 +10,7 @@
   display: none;
 }
 
-/* 💡 추가됨: 릴렉스 모드 시 배경 투명화 */
+/* 릴렉스 모드 시 배경 투명화 */
 .relaxModeBg {
   background: transparent !important;
 }
@@ -52,14 +52,13 @@
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
 }
 
-/* 세련된 CD 스타일 레코드판 */
+/*  CD 스타일 레코드판 */
 .vinyl {
   position: absolute;
   width: 32rem;
   height: 32rem;
   border-radius: 50%;
   z-index: 5;
-  /* 💡 수정됨: 기본 상태에서 CD가 살짝만(왼쪽에 숨어서) 보이도록 조정 */
   left: 55%;
   transform: translateX(-40%);
 

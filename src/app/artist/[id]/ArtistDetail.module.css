@@ -16,7 +16,6 @@
   padding: 4rem 2rem;
 }
 
-/* 독창적인 히어로 섹션: 배경에 블러 처리된 아티스트 이미지 */
 .hero {
   position: relative;
   display: flex;
@@ -86,7 +85,7 @@
 }
 
 .title {
-  font-size: 6rem; /* 대담한 폰트 사이즈 */
+  font-size: 6rem;
   font-weight: 900;
   margin: 0;
   color: #fff;
@@ -100,7 +99,7 @@
   align-items: center;
   gap: 1rem;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 1.4rem; /* 폰트 사이즈 확대 */
+  font-size: 1.4rem;
   margin-top: 1.5rem;
   font-weight: 500;
 }
