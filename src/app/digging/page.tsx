@@ -100,10 +100,7 @@ export default function DiggingPage() {
               <>
                 {filter === "track" && <TrackList tracks={results} />}
                 {filter === "artist" && (
-                  <ArtistGrid
-                    artists={results}
-                    onClick={() => handlePending("아티스트 페이지")}
-                  />
+                  <ArtistGrid artists={results} />
                 )}
                 {filter === "album" && (
                   <AlbumGrid
