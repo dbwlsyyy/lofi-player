@@ -5,10 +5,11 @@ import Image from "next/image";
 import { FiChevronDown } from "react-icons/fi";
 import { SearchResult } from "@/types/spotify";
 import styles from "./AlbumGrid.module.css";
+import Link from "next/link";
 
 interface AlbumGridProps {
   albums: SearchResult[];
-  onClick: (id: string) => void;
+  onClick?: (id: string) => void;
 }
 
 type SortOption = "latest" | "oldest";
@@ -45,10 +46,10 @@ export default function AlbumGrid({ albums, onClick }: AlbumGridProps) {
       {/* 연속 그리드 (Continuous Grid) */}
       <div className={styles.gridContainer}>
         {sortedAlbums.map((item) => (
-          <div
+          <Link
+            href={`/album/${item.id}`}
             key={item.id}
             className={styles.albumCard}
-            onClick={() => onClick(item.id)}
           >
             <div className={styles.albumImgWrapper}>
               <Image
@@ -67,7 +68,7 @@ export default function AlbumGrid({ albums, onClick }: AlbumGridProps) {
               <p className={styles.albumName}>{item.name}</p>
               <p className={styles.albumArtist}>{item.artists?.join(", ")}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

@@ -2,9 +2,17 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  background: radial-gradient(circle at top right, rgba(79, 125, 243, 0.12), transparent 40%),
-              linear-gradient(180deg, rgba(10, 15, 25, 1) 0%, rgba(20, 25, 40, 1) 100%);
   scrollbar-width: none;
+  background: linear-gradient(180deg, #1e3a8a 0%, #0a0a0a 40%, #0a0a0a 100%);
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+/* 💡 추가됨: 릴렉스 모드 시 배경 투명화 */
+.relaxModeBg {
+  background: transparent !important;
 }
 
 .container::-webkit-scrollbar {
@@ -42,13 +50,6 @@
   border-radius: 0.8rem;
   overflow: hidden;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-  cursor: pointer;
-}
-
-.artWrapper:hover {
-  transform: translateX(-20%) rotateY(-15deg);
-  box-shadow: 20px 30px 60px rgba(0, 0, 0, 0.8);
 }
 
 /* 세련된 CD 스타일 레코드판 */
@@ -58,12 +59,13 @@
   height: 32rem;
   border-radius: 50%;
   z-index: 5;
-  left: 50%;
-  transform: translateX(-50%);
-  
+  /* 💡 수정됨: 기본 상태에서 CD가 살짝만(왼쪽에 숨어서) 보이도록 조정 */
+  left: 55%;
+  transform: translateX(-40%);
+
   /* CD의 금속성 광택 효과 */
   background: #111;
-  background-image: 
+  background-image:
     conic-gradient(
       from 0deg,
       transparent 0deg,
@@ -76,13 +78,8 @@
       rgba(255, 255, 255, 0.05) 315deg,
       transparent 360deg
     ),
-    repeating-radial-gradient(
-      circle at center,
-      #222 0,
-      #111 1px,
-      #222 2px
-    );
-  
+    repeating-radial-gradient(circle at center, #222 0, #111 1px, #222 2px);
+
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
   display: flex;
@@ -116,7 +113,7 @@
 
 /* 호버 시 CD가 빠져나오는 인터랙션 */
 .artSection:hover .vinyl {
-  transform: translateX(35%) rotate(360deg);
+  transform: translateX(5%) rotate(360deg);
 }
 
 /* 텍스트 스타일 */
@@ -147,7 +144,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 1.2rem;
-  color: #a7b3d1;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 1.6rem;
   font-weight: 500;
 }
@@ -155,7 +152,7 @@
 .dot {
   width: 4px;
   height: 4px;
-  background: #4f7df3;
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
 }
 
@@ -176,7 +173,7 @@
   color: #fff;
   border: none;
   padding: 1.4rem 3.5rem;
-  border-radius: 1.5rem;
+  border-radius: 5rem;
   font-weight: 800;
   font-size: 1.6rem;
   cursor: pointer;
@@ -243,15 +240,6 @@
   font-weight: 600;
 }
 
-.footer {
-  margin-top: 8rem;
-  padding: 4rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  text-align: center;
-  color: rgba(167, 179, 209, 0.4);
-  font-size: 1.4rem;
-}
-
 .loading {
   display: flex;
   justify-content: center;
@@ -259,7 +247,13 @@
   height: 100vh;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;
     text-align: center;
@@ -268,19 +262,20 @@
   .artSection {
     order: -1;
   }
-  .metaRow, .actionRow {
+  .metaRow {
     justify-content: center;
   }
-  .detailsGrid {
-    grid-template-columns: 1fr;
+  .actionRow {
+    justify-items: center;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .title {
     font-size: 4rem;
   }
-  .artWrapper, .vinyl {
+  .artWrapper,
+  .vinyl {
     width: 26rem;
     height: 26rem;
   }

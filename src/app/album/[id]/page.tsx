@@ -64,14 +64,15 @@ export default function AlbumDetailPage() {
   if (!album) return null;
 
   const searchResultTracks = album.tracks.map(mapTrackToSearchResult);
-  const totalDurationMin = Math.floor(album.tracks.reduce((acc, t) => acc + t.durationMs, 0) / 60000);
+  const totalDurationMin = Math.floor(
+    album.tracks.reduce((acc, t) => acc + t.durationMs, 0) / 60000,
+  );
 
   return (
-    <main className={styles.container}>
+    <main className={`${styles.container} ${isRelaxMode ? styles.relaxModeBg : ""}`}>
       <div className={styles.content}>
         {!isRelaxMode && (
           <>
-            {/* 세련된 CD 인터랙션이 포함된 히어로 섹션 */}
             <header className={styles.hero}>
               <div className={styles.artSection}>
                 <div className={styles.artWrapper}>
@@ -117,46 +118,38 @@ export default function AlbumDetailPage() {
                 </div>
               </div>
             </header>
-
-            {/* 상세 정보 및 트랙 리스트 그리드 레이아웃 */}
             <div className={styles.detailsGrid}>
               <section className={styles.tracksSection}>
                 <h2 className={styles.sectionTitle}>
-                  <FaMusic size={20} style={{ marginRight: '1rem' }} /> Tracklist
+                  <FaMusic size={20} /> Tracklist
                 </h2>
                 <TrackList tracks={searchResultTracks} />
               </section>
 
               <aside className={styles.infoSection}>
                 <h2 className={styles.sectionTitle}>
-                  <FaInfoCircle size={20} style={{ marginRight: '1rem' }} /> Album Info
+                  <FaInfoCircle size={20} /> Album Info
                 </h2>
                 <div className={styles.infoCard}>
                   <div className={styles.infoItem}>
-                    <span className={styles.infoLabel}>Released</span>
+                    <span className={styles.infoLabel}>Released (발매일)</span>
                     <p className={styles.infoValue}>{album.releaseDate}</p>
                   </div>
                   <div className={styles.infoItem}>
-                    <span className={styles.infoLabel}>Label</span>
+                    <span className={styles.infoLabel}>Label (레이블)</span>
                     <p className={styles.infoValue}>{album.label}</p>
                   </div>
                   <div className={styles.infoItem}>
-                    <span className={styles.infoLabel}>Total Duration</span>
-                    <p className={styles.infoValue}>{totalDurationMin} minutes</p>
+                    <span className={styles.infoLabel}>Total Duration (전체 재생 시간)</span>
+                    <p className={styles.infoValue}>{totalDurationMin} 분</p>
                   </div>
                   <div className={styles.infoItem}>
-                    <span className={styles.infoLabel}>Format</span>
-                    <p className={styles.infoValue}>Digital / {album.type.toUpperCase()}</p>
+                    <span className={styles.infoLabel}>Format (발매 형식)</span>
+                    <p className={styles.infoValue}>{album.type.toUpperCase()}</p>
                   </div>
                 </div>
               </aside>
-            </div>
-
-            <footer className={styles.footer}>
-              {album.copyrights.map((c, i) => (
-                <p key={i} className={styles.copyright}>{c.text}</p>
-              ))}
-            </footer>
+            </div>{" "}
           </>
         )}
       </div>
