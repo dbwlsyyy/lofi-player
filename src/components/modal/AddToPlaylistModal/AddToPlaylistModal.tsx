@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchPlaylists } from "@/apis/userApi";
 import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
-import { SpotifyPlaylistItem } from "@/types/spotify";
+import { Playlist } from "@/types/domainTypes";
 import axios from "axios";
 
 interface AddModalProps {
@@ -20,7 +20,7 @@ export default function AddToPlaylistModal({
   onSelect,
   accessToken,
 }: AddModalProps) {
-  const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
   useEffect(() => {
     if (!isOpen || !accessToken) return;
@@ -70,7 +70,7 @@ export default function AddToPlaylistModal({
             >
               <div className={styles.imgBox}>
                 <Image
-                  src={pl.images?.[0]?.url || "/default_playlist.png"}
+                  src={pl.image || "/default_playlist.png"}
                   alt={pl.name}
                   fill
                   sizes="4.4rem"

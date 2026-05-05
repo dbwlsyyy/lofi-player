@@ -1,3 +1,4 @@
+import { JWT } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
 import Spotify from "next-auth/providers/spotify";
 
@@ -5,7 +6,7 @@ if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET is not defined");
 }
 
-async function refreshAccessToken(token: any) {
+async function refreshAccessToken(token: JWT) {
   try {
     const url = "https://accounts.spotify.com/api/token";
     const basicAuth = Buffer.from(
@@ -20,7 +21,7 @@ async function refreshAccessToken(token: any) {
       },
       body: new URLSearchParams({
         grant_type: "refresh_token",
-        refresh_token: token.refreshToken,
+        refresh_token: (token.refreshToken as string) || "",
       }),
     });
 

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FiUser, FiDisc } from "react-icons/fi";
-import { SearchResult } from "@/types/spotify";
+import { SearchResult } from "@/types/domainTypes";
 import styles from "./PlaylistList.module.css";
 import Link from "next/link";
 

@@ -1,6 +1,7 @@
 import { setRepeatMode, setShuffle, startPlayback } from "@/apis/playbackApi";
 import { mapSdkTrackToLocalTrack } from "@/lib/spotifyMapper";
-import { PlayerSliceCreator, PlaybackSlice, RepeatMode, Track } from "@/types/player";
+import { PlayerSliceCreator, PlaybackSlice, RepeatMode } from "@/types/player";
+import { Track } from "@/types/domainTypes";
 import { handlePlaybackError } from "../utils/errorHandlers";
 
 export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get) => ({
@@ -296,7 +297,7 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
     const newTrackWithKey = { ...track, uniqueKey: crypto.randomUUID() };
 
     // 2. 새로운 큐 및 삽입 위치 계산
-    let newQueue: any[];
+    let newQueue: Track[];
     let playIndex: number;
 
     if (currentQueue.length === 0) {
@@ -336,7 +337,7 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
       if (uris.length > 0 && playIndex < uris.length) {
         await startPlayback(uris, deviceId, accessToken, playIndex);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("playSingleTrack 에러 상세:", error.response?.data || error);
 
       // 최후의 보루: 현재 물려있는 곡이라도 그냥 재생 시킴

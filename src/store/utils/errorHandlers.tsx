@@ -1,21 +1,20 @@
 import { uiToast } from "@/lib/toasts";
 import axios from "axios";
 import { FiExternalLink, FiLock, FiWifiOff } from "react-icons/fi";
+import { Track } from "@/types/domainTypes";
 
 export const handlePlaybackError = (
   error: unknown,
-  rollbackState: { queue: any[]; currentIndex: number; isPlaying: boolean },
-  setQueueAndPlay: (tracks: any[], index: number) => void,
+  rollbackState: { queue: Track[]; currentIndex: number; isPlaying: boolean },
+  setQueueAndPlay: (tracks: Track[], index: number) => void,
   setIsPlaying: (playing: boolean) => void,
   setPosition: (pos: number) => void,
   setDuration: (dur: number) => void,
 ) => {
   console.error("재생 요청 실패:", error);
-
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;
     const code = error.code;
-
     // --- 에러 UI 처리 ---
     if (status === 403) {
       const authLink = (
@@ -55,7 +54,6 @@ export const handlePlaybackError = (
     } else {
       uiToast.error(`일시적인 오류가 발생했습니다. ${status ? status : ""}`, `error-${status}`);
     }
-
     // --- 상태 롤백 처리 ---
     if (status === 403 || status === 404) {
       if (rollbackState.queue.length > 0) {

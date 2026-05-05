@@ -2,7 +2,7 @@
 import Image from "next/image";
 import styles from "./ArtistGrid.module.css";
 import Link from "next/link";
-import { SearchResult, SpotifyArtistDetailed } from "@/types/spotify";
+import { SearchResult } from "@/types/domainTypes";
 
 export default function ArtistGrid({ artists }: { artists: SearchResult[] }) {
   return (

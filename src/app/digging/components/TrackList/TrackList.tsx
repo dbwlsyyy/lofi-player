@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FiHeart, FiPlay } from "react-icons/fi";
-import { SearchResult } from "@/types/spotify";
+import { SearchResult } from "@/types/domainTypes";
 import styles from "./TrackList.module.css";
 import { useSession } from "next-auth/react";
 import { usePlayerStore } from "@/store/usePlayerStore";

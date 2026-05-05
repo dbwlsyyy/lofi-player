@@ -1,5 +1,4 @@
 // 재생 상태 관련 Web API (JSDoc 포함)
-
 import { createSpotifyClient } from "@/lib/spotifyClient";
 import { RepeatMode } from "@/types/player";
 
@@ -8,7 +7,6 @@ import { RepeatMode } from "@/types/player";
  */
 export async function transferToDevice(deviceId: string, accessToken: string) {
   const client = createSpotifyClient(accessToken);
-
   return client.put("me/player", {
     device_ids: [deviceId],
     play: false,
@@ -25,12 +23,10 @@ export async function startPlayback(
   offsetIndex?: number,
 ) {
   const client = createSpotifyClient(accessToken);
-
   const body =
     offsetIndex !== undefined
       ? { uris, offset: { position: offsetIndex } }
       : { uris };
-
   return client.put(`me/player/play?device_id=${deviceId}`, body);
 }
 
