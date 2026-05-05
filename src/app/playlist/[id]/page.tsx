@@ -3,147 +3,143 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import { fetchPlaylistTracks, removeTrackFromPlaylist, updatePlaylistName } from "@/apis/userApi";
-import { useSession } from "next-auth/react";
+import { fetchPlaylistTracks, updatePlaylistName, fetchPlaylist, fetchMe } from "@/apis/userApi";
 import { useUiStore } from "@/store/useUiStore";
-import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaRegTrashAlt } from "react-icons/fa";
+import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaExclamationTriangle } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
-import { formatTime, formatTotalDuration } from "@/lib/formatTime";
-import ConfirmModal from "@/components/modal/ConfirmModal/ConfirmModal";
+import { formatTotalDuration } from "@/lib/formatTime";
 import { Track } from "@/types/player";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
-import Link from "next/link";
 import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
+import MyPlaylistList from "../components/MyPlaylistList/MyPlaylistList";
+import TrackList from "@/app/digging/components/TrackList/TrackList";
+import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
+import { SpotifyPlaylistDetailed } from "@/types/spotify";
 
 export default function PlaylistDetailPage() {
-  const { data: session } = useSession();
-  const token = session?.accessToken;
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const { isRelaxMode } = useUiStore();
-  const { playAllTracks, playSingleTrack } = usePlayerStore(
+  const { token, playAllTracks } = usePlayerStore(
     useShallow((state) => ({
+      token: state.accessToken,
       playAllTracks: state.playAllTracks,
-      playSingleTrack: state.playSingleTrack,
     })),
   );
 
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [playlistInfo, setPlaylistInfo] = useState<SpotifyPlaylistDetailed | null>(null);
+  const [isMine, setIsMine] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const playlistName = searchParams.get("name") || "Your Selection";
-  const playlistImg = searchParams.get("img");
+  const playlistImgFromUrl = searchParams.get("img");
 
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(playlistName);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTrackUri, setSelectedTrackUri] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
 
   useEffect(() => {
     if (!token || !id) return;
 
     const controller = new AbortController();
-    setLoading(true);
 
-    const load = async () => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const lists = await fetchPlaylistTracks(token, id as string, controller.signal);
+        const [me, playlist] = await Promise.all([
+          fetchMe(token, controller.signal),
+          fetchPlaylist(token, id as string, controller.signal),
+        ]);
 
-        const tracksWithKey = lists.map((track) => ({
-          ...track,
-          uniqueKey: crypto.randomUUID(),
-        }));
-        setTracks(tracksWithKey);
+        const mine = playlist.owner === me.display_name || playlist.owner === me.id;
+        setIsMine(mine);
+        setPlaylistInfo(playlist);
+        setTitle(playlist.name);
+
+        if (mine) {
+          const lists = await fetchPlaylistTracks(token, id as string, controller.signal);
+          setTracks(lists.map((t) => ({ ...t, uniqueKey: crypto.randomUUID() })));
+        } else {
+          setTracks(playlist.tracks);
+        }
+        setLoading(false);
       } catch (err) {
         if (axios.isCancel(err)) return;
-        console.error("로드 실패:", err);
-        uiToast.error("트랙 정보를 불러오지 못했습니다.");
-      } finally {
+        console.error("데이터 로드 실패:", err);
+        setError("플레이리스트 정보를 불러오지 못했습니다.");
+        uiToast.error("정보를 불러오지 못했습니다.");
         setLoading(false);
       }
     };
-    load();
 
-    return () => {
-      controller.abort();
-    };
+    loadData();
+
+    return () => controller.abort();
   }, [id, token]);
 
-  useEffect(() => {
-    setTitle(playlistName); // URL 변경 시 로컬 상태(title)를 최신 정보로 동기화
-  }, [playlistName]);
-
   const handleUpdateName = async () => {
-    if (!title.trim() || title === playlistName) {
-      setTitle(playlistName);
+    if (!title.trim() || title === playlistInfo?.name) {
+      setTitle(playlistInfo?.name || "");
       setIsEditing(false);
       return;
     }
 
     const previousTitle = title;
-
     try {
       setIsEditing(false);
-
       await updatePlaylistName(token!, id as string, title);
       uiToast.success("플레이리스트 이름이 변경되었습니다.");
 
+      if (playlistInfo) {
+        setPlaylistInfo({ ...playlistInfo, name: title });
+      }
+
       const newParams = new URLSearchParams(searchParams.toString());
       newParams.set("name", title);
-      router.replace(`/playlist/${id}?${newParams.toString()}`, {
-        scroll: false,
-      });
+      router.replace(`/playlist/${id}?${newParams.toString()}`, { scroll: false });
     } catch (err: any) {
       setTitle(previousTitle);
-      if (err.response?.status === 403) {
-        uiToast.error("이름을 수정할 권한이 없습니다. 다시 로그인해주세요.");
-      } else {
-        uiToast.error("이름 수정 중 오류가 발생했습니다.");
-      }
+      uiToast.error("이름 수정 중 오류가 발생했습니다.");
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleUpdateName();
-    } else if (e.key === "Escape") {
-      setTitle(playlistName);
+    if (e.key === "Enter") handleUpdateName();
+    else if (e.key === "Escape") {
+      setTitle(playlistInfo?.name || "");
       setIsEditing(false);
     }
   };
 
+  if (loading)
+    return (
+      <div className={styles.loading}>
+        <LoadingDots />
+      </div>
+    );
+  if (error || !playlistInfo) {
+    return (
+      <div className={styles.loading}>
+        <div style={{ textAlign: "center", color: "#a7b3d1" }}>
+          <FaExclamationTriangle
+            size={40}
+            style={{ marginBottom: "1.5rem", color: "#4f7df3" }}
+          />
+          <p style={{ fontSize: "1.6rem" }}>{error || "정보를 표시할 수 없습니다."}</p>
+        </div>
+      </div>
+    );
+  }
+
   const totalMs = tracks.reduce((acc, track) => acc + (track.durationMs || 0), 0);
-
-  const handleRemoveClick = (e: React.MouseEvent, trackUri: string) => {
-    e.stopPropagation();
-    setSelectedTrackUri(trackUri);
-    setIsModalOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!selectedTrackUri) return;
-
-    const previousTracks = [...tracks];
-    // 낙관적 업데이트
-    setTracks(tracks.filter((t) => t.uri !== selectedTrackUri));
-    setIsModalOpen(false); // 모달 닫기
-
-    try {
-      await removeTrackFromPlaylist(token!, id as string, selectedTrackUri);
-      uiToast.success("곡이 삭제되었습니다.");
-    } catch (err) {
-      setTracks(previousTracks); // 실패 시 복구
-      uiToast.error("곡 삭제에 실패했습니다.");
-    } finally {
-      setSelectedTrackUri(null);
-    }
-  };
+  const searchResultTracks = tracks.map(mapTrackToSearchResult);
 
   return (
     <main className={styles.container}>
@@ -155,8 +151,8 @@ export default function PlaylistDetailPage() {
             <header className={styles.hero}>
               <div className={styles.heroArtWrapper}>
                 <Image
-                  src={playlistImg || "/default_playlist.png"}
-                  alt={`${playlistName} 앨범 커버`}
+                  src={playlistInfo.image || playlistImgFromUrl || "/default_playlist.png"}
+                  alt={playlistInfo.name}
                   fill
                   priority
                   sizes="24rem"
@@ -164,10 +160,9 @@ export default function PlaylistDetailPage() {
                 />
               </div>
               <div className={styles.heroText}>
-                <span className={styles.label}>PLAYLIST</span>
-
+                <span className={styles.label}>{isMine ? "MY PLAYLIST" : "PLAYLIST"}</span>
                 <div className={styles.titleContainer}>
-                  {isEditing ? (
+                  {isMine && isEditing ? (
                     <div className={styles.editForm}>
                       <input
                         className={styles.titleInput}
@@ -178,7 +173,6 @@ export default function PlaylistDetailPage() {
                         autoFocus
                         spellCheck={false}
                       />
-
                       <div className={styles.editBtnGroup}>
                         <button
                           onMouseDown={handleUpdateName}
@@ -188,7 +182,7 @@ export default function PlaylistDetailPage() {
                         </button>
                         <button
                           onMouseDown={() => {
-                            setTitle(playlistName);
+                            setTitle(playlistInfo.name);
                             setIsEditing(false);
                           }}
                           className={`${styles.editActionBtn} ${styles.cancel}`}
@@ -199,22 +193,23 @@ export default function PlaylistDetailPage() {
                     </div>
                   ) : (
                     <h2 className={styles.titleWrapper}>
-                      <span className={styles.titleText}>{title}</span>
-                      <FaRegEdit
-                        className={styles.editIcon}
-                        onClick={() => setIsEditing(true)}
-                      />
+                      <span className={styles.titleText}>{playlistInfo.name}</span>
+                      {isMine && (
+                        <FaRegEdit
+                          className={styles.editIcon}
+                          onClick={() => setIsEditing(true)}
+                        />
+                      )}
                     </h2>
                   )}
                 </div>
-
                 <div className={styles.metaRow}>
-                  <span className={styles.dot}>•</span>
+                  {!isMine && <span>By {playlistInfo.owner}</span>}
+                  {!isMine && <span className={styles.dot}>•</span>}
                   <span>{tracks.length} tracks</span>
                   <span className={styles.dot}>•</span>
-                  <span>{loading ? "0시간 00분" : formatTotalDuration(totalMs)}</span>
+                  <span>{formatTotalDuration(totalMs)}</span>
                 </div>
-
                 <button
                   className={styles.playBtn}
                   onClick={() => playAllTracks(tracks, 0)}
@@ -224,75 +219,19 @@ export default function PlaylistDetailPage() {
               </div>
             </header>
 
-            <section className={styles.listSection}>
-              <div className={styles.listHeader}>
-                <span className={styles.hNum}>#</span>
-                <span className={styles.hTitle}>TITLE</span>
-                <span className={styles.hArtist}>ARTIST</span>
-                <span className={styles.hTime}>TIME</span>
-                <span className={styles.hEmpty}></span>
+            {isMine ? (
+              <MyPlaylistList
+                playlistId={id as string}
+                initialTracks={tracks}
+              />
+            ) : (
+              <div style={{ marginTop: "4rem" }}>
+                <TrackList tracks={searchResultTracks} />
               </div>
-
-              {loading ? (
-                <div className={styles.loading}>
-                  <LoadingDots />
-                </div>
-              ) : (
-                <div className={styles.list}>
-                  {tracks.map((t, i) => (
-                    <div
-                      key={t.uniqueKey}
-                      className={styles.row}
-                      onClick={() => playSingleTrack(t)}
-                      style={{
-                        animationDelay: `${i * 0.05}s`,
-                      }}
-                    >
-                      <span className={styles.number}>{i + 1}</span>
-                      <div className={styles.trackMain}>
-                        <Link
-                          href={`/song/${t.id}`}
-                          className={styles.artWrapper}
-                        >
-                          <Image
-                            src={t.image || "/default_album.png"}
-                            alt={t.name}
-                            fill
-                            sizes="4.4rem"
-                            className={styles.art}
-                          />
-                        </Link>
-                        <p className={styles.name}>{t.name}</p>
-                      </div>
-
-                      <span className={styles.artist}>{t.artists.join(", ")}</span>
-                      <span className={styles.time}>{formatTime(t.durationMs)}</span>
-
-                      <button
-                        className={styles.removeBtn}
-                        onClick={(e) => handleRemoveClick(e, t.uri)}
-                        title="곡 삭제"
-                      >
-                        <FaRegTrashAlt />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
+            )}
           </div>
         )}
       </div>
-
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        title="곡 삭제 확인"
-        message="이 곡을 플레이리스트에서 삭제할까요?"
-        confirmText="삭제하기"
-        type="danger"
-      />
     </main>
   );
 }

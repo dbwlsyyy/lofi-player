@@ -6,6 +6,8 @@ import {
   SearchFilter,
   SearchResult,
   SpotifyAlbumDetailed,
+  SpotifyArtistDetailed,
+  SpotifyPlaylistDetailed,
   SpotifyPlaylistItem,
   SpotifyPlaylistResponse,
   SpotifyUser,
@@ -340,6 +342,52 @@ export async function fetchAlbum(
   } catch (e: any) {
     if (axios.isCancel(e)) throw e;
     console.error(`fetchAlbum(${albumId}) 에러:`, e.response?.status, e.message);
+    throw e;
+  }
+}
+
+/**
+ * [특정 플레이리스트 상세 정보(메타 + 트랙) 가져오기]
+ */
+export async function fetchPlaylist(
+  accessToken: string,
+  playlistId: string,
+  signal?: AbortSignal,
+): Promise<SpotifyPlaylistDetailed> {
+  try {
+    const api = createSpotifyClient(accessToken);
+    const { data } = await api.get(`/playlists/${playlistId}`, {
+      ...(signal ? { signal } : {}),
+    });
+
+    // 1. 내부 트랙 데이터를 프론트엔드 Track[] 구조로 예쁘게 매핑
+    const mappedTracks = data.tracks.items
+      .filter((item: any) => !!item.track) // null 트랙(삭제된 곡) 방어
+      .map((item: any) => ({
+        id: item.track!.id,
+        name: item.track!.name,
+        artists: item.track!.artists.map((a: SpotifyArtistDetailed) => a.name),
+        image: item.track!.album.images?.[0]?.url ?? "/default_album.png",
+        durationMs: item.track!.duration_ms,
+        uri: item.track!.uri,
+        previewUrl: item.track!.preview_url ?? undefined,
+      }));
+
+    // 2. 전체 플레이리스트 정보를 SpotifyPlaylistDetailed 타입으로 포장해서 리턴
+    return {
+      id: data.id,
+      name: data.name,
+      // display_name이 없을 경우 id(고유번호)를 폴백으로 사용
+      owner: data.owner.display_name || data.owner.id,
+      image: data.images?.[0]?.url || "/default_playlist.png",
+      description: data.description,
+      tracks: mappedTracks,
+    };
+  } catch (e: any) {
+    if (axios.isCancel(e)) {
+      throw e;
+    }
+    console.error(`fetchPlaylist(${playlistId}) API 에러:`, e.response?.status, e.message);
     throw e;
   }
 }

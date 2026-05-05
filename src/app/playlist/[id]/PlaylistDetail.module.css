@@ -20,6 +20,10 @@
   padding: 4rem 2rem;
 }
 
+.wrapper {
+  width: 100%;
+}
+
 .hero {
   display: flex;
   align-items: flex-end;
@@ -56,16 +60,6 @@
   font-weight: 900;
   letter-spacing: -0.2rem;
   line-height: 1;
-}
-.metaRow {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 1.4rem;
-  color: rgba(255, 255, 255, 0.4);
-}
-.dot {
-  font-size: 1rem;
 }
 
 .titleContainer {
@@ -163,6 +157,10 @@
   font-weight: 700;
 }
 
+.dot {
+  font-size: 1rem;
+}
+
 .playBtn {
   margin-top: 1.5rem;
   display: flex;
@@ -189,139 +187,12 @@
   padding: 8rem 0;
 }
 
-.listHeader {
-  display: flex;
-  align-items: center;
-  padding: 1.2rem 1.6rem;
-  border-bottom: 0.1rem solid rgba(255, 255, 255, 0.1);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.3);
-  letter-spacing: 0.1rem;
-}
-.hNum {
-  width: 4rem;
-}
-.hTitle {
-  flex: 2;
-}
-.hArtist {
-  flex: 1;
-}
-.hTime {
-  flex: 0.3;
-  text-align: right;
-  margin-right: 2rem;
-}
-
-.hEmpty {
-  width: 3.2rem;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  padding: 1.2rem 1.6rem;
-  border-radius: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  opacity: 0;
-  animation: slideUp 0.5s ease forwards;
-}
-
-.row:hover {
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateX(0.8rem);
-}
-
-.number {
-  width: 4rem;
-  font-size: 1.4rem;
-  color: rgba(255, 255, 255, 0.2);
-  font-weight: 600;
-}
-.trackMain {
-  flex: 2;
-  display: flex;
-  align-items: center;
-  gap: 1.6rem;
-}
-
-.artWrapper {
-  position: relative;
-  width: 4.4rem;
-  height: 4.4rem;
-  border-radius: 0.4rem;
-  overflow: hidden;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.art {
-  object-fit: cover;
-  transition: 0.2s ease-in-out;
-}
-.artWrapper:hover .art {
-  transform: scale(1.1);
-}
-
-.name {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #fff;
-}
-.artist {
-  flex: 1;
-  font-size: 1.4rem;
-  color: rgba(255, 255, 255, 0.4);
-}
-.time {
-  flex: 0.3;
-  font-size: 1.4rem;
-  color: rgba(255, 255, 255, 0.4);
-  text-align: right;
-  margin-right: 2rem;
-}
-
-.removeBtn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.2);
-  width: 3.2rem;
-  height: 3.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.4rem;
-  transition: all 0.2s;
-  opacity: 0;
-}
-
-.row:hover .removeBtn {
-  opacity: 1;
-}
-
-.removeBtn:hover {
-  color: #ff4b4b;
-  transform: scale(1.2);
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
-  }
-}
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(1.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -338,7 +209,7 @@
   .heroText {
     align-items: center;
   }
-  .title {
+  .titleWrapper {
     font-size: 3.6rem;
   }
   .playBtn {
