@@ -5,6 +5,7 @@ import { createSpotifyClient } from "../lib/spotifyClient";
 import {
   SearchFilter,
   SearchResult,
+  SpotifyAlbumDetailed,
   SpotifyPlaylistItem,
   SpotifyPlaylistResponse,
   SpotifyUser,
@@ -342,4 +343,3 @@ export async function fetchAlbum(
     throw e;
   }
 }
-
