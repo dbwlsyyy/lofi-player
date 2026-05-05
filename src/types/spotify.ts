@@ -70,6 +70,14 @@ export interface SpotifyAlbumSimplified {
   image: string;
   releaseDate: string;
   type: string;
+  artists?: string[];
+}
+
+// 앨범 상세 정보 타입
+export interface SpotifyAlbumDetailed extends SpotifyAlbumSimplified {
+  tracks: Track[];
+  copyrights: { text: string; type: string }[];
+  label: string;
 }
 
 // 아티스트 상세 페이지 전체 데이터 모델

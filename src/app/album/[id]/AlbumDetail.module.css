@@ -1,0 +1,188 @@
+.container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background: transparent;
+  scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* 앨범 전용 유니크한 히어로 섹션: 레코드판 느낌의 레이아웃 */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  margin-bottom: 5rem;
+  position: relative;
+}
+
+.artContainer {
+  position: relative;
+  width: 28rem;
+  height: 28rem;
+  flex-shrink: 0;
+}
+
+.albumArtWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* 레코드판 효과 */
+.vinyl {
+  position: absolute;
+  top: 5%;
+  right: -20%;
+  width: 90%;
+  height: 90%;
+  background: #111;
+  border-radius: 50%;
+  z-index: 1;
+  background-image: repeating-radial-gradient(
+    circle at center,
+    #222 0,
+    #111 2px,
+    #222 4px
+  );
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.artContainer:hover .vinyl {
+  transform: translateX(30%) rotate(180deg);
+}
+
+.heroText {
+  flex: 1;
+}
+
+.label {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--spotify-green, #1db954);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.title {
+  font-size: 4.5rem;
+  font-weight: 900;
+  margin: 0 0 1.5rem;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.4rem; /* 사용자 요청 폰트 사이즈 */
+  font-weight: 500;
+}
+
+.dot {
+  color: var(--spotify-green);
+}
+
+.artistLink {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.artistLink:hover {
+  text-decoration: underline;
+}
+
+.actionRow {
+  margin-top: 3rem;
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--spotify-green, #1db954);
+  color: #000;
+  border: none;
+  padding: 1.2rem 3rem;
+  border-radius: 100px;
+  font-weight: 800;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.playBtn:hover {
+  transform: scale(1.05);
+  background: #1ed760;
+}
+
+.section {
+  margin-top: 4rem;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: #fff;
+}
+
+.footer {
+  margin-top: 5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+}
+
+.copyright {
+  margin-bottom: 0.5rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    gap: 3rem;
+  }
+  .artContainer {
+    width: 22rem;
+    height: 22rem;
+  }
+  .vinyl {
+    display: none;
+  }
+  .title {
+    font-size: 3.5rem;
+  }
+  .metaRow {
+    justify-content: center;
+  }
+}
