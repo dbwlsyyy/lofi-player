@@ -5,12 +5,12 @@ import { NextAuthProvider } from "./providers";
 import { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { Toaster } from "react-hot-toast";
-
-const QueueSidebar = dynamic(() => import("@/components/layout/QueueSidebar/QueueSidebar"));
 import ToggleBtn from "@/components/layout/ToggleBtn/ToggleBtn";
 import GlobalBackground from "@/components/layout/GlobalBackground/GlobalBackground";
 import TopNav from "@/components/layout/TopNav/TopNav";
 import PageWrapper from "@/components/layout/PageWrapper";
+
+const QueueSidebar = dynamic(() => import("@/components/layout/QueueSidebar/QueueSidebar"));
 
 export const metadata = {
   title: "Lofi Player",

@@ -1,5 +1,3 @@
-import withBundleAnalyzer from '@next/bundle-analyzer';
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -7,20 +5,10 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.spotifycdn.com",
-      },
-      {
-        protocol: "https",
-        hostname: "*.scdn.co",
-      },
+      { protocol: "https", hostname: "*.spotifycdn.com" },
+      { protocol: "https", hostname: "*.scdn.co" },
     ],
   },
 };
 
-const analyzer = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-});
-
-export default analyzer(nextConfig);
+export default nextConfig;

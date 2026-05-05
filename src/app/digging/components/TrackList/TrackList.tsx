@@ -11,12 +11,16 @@ import { formatTime } from "@/lib/formatTime";
 import TrackDropdown from "@/components/common/TrackDropdown/TrackDropdown";
 import dynamic from "next/dynamic";
 
-const AddToPlaylistModal = dynamic(() => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"), {
-  ssr: false,
-});
 import { addTrackToPlaylist } from "@/apis/userApi";
 import { uiToast } from "@/lib/toasts";
 import { useState } from "react";
+
+const AddToPlaylistModal = dynamic(
+  () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
+  {
+    ssr: false,
+  },
+);
 
 export default function TrackList({ tracks }: { tracks: Track[] }) {
   const { data: session } = useSession();

@@ -10,12 +10,15 @@ import Link from "next/link";
 import { useShallow } from "zustand/shallow";
 import TrackDropdown from "@/components/common/TrackDropdown/TrackDropdown";
 import dynamic from "next/dynamic";
-
-const AddToPlaylistModal = dynamic(() => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"), {
-  ssr: false,
-});
 import { uiToast } from "@/lib/toasts";
 import { addTrackToPlaylist } from "@/apis/userApi";
+
+const AddToPlaylistModal = dynamic(
+  () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
+  {
+    ssr: false,
+  },
+);
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
