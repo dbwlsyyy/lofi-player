@@ -1,19 +1,27 @@
 .sidebar {
   position: fixed;
-  top: 0;
-  right: 0;
-  height: 100%;
+
+  top: 2rem;
+  right: 2rem;
+  bottom: 13rem;
   width: 30rem;
-  background: rgba(10, 10, 10, 0.92);
+  border-radius: 1.6rem; /* 모달 느낌을 위한 둥근 모서리 */
+
+  background: rgb(10, 10, 10);
   backdrop-filter: blur(1.2rem);
   -webkit-backdrop-filter: blur(1.2rem);
-  border-left: 0.1rem solid rgba(255, 255, 255, 0.04);
+  border: 0.1rem solid rgba(255, 255, 255, 0.08);
 
   display: flex;
   flex-direction: column;
-  transform: translateX(100%);
-  transition: transform 0.28s ease;
+
+  /* 숨길 때 right 여백(2rem)까지 고려해서 화면 밖으로 완전히 밀어냄 */
+  transform: translateX(calc(100% + 2rem));
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   z-index: 50;
+
+  overflow: hidden; /* 내용물이 둥근 모서리를 삐져나오지 않게 방어 */
+  box-shadow: -4px 12px 40px rgba(0, 0, 0, 0.6);
 }
 
 .open {
@@ -69,8 +77,9 @@
   flex-direction: column;
   padding-top: 0.5rem;
 
-  padding-bottom: calc(100dvh - 25.5rem);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 2%, black 100%, transparent 100%);
+  /* 기존의 calc()로 억지로 잡던 높이는 부모가 닫힌 상자가 되었으므로 삭제하고 깔끔하게 여백만 줌 */
+  padding-bottom: 2rem;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 2%, black 95%, transparent 100%);
 }
 
 .item {
@@ -230,6 +239,9 @@
 
 @media (max-width: 700px) {
   .sidebar {
-    width: 75vw;
+    width: calc(100vw - 3.2rem);
+    right: 1.6rem;
+    top: 1.6rem;
+    bottom: 12rem;
   }
 }
