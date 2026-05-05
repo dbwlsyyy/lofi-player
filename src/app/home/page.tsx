@@ -9,7 +9,7 @@ import { useUiStore } from "@/store/useUiStore";
 import LoadingSpinner from "@/components/loading/LoadingSpinner/LoadingSpinner";
 import NavToggle from "../../components/common/NavToggle/NavToggle";
 import LoginHero from "./components/LoginHero/LoginHero";
-import { SpotifyPlaylistItem, SpotifyUser } from "@/types/spotify";
+import { User, Playlist } from "@/types/domainTypes";
 import Link from "next/link";
 import axios from "axios";
 
@@ -19,8 +19,8 @@ export default function HomePage() {
 
   const { isRelaxMode } = useUiStore();
 
-  const [me, setMe] = useState<SpotifyUser | null>(null);
-  const [playlists, setPlaylists] = useState<SpotifyPlaylistItem[]>([]);
+  const [me, setMe] = useState<User | null>(null);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [error, setError] = useState("");
 
   const handleLogin = () => {
@@ -40,9 +40,9 @@ export default function HomePage() {
 
         setMe(profile);
         setPlaylists(list);
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (axios.isCancel(e)) return;
-        if (e.response?.status === 401) {
+        if (axios.isAxiosError(e) && e.response?.status === 401) {
           handleLogin();
         } else {
           setError("Spotify 데이터를 불러오는 중 오류가 발생했습니다.");
@@ -78,12 +78,12 @@ export default function HomePage() {
                     {playlists.map((pl) => (
                       <Link
                         key={pl.id}
-                        href={`/playlist/${pl.id}?name=${encodeURIComponent(pl.name)}&img=${pl.images[0]?.url}`}
+                        href={`/playlist/${pl.id}?name=${encodeURIComponent(pl.name)}&img=${pl.image}`}
                         className={styles.playlistCard}
                       >
                         <div className={styles.imageWrapper}>
                           <Image
-                            src={pl.images?.[0]?.url || "/default_playlist.png"}
+                            src={pl.image || "/default_playlist.png"}
                             alt={pl.name}
                             fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -92,7 +92,7 @@ export default function HomePage() {
                         </div>
                         <div className={styles.playlistInfo}>
                           <h4>{pl.name}</h4>
-                          <p>{pl.tracks.total} Tracks</p>
+                          <p>{pl.tracksTotal} Tracks</p>
                         </div>
                       </Link>
                     ))}

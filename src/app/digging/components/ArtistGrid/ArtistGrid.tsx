@@ -2,9 +2,9 @@
 import Image from "next/image";
 import styles from "./ArtistGrid.module.css";
 import Link from "next/link";
-import { SearchResult, SpotifyArtistDetailed } from "@/types/spotify";
+import { Artist } from "@/types/domainTypes";
 
-export default function ArtistGrid({ artists }: { artists: SearchResult[] }) {
+export default function ArtistGrid({ artists }: { artists: Artist[] }) {
   return (
     <div className={styles.gridContainer}>
       {artists.map((item) => (

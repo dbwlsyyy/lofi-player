@@ -3,12 +3,11 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./AlbumDetail.module.css";
-import { fetchAlbum } from "@/apis/userApi";
+import { fetchAlbum } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
 import { FaPlay, FaInfoCircle, FaMusic, FaExclamationTriangle } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
-import { SpotifyAlbumDetailed } from "@/types/spotify";
-import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
+import { Album } from "@/types/domainTypes";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
@@ -26,7 +25,7 @@ export default function AlbumDetailPage() {
     })),
   );
 
-  const [album, setAlbum] = useState<SpotifyAlbumDetailed | null>(null);
+  const [album, setAlbum] = useState<Album | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,9 +40,6 @@ export default function AlbumDetailPage() {
 
       try {
         const data = await fetchAlbum(token, id as string, controller.signal);
-        if (!data) {
-          throw new Error("앨범 데이터를 찾을 수 없습니다.");
-        }
         setAlbum(data);
         setLoading(false);
       } catch (err) {
@@ -83,16 +79,7 @@ export default function AlbumDetailPage() {
     );
   }
 
-  const artistsName = Array.isArray(album.artists)
-    ? album.artists.join(", ")
-    : "알 수 없는 아티스트";
-  const releaseYear =
-    album.releaseDate && typeof album.releaseDate === "string"
-      ? album.releaseDate.split("-")[0]
-      : "정보 없음";
-
-  const tracks = Array.isArray(album.tracks) ? album.tracks : [];
-  const searchResultTracks = tracks.map(mapTrackToSearchResult);
+  const tracks = album.tracks || [];
   const totalDurationMin = Math.floor(
     tracks.reduce((acc, t) => acc + (t.durationMs || 0), 0) / 60000,
   );
@@ -106,7 +93,7 @@ export default function AlbumDetailPage() {
               <div className={styles.artSection}>
                 <div className={styles.artWrapper}>
                   <Image
-                    src={album.image || "/default_album.png"}
+                    src={album.image}
                     alt={album.name}
                     fill
                     priority
@@ -117,7 +104,7 @@ export default function AlbumDetailPage() {
                 <div className={styles.vinyl}>
                   <div className={styles.vinylLabel}>
                     <Image
-                      src={album.image || "/default_album.png"}
+                      src={album.image}
                       alt={album.name}
                       fill
                       sizes="(max-width: 768px) 10rem, 12rem"
@@ -128,14 +115,14 @@ export default function AlbumDetailPage() {
               </div>
 
               <div className={styles.heroText}>
-                <span className={styles.label}>{album.type || "Album"} Collection</span>
-                <h1 className={styles.title}>{album.name || "정보 없음"}</h1>
+                <span className={styles.label}>{album.type.toUpperCase()} Collection</span>
+                <h1 className={styles.title}>{album.name}</h1>
                 <div className={styles.metaRow}>
-                  <span className={styles.artistLink}>{artistsName}</span>
+                  <span className={styles.artistLink}>{album.artists.join(", ")}</span>
                   <div className={styles.dot} />
-                  <span>{releaseYear}</span>
+                  <span>{album.releaseDate.split("-")[0]}</span>
                   <div className={styles.dot} />
-                  <span>{tracks.length} Tracks</span>
+                  <span>{album.totalTracks} Tracks</span>
                 </div>
                 <div className={styles.actionRow}>
                   <button
@@ -155,7 +142,7 @@ export default function AlbumDetailPage() {
                   <FaMusic size={20} /> Tracklist
                 </h2>
                 {tracks.length > 0 ? (
-                  <TrackList tracks={searchResultTracks} />
+                  <TrackList tracks={tracks} />
                 ) : (
                   <p style={{ color: "#a7b3d1", fontSize: "1.4rem", padding: "2rem 0" }}>
                     수록곡 정보가 없습니다.
@@ -170,11 +157,11 @@ export default function AlbumDetailPage() {
                 <div className={styles.infoCard}>
                   <div className={styles.infoItem}>
                     <span className={styles.infoLabel}>Released (발매일)</span>
-                    <p className={styles.infoValue}>{album.releaseDate || "정보 없음"}</p>
+                    <p className={styles.infoValue}>{album.releaseDate}</p>
                   </div>
                   <div className={styles.infoItem}>
                     <span className={styles.infoLabel}>Label (레이블)</span>
-                    <p className={styles.infoValue}>{album.label || "정보 없음"}</p>
+                    <p className={styles.infoValue}>{album.label}</p>
                   </div>
                   <div className={styles.infoItem}>
                     <span className={styles.infoLabel}>Total Duration (총 재생 시간)</span>
@@ -182,7 +169,7 @@ export default function AlbumDetailPage() {
                   </div>
                   <div className={styles.infoItem}>
                     <span className={styles.infoLabel}>Format (발매 형식)</span>
-                    <p className={styles.infoValue}>{(album.type || "Album").toUpperCase()}</p>
+                    <p className={styles.infoValue}>{album.type.toUpperCase()}</p>
                   </div>
                 </div>
               </aside>

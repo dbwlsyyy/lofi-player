@@ -1,14 +1,6 @@
 import { StateCreator } from "zustand";
-export type Track = {
-  id: string;
-  name: string;
-  artists: string[];
-  image: string;
-  durationMs: number;
-  uri: string;
-  previewUrl?: string;
-  uniqueKey?: string;
-};
+import { Track } from "./domainTypes";
+
 export type RepeatMode = "off" | "context" | "track";
 
 // ---------------------------------------------------------

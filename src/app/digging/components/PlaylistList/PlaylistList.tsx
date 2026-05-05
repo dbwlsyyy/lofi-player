@@ -2,16 +2,11 @@
 
 import Image from "next/image";
 import { FiUser, FiDisc } from "react-icons/fi";
-import { SearchResult } from "@/types/spotify";
+import { Playlist } from "@/types/domainTypes";
 import styles from "./PlaylistList.module.css";
 import Link from "next/link";
 
-interface PlaylistListProps {
-  playlists: SearchResult[];
-  onClick?: (id: string) => void;
-}
-
-export default function PlaylistList({ playlists, onClick }: PlaylistListProps) {
+export default function PlaylistList({ playlists }: { playlists: Playlist[] }) {
   return (
     <div className={styles.listContainer}>
       {playlists.map((item) => (
