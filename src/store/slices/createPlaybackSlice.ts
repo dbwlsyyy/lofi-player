@@ -1,8 +1,8 @@
 import { setRepeatMode, setShuffle, startPlayback } from "@/apis/playbackApi";
-import { mapSdkTrackToLocalTrack } from "@/lib/spotifyMapper";
 import { PlayerSliceCreator, PlaybackSlice, RepeatMode } from "@/types/player";
 import { Track } from "@/types/domainTypes";
 import { handlePlaybackError } from "../utils/errorHandlers";
+import { mapSpotifySdkTrackToTrack } from "@/lib/spotifyMapper";
 
 export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get) => ({
   // ---------------------------------------------------------
@@ -337,7 +337,7 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
       if (uris.length > 0 && playIndex < uris.length) {
         await startPlayback(uris, deviceId, accessToken, playIndex);
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("playSingleTrack 에러 상세:", error.response?.data || error);
 
       // 최후의 보루: 현재 물려있는 곡이라도 그냥 재생 시킴
@@ -476,7 +476,7 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
       if (nextIdx === -1) nextIdx = prevState.queue.findIndex((t: any) => t.id === sdkTrack.id);
 
       const foundInQueue = nextIdx !== -1 ? prevState.queue[nextIdx] : null;
-      const finalTrack = foundInQueue ?? mapSdkTrackToLocalTrack(sdkTrack); // 기존 유틸 함수 유지
+      const finalTrack = foundInQueue ?? mapSpotifySdkTrackToTrack(sdkTrack); // 기존 유틸 함수 유지
 
       return {
         currentIndex: nextIdx !== -1 ? nextIdx : 0,

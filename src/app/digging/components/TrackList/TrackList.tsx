@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FiHeart, FiPlay } from "react-icons/fi";
-import { SearchResult } from "@/types/domainTypes";
+import { Track } from "@/types/domainTypes";
 import styles from "./TrackList.module.css";
 import { useSession } from "next-auth/react";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -13,9 +13,8 @@ import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlayl
 import { addTrackToPlaylist } from "@/apis/userApi";
 import { uiToast } from "@/lib/toasts";
 import { useState } from "react";
-import { mapSearchResultToTrack } from "@/lib/spotifyMapper";
 
-export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
+export default function TrackList({ tracks }: { tracks: Track[] }) {
   const { data: session } = useSession();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,13 +27,12 @@ export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
     })),
   );
 
-  const handlePlayClick = (item: SearchResult) => {
-    if (!session?.accessToken) return;
-    playSingleTrack(mapSearchResultToTrack(item));
+  const handlePlayClick = (track: Track) => {
+    playSingleTrack(track);
   };
 
-  const handleAddNextClick = (item: SearchResult) => {
-    addTrackToNext(mapSearchResultToTrack(item));
+  const handleAddNextClick = (track: Track) => {
+    addTrackToNext(track);
   };
 
   const handleAddClick = (uri: string) => {
@@ -57,7 +55,7 @@ export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
     <div className={styles.listContainer}>
       {tracks.map((item) => (
         <div
-          key={item.id}
+          key={item.uniqueKey}
           className={styles.trackRow}
         >
           <div className={styles.trackLeading}>

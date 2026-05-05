@@ -1,18 +1,11 @@
-import { 
-  SpotifyApiTrack, 
-  SpotifyApiArtist, 
-  SpotifyApiAlbum, 
-  SpotifyApiPlaylist, 
-  SpotifyApiUser 
+import {
+  SpotifyApiTrack,
+  SpotifyApiArtist,
+  SpotifyApiAlbum,
+  SpotifyApiPlaylist,
+  SpotifyApiUser,
 } from "@/types/spotifyApiTypes";
-import { 
-  Track, 
-  Artist, 
-  Album, 
-  Playlist, 
-  User, 
-  SearchResult 
-} from "@/types/domainTypes";
+import { Track, Artist, Album, Playlist, User } from "@/types/domainTypes";
 
 /**
  * Spotify API Raw Data를 우리 앱의 Domain Data로 변환하는 매퍼 모음
@@ -22,11 +15,11 @@ import {
 export const mapSpotifyApiTrackToTrack = (apiTrack: SpotifyApiTrack): Track => ({
   id: apiTrack.id || "",
   name: apiTrack.name || "Unknown Title",
-  artists: apiTrack.artists?.map(a => a.name) || [],
+  artists: apiTrack.artists?.map((a) => a.name) || [],
   image: apiTrack.album?.images?.[0]?.url || "/default_album.png",
   durationMs: apiTrack.duration_ms || 0,
   uri: apiTrack.uri || "",
-  previewUrl: apiTrack.preview_url || undefined,
+  previewUrl: apiTrack.preview_url || "",
   uniqueKey: crypto.randomUUID(),
 });
 
@@ -45,10 +38,11 @@ export const mapSpotifyApiAlbumToAlbum = (apiAlbum: SpotifyApiAlbum): Album => (
   image: apiAlbum.images?.[0]?.url || "/default_album.png",
   releaseDate: apiAlbum.release_date || "",
   type: apiAlbum.album_type || "album",
-  artists: apiAlbum.artists?.map(a => a.name) || [],
+  artists: apiAlbum.artists?.map((a) => a.name) || [],
   totalTracks: apiAlbum.total_tracks || 0,
   label: apiAlbum.label || "",
-  copyrights: apiAlbum.copyrights?.map(c => c.text) || [],
+  uri: apiAlbum.uri || "",
+  copyrights: apiAlbum.copyrights?.map((c) => c.text) || [],
   tracks: apiAlbum.tracks?.items?.map(mapSpotifyApiTrackToTrack) || [],
 });
 
@@ -61,7 +55,7 @@ export const mapSpotifyApiPlaylistToPlaylist = (apiPlaylist: SpotifyApiPlaylist)
   ownerId: apiPlaylist.owner?.id || "",
   tracksTotal: apiPlaylist.tracks?.total || 0,
   uri: apiPlaylist.uri || "",
-  tracks: apiPlaylist.tracks?.items?.map(item => mapSpotifyApiTrackToTrack(item.track)) || [],
+  tracks: apiPlaylist.tracks?.items?.map((item) => mapSpotifyApiTrackToTrack(item.track)) || [],
 });
 
 export const mapSpotifyApiUserToUser = (apiUser: SpotifyApiUser): User => ({
@@ -69,45 +63,17 @@ export const mapSpotifyApiUserToUser = (apiUser: SpotifyApiUser): User => ({
   displayName: apiUser.display_name || "Unknown User",
   email: apiUser.email || "",
   image: apiUser.images?.[0]?.url || "/default_user.png",
-  product: apiUser.product,
+  product: apiUser.product || "",
 });
 
-// SearchResult 변환 매퍼 (디깅 페이지용)
-export const mapTrackToSearchResult = (track: Track): SearchResult => ({
-  id: track.id,
-  name: track.name,
-  image: track.image,
-  type: "track",
-  uri: track.uri,
-  artists: track.artists,
-  durationMs: track.durationMs,
-});
-
-export const mapArtistToSearchResult = (artist: Artist): SearchResult => ({
-  id: artist.id,
-  name: artist.name,
-  image: artist.image,
-  type: "artist",
-  uri: artist.uri,
-});
-
-export const mapAlbumToSearchResult = (album: Album): SearchResult => ({
-  id: album.id,
-  name: album.name,
-  image: album.image,
-  type: "album",
-  uri: album.uri,
-  artists: album.artists,
-  releaseDate: album.releaseDate,
-});
-
-export const mapPlaylistToSearchResult = (playlist: Playlist): SearchResult => ({
-  id: playlist.id,
-  name: playlist.name,
-  image: playlist.image,
-  type: "playlist",
-  uri: playlist.uri,
-  owner: playlist.owner,
-  tracksTotal: playlist.tracksTotal,
-  description: playlist.description,
+// 웹 플레이어 SDK Track -> Local Domain Track 변환
+export const mapSpotifySdkTrackToTrack = (sdkTrack: Spotify.Track): Track => ({
+  id: sdkTrack.id ?? "",
+  name: sdkTrack.name || "Unknown Title",
+  artists: sdkTrack.artists.map((a) => a.name) || [],
+  image: sdkTrack.album.images?.[0]?.url ?? "/default_album.png",
+  durationMs: sdkTrack.duration_ms || 0,
+  uri: sdkTrack.uri || "",
+  previewUrl: "", // SDK 트랙에는 미리듣기가 없으므로 빈 문자열
+  uniqueKey: crypto.randomUUID(),
 });

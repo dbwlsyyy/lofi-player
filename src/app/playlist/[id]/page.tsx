@@ -17,7 +17,6 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
 import MyPlaylistList from "../components/MyPlaylistList/MyPlaylistList";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
-import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
 
 export default function PlaylistDetailPage() {
   const { id } = useParams();
@@ -139,7 +138,6 @@ export default function PlaylistDetailPage() {
   }
 
   const totalMs = tracks.reduce((acc, track) => acc + (track.durationMs || 0), 0);
-  const searchResultTracks = tracks.map(mapTrackToSearchResult);
 
   return (
     <main className={styles.container}>
@@ -226,7 +224,7 @@ export default function PlaylistDetailPage() {
               />
             ) : (
               <div style={{ marginTop: "4rem" }}>
-                <TrackList tracks={searchResultTracks} />
+                <TrackList tracks={tracks} />
               </div>
             )}
           </div>

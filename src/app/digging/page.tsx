@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { searchSpotify } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
-import { SearchFilter, SearchResult } from "@/types/domainTypes";
+import { Album, Artist, Playlist, SearchFilter, Track } from "@/types/domainTypes";
 import styles from "./Digging.module.css";
 import NavBar from "../../components/common/NavToggle/NavToggle";
 
@@ -25,7 +25,7 @@ export default function DiggingPage() {
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<SearchFilter>("track"); // 기본값 '곡'
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<Track[] | Artist[] | Album[] | Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const debouncedSearchTerm = useDebounce(query, 500);
@@ -91,14 +91,10 @@ export default function DiggingPage() {
             ) : results.length > 0 ? (
               /* 로딩 끝나고 데이터 있을 때만 렌더링 */
               <>
-                {filter === "track" && <TrackList tracks={results} />}
-                {filter === "artist" && <ArtistGrid artists={results} />}
-                {filter === "album" && (
-                  <AlbumGrid albums={results} />
-                )}
-                {filter === "playlist" && (
-                  <PlaylistList playlists={results} />
-                )}
+                {filter === "track" && <TrackList tracks={results as Track[]} />}
+                {filter === "artist" && <ArtistGrid artists={results as Artist[]} />}
+                {filter === "album" && <AlbumGrid albums={results as Album[]} />}
+                {filter === "playlist" && <PlaylistList playlists={results as Playlist[]} />}
               </>
             ) : (
               query && (

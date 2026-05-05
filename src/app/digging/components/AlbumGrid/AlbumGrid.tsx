@@ -3,18 +3,13 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { FiChevronDown } from "react-icons/fi";
-import { SearchResult } from "@/types/domainTypes";
+import { Album } from "@/types/domainTypes";
 import styles from "./AlbumGrid.module.css";
 import Link from "next/link";
 
-interface AlbumGridProps {
-  albums: SearchResult[];
-  onClick?: (id: string) => void;
-}
-
 type SortOption = "latest" | "oldest";
 
-export default function AlbumGrid({ albums, onClick }: AlbumGridProps) {
+export default function AlbumGrid({ albums }: { albums: Album[] }) {
   const [sortOrder, setSortOrder] = useState<SortOption>("latest");
 
   // 단순 정렬 (그룹핑 제거)

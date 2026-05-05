@@ -14,7 +14,6 @@ import Link from "next/link";
 import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
-import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
 
 export default function ArtistDetailPage() {
@@ -81,7 +80,7 @@ export default function ArtistDetailPage() {
 
   if (!data.artist) return null;
 
-  const popularSearchResultTracks = data.topTracks.slice(0, 6).map(mapTrackToSearchResult);
+  const popularSearchResultTracks = data.topTracks.slice(0, 6);
 
   return (
     <main className={styles.container}>

@@ -32,6 +32,7 @@ export interface Album {
   releaseDate: string;
   type: string;
   artists: string[];
+  uri: string;
   totalTracks?: number;
   label?: string;
   copyrights?: string[];
@@ -56,19 +57,4 @@ export interface User {
   email: string;
   image: string;
   product?: string;
-}
-
-// 디깅 페이지 검색 결과 통합 타입
-export interface SearchResult {
-  id: string;
-  name: string;
-  image: string;
-  type: SearchFilter;
-  uri: string;
-  artists?: string[];
-  durationMs?: number;
-  releaseDate?: string;
-  owner?: string;
-  tracksTotal?: number;
-  description?: string;
 }

@@ -8,7 +8,6 @@ import { useUiStore } from "@/store/useUiStore";
 import { FaPlay, FaInfoCircle, FaMusic, FaExclamationTriangle } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { Album } from "@/types/domainTypes";
-import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
@@ -81,7 +80,6 @@ export default function AlbumDetailPage() {
   }
 
   const tracks = album.tracks || [];
-  const searchResultTracks = tracks.map(mapTrackToSearchResult);
   const totalDurationMin = Math.floor(
     tracks.reduce((acc, t) => acc + (t.durationMs || 0), 0) / 60000,
   );
@@ -144,7 +142,7 @@ export default function AlbumDetailPage() {
                   <FaMusic size={20} /> Tracklist
                 </h2>
                 {tracks.length > 0 ? (
-                  <TrackList tracks={searchResultTracks} />
+                  <TrackList tracks={tracks} />
                 ) : (
                   <p style={{ color: "#a7b3d1", fontSize: "1.4rem", padding: "2rem 0" }}>
                     수록곡 정보가 없습니다.

@@ -1,28 +1,17 @@
 import { createSpotifyClient } from "@/lib/spotifyClient";
-import { 
-  SpotifyApiSearchResponse, 
-  SpotifyApiArtist, 
-  SpotifyApiTrack, 
-  SpotifyApiAlbum, 
-  SpotifyApiPlaylist 
+import {
+  SpotifyApiSearchResponse,
+  SpotifyApiArtist,
+  SpotifyApiTrack,
+  SpotifyApiAlbum,
+  SpotifyApiPlaylist,
 } from "@/types/spotifyApiTypes";
-import { 
-  SearchResult, 
-  Artist, 
-  Track, 
-  Album, 
-  Playlist, 
-  SearchFilter 
-} from "@/types/domainTypes";
-import { 
-  mapTrackToSearchResult, 
-  mapArtistToSearchResult, 
-  mapAlbumToSearchResult, 
-  mapPlaylistToSearchResult,
+import { Artist, Track, Album, Playlist, SearchFilter } from "@/types/domainTypes";
+import {
   mapSpotifyApiArtistToArtist,
   mapSpotifyApiTrackToTrack,
   mapSpotifyApiAlbumToAlbum,
-  mapSpotifyApiPlaylistToPlaylist
+  mapSpotifyApiPlaylistToPlaylist,
 } from "@/lib/spotifyMapper";
 import axios, { AxiosError } from "axios";
 
@@ -36,7 +25,7 @@ export async function searchSpotify(
   query: string,
   filter: SearchFilter,
   signal?: AbortSignal,
-): Promise<SearchResult[]> {
+): Promise<Track[] | Artist[] | Album[] | Playlist[]> {
   if (!query.trim()) return [];
 
   const api = createSpotifyClient(accessToken);
@@ -48,21 +37,19 @@ export async function searchSpotify(
     });
 
     if (filter === "artist" && data.artists) {
-      return data.artists.items.map(item => mapArtistToSearchResult(mapSpotifyApiArtistToArtist(item)));
+      return data.artists.items.map(mapSpotifyApiArtistToArtist);
     }
 
     if (filter === "album" && data.albums) {
-      return data.albums.items.map(item => mapAlbumToSearchResult(mapSpotifyApiAlbumToAlbum(item)));
+      return data.albums.items.map(mapSpotifyApiAlbumToAlbum);
     }
 
     if (filter === "playlist" && data.playlists) {
-      return data.playlists.items
-        .filter(pl => pl !== null)
-        .map(item => mapPlaylistToSearchResult(mapSpotifyApiPlaylistToPlaylist(item)));
+      return data.playlists.items.filter((pl) => pl !== null).map(mapSpotifyApiPlaylistToPlaylist);
     }
 
     if (filter === "track" && data.tracks) {
-      return data.tracks.items.map(item => mapTrackToSearchResult(mapSpotifyApiTrackToTrack(item)));
+      return data.tracks.items.map(mapSpotifyApiTrackToTrack);
     }
 
     return [];
@@ -75,9 +62,9 @@ export async function searchSpotify(
 }
 
 export async function fetchArtist(
-  accessToken: string, 
-  artistId: string, 
-  signal?: AbortSignal
+  accessToken: string,
+  artistId: string,
+  signal?: AbortSignal,
 ): Promise<Artist> {
   const api = createSpotifyClient(accessToken);
   try {
@@ -100,10 +87,13 @@ export async function fetchArtistTopTracks(
 ): Promise<Track[]> {
   const api = createSpotifyClient(accessToken);
   try {
-    const { data } = await api.get<{ tracks: SpotifyApiTrack[] }>(`/artists/${artistId}/top-tracks`, {
-      params: { market },
-      ...(signal ? { signal } : {}),
-    });
+    const { data } = await api.get<{ tracks: SpotifyApiTrack[] }>(
+      `/artists/${artistId}/top-tracks`,
+      {
+        params: { market },
+        ...(signal ? { signal } : {}),
+      },
+    );
     return data.tracks.map(mapSpotifyApiTrackToTrack);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;

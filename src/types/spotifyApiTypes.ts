@@ -35,6 +35,7 @@ export interface SpotifyApiAlbum {
   release_date: string;
   album_type: string;
   artists: SpotifyApiArtist[];
+  uri: string;
   total_tracks?: number;
   label?: string;
   copyrights?: { text: string; type: string }[];
