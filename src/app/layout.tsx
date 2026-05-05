@@ -3,8 +3,10 @@ import "./globals.css";
 import SDKProvider from "./SDKProvider";
 import { NextAuthProvider } from "./providers";
 import { ReactNode } from "react";
-import QueueSidebar from "@/components/layout/QueueSidebar/QueueSidebar";
+import dynamic from "next/dynamic";
 import { Toaster } from "react-hot-toast";
+
+const QueueSidebar = dynamic(() => import("@/components/layout/QueueSidebar/QueueSidebar"));
 import ToggleBtn from "@/components/layout/ToggleBtn/ToggleBtn";
 import GlobalBackground from "@/components/layout/GlobalBackground/GlobalBackground";
 import TopNav from "@/components/layout/TopNav/TopNav";

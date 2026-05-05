@@ -9,7 +9,11 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
 import { formatTime } from "@/lib/formatTime";
 import TrackDropdown from "@/components/common/TrackDropdown/TrackDropdown";
-import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
+import dynamic from "next/dynamic";
+
+const AddToPlaylistModal = dynamic(() => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"), {
+  ssr: false,
+});
 import { addTrackToPlaylist } from "@/apis/userApi";
 import { uiToast } from "@/lib/toasts";
 import { useState } from "react";

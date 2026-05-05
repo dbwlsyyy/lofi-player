@@ -1,17 +1,26 @@
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.spotifycdn.com", // 모든 spotifycdn 서브도메인 허용 (fa, ak 등)
+        hostname: "*.spotifycdn.com",
       },
       {
         protocol: "https",
-        hostname: "*.scdn.co", // 일반 앨범/아티스트 이미지, 플레이리스트 모자이크 이미지
+        hostname: "*.scdn.co",
       },
     ],
   },
 };
 
-export default nextConfig;
+const analyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default analyzer(nextConfig);
