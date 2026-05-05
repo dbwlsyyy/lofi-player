@@ -1,0 +1,268 @@
+.container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background: radial-gradient(circle at top right, rgba(79, 125, 243, 0.15), transparent 40%),
+              radial-gradient(circle at bottom left, rgba(79, 125, 243, 0.1), transparent 40%);
+  scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.content {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 6rem 4rem;
+}
+
+/* 블루 테마를 반영한 독창적인 히어로 섹션 */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 6rem;
+  align-items: center;
+  margin-bottom: 8rem;
+  perspective: 1000px;
+}
+
+.artSection {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.artWrapper {
+  position: relative;
+  width: 32rem;
+  height: 32rem;
+  z-index: 10;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+
+.artWrapper:hover {
+  transform: translateX(-15%) rotateY(-10deg);
+}
+
+.vinyl {
+  position: absolute;
+  width: 30rem;
+  height: 30rem;
+  background: #050505;
+  border-radius: 50%;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+  background-image: 
+    repeating-radial-gradient(circle at center, #1a1a1a 0, #050505 2px, #1a1a1a 4px),
+    linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vinylLabel {
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #000;
+}
+
+.artWrapper:hover + .vinyl {
+  transform: translateX(25%) rotate(360deg);
+}
+
+/* 블루 테마 텍스트 스타일 */
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.label {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #4f7df3; /* 메인 블루 컬러 */
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+}
+
+.title {
+  font-size: 5.5rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.2rem;
+  color: #a7b3d1;
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background: #4f7df3;
+  border-radius: 50%;
+}
+
+.artistLink {
+  color: #fff;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.artistLink:hover {
+  color: #4f7df3;
+}
+
+.actionRow {
+  margin-top: 2rem;
+  display: flex;
+  gap: 2rem;
+}
+
+.playBtn {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: #4f7df3;
+  color: #fff;
+  border: none;
+  padding: 1.4rem 3.5rem;
+  border-radius: 1.5rem;
+  font-weight: 800;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(79, 125, 243, 0.4);
+}
+
+.playBtn:hover {
+  transform: translateY(-5px);
+  background: #608aff;
+  box-shadow: 0 15px 35px rgba(79, 125, 243, 0.5);
+}
+
+/* 앨범 상세 정보 섹션 */
+.detailsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 6rem;
+  margin-top: 4rem;
+}
+
+.sectionTitle {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.sectionTitle::before {
+  content: "";
+  width: 0.6rem;
+  height: 2.4rem;
+  background: #4f7df3;
+  border-radius: 1rem;
+}
+
+.infoCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2.5rem;
+  padding: 3rem;
+  backdrop-filter: blur(10px);
+}
+
+.infoItem {
+  margin-bottom: 2.5rem;
+}
+
+.infoLabel {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #4f7df3;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.infoValue {
+  font-size: 1.6rem;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.footer {
+  margin-top: 8rem;
+  padding: 4rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+  color: rgba(167, 179, 209, 0.4);
+  font-size: 1.4rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 4rem;
+  }
+  .artSection {
+    order: -1;
+  }
+  .metaRow {
+    justify-content: center;
+  }
+  .actionRow {
+    justify-content: center;
+  }
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 4rem;
+  }
+  .artWrapper {
+    width: 24rem;
+    height: 24rem;
+  }
+  .vinyl {
+    width: 22rem;
+    height: 22rem;
+  }
+  .content {
+    padding: 4rem 2rem;
+  }
+}
