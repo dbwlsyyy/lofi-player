@@ -1,39 +1,36 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import styles from "./ArtistDetail.module.css";
-import { fetchArtist, fetchArtistTopTracks, fetchArtistAlbums } from "@/apis/userApi";
-import { useSession } from "next-auth/react";
+import { fetchArtist, fetchArtistTopTracks, fetchArtistAlbums } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
 import { FaPlay } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
-import { Track } from "@/types/player";
+import { Artist, Track, Album } from "@/types/domainTypes";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
-import { SpotifyAlbumSimplified, SpotifyArtistDetailed } from "@/types/spotify";
 import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
 
 export default function ArtistDetailPage() {
   const { id } = useParams();
   const { isRelaxMode } = useUiStore();
-  const { token, playAllTracks, playSingleTrack } = usePlayerStore(
+  const { token, playAllTracks } = usePlayerStore(
     useShallow((state) => ({
       token: state.accessToken,
       playAllTracks: state.playAllTracks,
-      playSingleTrack: state.playSingleTrack,
     })),
   );
 
   const [data, setData] = useState<{
-    artist: SpotifyArtistDetailed | null;
+    artist: Artist | null;
     topTracks: Track[];
-    albums: SpotifyAlbumSimplified[];
+    albums: Album[];
   }>({
     artist: null,
     topTracks: [],
@@ -57,7 +54,7 @@ export default function ArtistDetailPage() {
 
         setData({
           artist: artistData,
-          topTracks: tracksData.map((t) => ({ ...t, uniqueKey: crypto.randomUUID() })),
+          topTracks: tracksData,
           albums: albumsData,
         });
       } catch (err) {
@@ -74,10 +71,6 @@ export default function ArtistDetailPage() {
     return () => controller.abort();
   }, [id, token]);
 
-  const followerCount = data.artist?.followers?.total.toLocaleString() || "0";
-
-  const popularSearchResultTracks = data.topTracks.slice(0, 6).map(mapTrackToSearchResult);
-
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -88,6 +81,8 @@ export default function ArtistDetailPage() {
 
   if (!data.artist) return null;
 
+  const popularSearchResultTracks = data.topTracks.slice(0, 6).map(mapTrackToSearchResult);
+
   return (
     <main className={styles.container}>
       <div className={styles.content}>
@@ -96,7 +91,7 @@ export default function ArtistDetailPage() {
             <header className={styles.hero}>
               <div className={styles.heroBg}>
                 <Image
-                  src={data.artist.images?.[0]?.url || "/default_artist.png"}
+                  src={data.artist.image}
                   alt="아티스트 이미지"
                   fill
                   className={styles.heroArt}
@@ -106,7 +101,7 @@ export default function ArtistDetailPage() {
               <div className={styles.heroContent}>
                 <div className={styles.heroArtWrapper}>
                   <Image
-                    src={data.artist.images?.[0]?.url || "/default_artist.png"}
+                    src={data.artist.image}
                     alt={data.artist.name}
                     fill
                     priority
@@ -117,9 +112,9 @@ export default function ArtistDetailPage() {
                 <div className={styles.heroText}>
                   <h1 className={styles.title}>{data.artist.name}</h1>
                   <div className={styles.metaRow}>
-                    <span>{followerCount} followers</span>
+                    <span>{data.artist.followers.toLocaleString()} followers</span>
                     <span className={styles.dot}>•</span>
-                    <span>{data.artist.genres?.slice(0, 2).join(" / ") || "장르 없음"}</span>
+                    <span>{data.artist.genres.slice(0, 2).join(" / ") || "장르 없음"}</span>
                   </div>
                   <div className={styles.actionRow}>
                     <button
@@ -134,7 +129,6 @@ export default function ArtistDetailPage() {
               </div>
             </header>
 
-            {/* 인기 트랙 섹션 */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Popular Tracks</h2>
               {data.topTracks.length > 0 ? (
@@ -146,7 +140,6 @@ export default function ArtistDetailPage() {
               )}
             </section>
 
-            {/* 앨범 섹션 추가 */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Discography</h2>
               {data.albums.length > 0 ? (

@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { searchSpotify } from "@/apis/userApi";
+import { searchSpotify } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
-import { SearchFilter, SearchResult } from "@/types/spotify";
-import { uiToast } from "@/lib/toasts";
+import { SearchFilter, SearchResult } from "@/types/domainTypes";
 import styles from "./Digging.module.css";
 import NavBar from "../../components/common/NavToggle/NavToggle";
 
@@ -34,7 +33,6 @@ export default function DiggingPage() {
   // 검색 로직
   useEffect(() => {
     if (!debouncedSearchTerm.trim() || !accessToken) {
-      // setResults([]); 기획 문제
       setIsLoading(false);
       return;
     }
@@ -55,7 +53,6 @@ export default function DiggingPage() {
         if (axios.isCancel(error)) {
           return;
         }
-
         console.error(error);
       } finally {
         setIsLoading(false);
@@ -68,10 +65,6 @@ export default function DiggingPage() {
       controller.abort();
     };
   }, [debouncedSearchTerm, filter, accessToken]);
-
-  const handlePending = (msg: string) => {
-    uiToast.custom("준비 중인 기능", null);
-  };
 
   return (
     <main className={styles.container}>

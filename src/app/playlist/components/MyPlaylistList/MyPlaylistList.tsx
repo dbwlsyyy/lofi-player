@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { Track } from "@/types/player";
+import { Track } from "@/types/domainTypes";
 import { formatTime } from "@/lib/formatTime";
 import { removeTrackFromPlaylist } from "@/apis/userApi";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -63,7 +63,7 @@ export default function MyPlaylistList({ playlistId, initialTracks }: MyPlaylist
         <div className={styles.list}>
           {tracks.map((t, i) => (
             <div
-              key={t.uniqueKey}
+              key={t.uniqueKey || t.id}
               className={styles.row}
               onClick={() => playSingleTrack(t)}
               style={{

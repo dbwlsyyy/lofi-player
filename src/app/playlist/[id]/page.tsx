@@ -3,12 +3,13 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import { fetchPlaylistTracks, updatePlaylistName, fetchPlaylist, fetchMe } from "@/apis/userApi";
+import { fetchPlaylistTracks, updatePlaylistName, fetchMe } from "@/apis/userApi";
+import { fetchPlaylist } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
 import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaExclamationTriangle } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTotalDuration } from "@/lib/formatTime";
-import { Track } from "@/types/player";
+import { Track, Playlist } from "@/types/domainTypes";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
 import axios from "axios";
@@ -17,7 +18,6 @@ import { useShallow } from "zustand/shallow";
 import MyPlaylistList from "../components/MyPlaylistList/MyPlaylistList";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
 import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
-import { SpotifyPlaylistDetailed } from "@/types/spotify";
 
 export default function PlaylistDetailPage() {
   const { id } = useParams();
@@ -33,7 +33,7 @@ export default function PlaylistDetailPage() {
   );
 
   const [tracks, setTracks] = useState<Track[]>([]);
-  const [playlistInfo, setPlaylistInfo] = useState<SpotifyPlaylistDetailed | null>(null);
+  const [playlistInfo, setPlaylistInfo] = useState<Playlist | null>(null);
   const [isMine, setIsMine] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,16 +58,16 @@ export default function PlaylistDetailPage() {
           fetchPlaylist(token, id as string, controller.signal),
         ]);
 
-        const mine = playlist.owner === me.display_name || playlist.owner === me.id;
+        const mine = playlist.ownerId === me.id;
         setIsMine(mine);
         setPlaylistInfo(playlist);
         setTitle(playlist.name);
 
         if (mine) {
           const lists = await fetchPlaylistTracks(token, id as string, controller.signal);
-          setTracks(lists.map((t) => ({ ...t, uniqueKey: crypto.randomUUID() })));
+          setTracks(lists);
         } else {
-          setTracks(playlist.tracks);
+          setTracks(playlist.tracks || []);
         }
         setLoading(false);
       } catch (err) {
@@ -104,7 +104,7 @@ export default function PlaylistDetailPage() {
       const newParams = new URLSearchParams(searchParams.toString());
       newParams.set("name", title);
       router.replace(`/playlist/${id}?${newParams.toString()}`, { scroll: false });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setTitle(previousTitle);
       uiToast.error("이름 수정 중 오류가 발생했습니다.");
     }
