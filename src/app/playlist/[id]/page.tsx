@@ -3,12 +3,7 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import { 
-  fetchPlaylistTracks, 
-  updatePlaylistName,
-  fetchPlaylist,
-  fetchMe
-} from "@/apis/userApi";
+import { fetchPlaylistTracks, updatePlaylistName, fetchPlaylist, fetchMe } from "@/apis/userApi";
 import { useUiStore } from "@/store/useUiStore";
 import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaExclamationTriangle } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
@@ -52,14 +47,15 @@ export default function PlaylistDetailPage() {
     if (!token || !id) return;
 
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
 
     const loadData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
         const [me, playlist] = await Promise.all([
           fetchMe(token, controller.signal),
-          fetchPlaylist(token, id as string, controller.signal)
+          fetchPlaylist(token, id as string, controller.signal),
         ]);
 
         const mine = playlist.owner === me.display_name || playlist.owner === me.id;
@@ -69,16 +65,16 @@ export default function PlaylistDetailPage() {
 
         if (mine) {
           const lists = await fetchPlaylistTracks(token, id as string, controller.signal);
-          setTracks(lists.map(t => ({ ...t, uniqueKey: crypto.randomUUID() })));
+          setTracks(lists.map((t) => ({ ...t, uniqueKey: crypto.randomUUID() })));
         } else {
           setTracks(playlist.tracks);
         }
+        setLoading(false);
       } catch (err) {
         if (axios.isCancel(err)) return;
         console.error("데이터 로드 실패:", err);
         setError("플레이리스트 정보를 불러오지 못했습니다.");
         uiToast.error("정보를 불러오지 못했습니다.");
-      } finally {
         setLoading(false);
       }
     };
@@ -100,7 +96,7 @@ export default function PlaylistDetailPage() {
       setIsEditing(false);
       await updatePlaylistName(token!, id as string, title);
       uiToast.success("플레이리스트 이름이 변경되었습니다.");
-      
+
       if (playlistInfo) {
         setPlaylistInfo({ ...playlistInfo, name: title });
       }
@@ -122,13 +118,21 @@ export default function PlaylistDetailPage() {
     }
   };
 
-  if (loading) return <div className={styles.loading}><LoadingDots /></div>;
+  if (loading)
+    return (
+      <div className={styles.loading}>
+        <LoadingDots />
+      </div>
+    );
   if (error || !playlistInfo) {
     return (
       <div className={styles.loading}>
-        <div style={{ textAlign: 'center', color: '#a7b3d1' }}>
-          <FaExclamationTriangle size={40} style={{ marginBottom: '1.5rem', color: '#4f7df3' }} />
-          <p style={{ fontSize: '1.6rem' }}>{error || "정보를 표시할 수 없습니다."}</p>
+        <div style={{ textAlign: "center", color: "#a7b3d1" }}>
+          <FaExclamationTriangle
+            size={40}
+            style={{ marginBottom: "1.5rem", color: "#4f7df3" }}
+          />
+          <p style={{ fontSize: "1.6rem" }}>{error || "정보를 표시할 수 없습니다."}</p>
         </div>
       </div>
     );
@@ -156,7 +160,7 @@ export default function PlaylistDetailPage() {
                 />
               </div>
               <div className={styles.heroText}>
-                <span className={styles.label}>{isMine ? "MY PLAYLIST" : "USER PLAYLIST"}</span>
+                <span className={styles.label}>{isMine ? "MY PLAYLIST" : "PLAYLIST"}</span>
                 <div className={styles.titleContainer}>
                   {isMine && isEditing ? (
                     <div className={styles.editForm}>
@@ -170,14 +174,32 @@ export default function PlaylistDetailPage() {
                         spellCheck={false}
                       />
                       <div className={styles.editBtnGroup}>
-                        <button onMouseDown={handleUpdateName} className={styles.editActionBtn}><FaCheck /></button>
-                        <button onMouseDown={() => { setTitle(playlistInfo.name); setIsEditing(false); }} className={`${styles.editActionBtn} ${styles.cancel}`}><FaTimes /></button>
+                        <button
+                          onMouseDown={handleUpdateName}
+                          className={styles.editActionBtn}
+                        >
+                          <FaCheck />
+                        </button>
+                        <button
+                          onMouseDown={() => {
+                            setTitle(playlistInfo.name);
+                            setIsEditing(false);
+                          }}
+                          className={`${styles.editActionBtn} ${styles.cancel}`}
+                        >
+                          <FaTimes />
+                        </button>
                       </div>
                     </div>
                   ) : (
                     <h2 className={styles.titleWrapper}>
                       <span className={styles.titleText}>{playlistInfo.name}</span>
-                      {isMine && <FaRegEdit className={styles.editIcon} onClick={() => setIsEditing(true)} />}
+                      {isMine && (
+                        <FaRegEdit
+                          className={styles.editIcon}
+                          onClick={() => setIsEditing(true)}
+                        />
+                      )}
                     </h2>
                   )}
                 </div>
@@ -188,19 +210,22 @@ export default function PlaylistDetailPage() {
                   <span className={styles.dot}>•</span>
                   <span>{formatTotalDuration(totalMs)}</span>
                 </div>
-                <button className={styles.playBtn} onClick={() => playAllTracks(tracks, 0)}>
+                <button
+                  className={styles.playBtn}
+                  onClick={() => playAllTracks(tracks, 0)}
+                >
                   <FaPlay size={12} /> Play All
                 </button>
               </div>
             </header>
 
             {isMine ? (
-              <MyPlaylistList 
+              <MyPlaylistList
                 playlistId={id as string}
-                initialTracks={tracks} 
+                initialTracks={tracks}
               />
             ) : (
-              <div style={{ marginTop: '4rem' }}>
+              <div style={{ marginTop: "4rem" }}>
                 <TrackList tracks={searchResultTracks} />
               </div>
             )}

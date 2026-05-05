@@ -86,3 +86,12 @@ export interface ArtistPageData {
   topTracks: Track[];
   albums: SpotifyAlbumSimplified[];
 }
+
+export interface SpotifyPlaylistDetailed {
+  id: string;
+  name: string;
+  owner: string; // 제작자 이름 (display_name)
+  image: string; // 플레이리스트 커버 이미지
+  description: string | null;
+  tracks: Track[]; // 내부에 포함된 곡 데이터 배열
+}

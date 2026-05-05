@@ -34,10 +34,11 @@ export default function AlbumDetailPage() {
     if (!token || !id) return;
 
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
 
     const loadAlbumData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
         const data = await fetchAlbum(token, id as string, controller.signal);
         if (!data) {
