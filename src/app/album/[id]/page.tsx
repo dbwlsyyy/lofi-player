@@ -12,7 +12,6 @@ import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
-import Link from "next/link";
 import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
@@ -65,13 +64,14 @@ export default function AlbumDetailPage() {
   if (!album) return null;
 
   const searchResultTracks = album.tracks.map(mapTrackToSearchResult);
+  const totalDurationMin = Math.floor(album.tracks.reduce((acc, t) => acc + t.durationMs, 0) / 60000);
 
   return (
     <main className={styles.container}>
       <div className={styles.content}>
         {!isRelaxMode && (
           <>
-            {/* 블루 테마의 독창적인 히어로 섹션 */}
+            {/* 세련된 CD 인터랙션이 포함된 히어로 섹션 */}
             <header className={styles.hero}>
               <div className={styles.artSection}>
                 <div className={styles.artWrapper}>
@@ -80,7 +80,7 @@ export default function AlbumDetailPage() {
                     alt={album.name}
                     fill
                     priority
-                    sizes="32rem"
+                    sizes="34rem"
                     className={styles.art}
                   />
                 </div>
@@ -90,7 +90,7 @@ export default function AlbumDetailPage() {
                       src={album.image}
                       alt=""
                       fill
-                      sizes="10rem"
+                      sizes="12rem"
                       className={styles.art}
                     />
                   </div>
@@ -112,7 +112,7 @@ export default function AlbumDetailPage() {
                     className={styles.playBtn}
                     onClick={() => playAllTracks(album.tracks, 0)}
                   >
-                    <FaPlay size={18} /> Play Now
+                    <FaPlay size={18} /> Play Album
                   </button>
                 </div>
               </div>
@@ -142,9 +142,11 @@ export default function AlbumDetailPage() {
                   </div>
                   <div className={styles.infoItem}>
                     <span className={styles.infoLabel}>Total Duration</span>
-                    <p className={styles.infoValue}>
-                      {Math.floor(album.tracks.reduce((acc, t) => acc + t.durationMs, 0) / 60000)} min
-                    </p>
+                    <p className={styles.infoValue}>{totalDurationMin} minutes</p>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <span className={styles.infoLabel}>Format</span>
+                    <p className={styles.infoValue}>Digital / {album.type.toUpperCase()}</p>
                   </div>
                 </div>
               </aside>

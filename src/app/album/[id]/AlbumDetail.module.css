@@ -2,8 +2,8 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  background: radial-gradient(circle at top right, rgba(79, 125, 243, 0.15), transparent 40%),
-              radial-gradient(circle at bottom left, rgba(79, 125, 243, 0.1), transparent 40%);
+  background: radial-gradient(circle at top right, rgba(79, 125, 243, 0.12), transparent 40%),
+              linear-gradient(180deg, rgba(10, 15, 25, 1) 0%, rgba(20, 25, 40, 1) 100%);
   scrollbar-width: none;
 }
 
@@ -17,14 +17,13 @@
   padding: 6rem 4rem;
 }
 
-/* 블루 테마를 반영한 독창적인 히어로 섹션 */
+/* 히어로 섹션 */
 .hero {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
-  gap: 6rem;
+  gap: 8rem;
   align-items: center;
   margin-bottom: 8rem;
-  perspective: 1000px;
 }
 
 .artSection {
@@ -32,56 +31,95 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  perspective: 1200px;
 }
 
 .artWrapper {
   position: relative;
-  width: 32rem;
-  height: 32rem;
+  width: 34rem;
+  height: 34rem;
   z-index: 10;
-  border-radius: 1rem;
+  border-radius: 0.8rem;
   overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   cursor: pointer;
 }
 
 .artWrapper:hover {
-  transform: translateX(-15%) rotateY(-10deg);
+  transform: translateX(-20%) rotateY(-15deg);
+  box-shadow: 20px 30px 60px rgba(0, 0, 0, 0.8);
 }
 
+/* 세련된 CD 스타일 레코드판 */
 .vinyl {
   position: absolute;
-  width: 30rem;
-  height: 30rem;
-  background: #050505;
+  width: 32rem;
+  height: 32rem;
   border-radius: 50%;
   z-index: 5;
   left: 50%;
   transform: translateX(-50%);
+  
+  /* CD의 금속성 광택 효과 */
+  background: #111;
   background-image: 
-    repeating-radial-gradient(circle at center, #1a1a1a 0, #050505 2px, #1a1a1a 4px),
-    linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+    conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(255, 255, 255, 0.05) 45deg,
+      transparent 90deg,
+      rgba(255, 255, 255, 0.05) 135deg,
+      transparent 180deg,
+      rgba(255, 255, 255, 0.05) 225deg,
+      transparent 270deg,
+      rgba(255, 255, 255, 0.05) 315deg,
+      transparent 360deg
+    ),
+    repeating-radial-gradient(
+      circle at center,
+      #222 0,
+      #111 1px,
+      #222 2px
+    );
+  
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+}
+
+/* CD 중앙 홀 및 라벨 */
+.vinyl::after {
+  content: "";
+  position: absolute;
+  width: 3rem;
+  height: 3rem;
+  background: #0a0f19;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  z-index: 15;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
 }
 
 .vinylLabel {
-  width: 10rem;
-  height: 10rem;
+  width: 12rem;
+  height: 12rem;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #000;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  z-index: 12;
+  filter: brightness(0.8);
 }
 
-.artWrapper:hover + .vinyl {
-  transform: translateX(25%) rotate(360deg);
+/* 호버 시 CD가 빠져나오는 인터랙션 */
+.artSection:hover .vinyl {
+  transform: translateX(35%) rotate(360deg);
 }
 
-/* 블루 테마 텍스트 스타일 */
+/* 텍스트 스타일 */
 .heroText {
   display: flex;
   flex-direction: column;
@@ -91,7 +129,7 @@
 .label {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #4f7df3; /* 메인 블루 컬러 */
+  color: #4f7df3;
   text-transform: uppercase;
   letter-spacing: 0.3em;
 }
@@ -100,9 +138,8 @@
   font-size: 5.5rem;
   font-weight: 900;
   color: #fff;
-  line-height: 1;
+  line-height: 1.1;
   letter-spacing: -0.03em;
-  text-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .metaRow {
@@ -125,17 +162,10 @@
 .artistLink {
   color: #fff;
   font-weight: 700;
-  transition: color 0.2s;
-}
-
-.artistLink:hover {
-  color: #4f7df3;
 }
 
 .actionRow {
-  margin-top: 2rem;
-  display: flex;
-  gap: 2rem;
+  margin-top: 2.5rem;
 }
 
 .playBtn {
@@ -151,16 +181,16 @@
   font-size: 1.6rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 25px rgba(79, 125, 243, 0.4);
+  box-shadow: 0 10px 25px rgba(79, 125, 243, 0.3);
 }
 
 .playBtn:hover {
   transform: translateY(-5px);
   background: #608aff;
-  box-shadow: 0 15px 35px rgba(79, 125, 243, 0.5);
+  box-shadow: 0 15px 35px rgba(79, 125, 243, 0.4);
 }
 
-/* 앨범 상세 정보 섹션 */
+/* 상세 정보 섹션 */
 .detailsGrid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -211,7 +241,6 @@
   font-size: 1.6rem;
   color: #fff;
   font-weight: 600;
-  line-height: 1.6;
 }
 
 .footer {
@@ -239,10 +268,7 @@
   .artSection {
     order: -1;
   }
-  .metaRow {
-    justify-content: center;
-  }
-  .actionRow {
+  .metaRow, .actionRow {
     justify-content: center;
   }
   .detailsGrid {
@@ -254,13 +280,9 @@
   .title {
     font-size: 4rem;
   }
-  .artWrapper {
-    width: 24rem;
-    height: 24rem;
-  }
-  .vinyl {
-    width: 22rem;
-    height: 22rem;
+  .artWrapper, .vinyl {
+    width: 26rem;
+    height: 26rem;
   }
   .content {
     padding: 4rem 2rem;
