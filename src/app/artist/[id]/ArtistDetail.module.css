@@ -100,7 +100,7 @@
   align-items: center;
   gap: 1rem;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 1.2rem; /* 폰트 사이즈 확대 */
+  font-size: 1.4rem; /* 폰트 사이즈 확대 */
   margin-top: 1.5rem;
   font-weight: 500;
 }
@@ -158,60 +158,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* 인기 트랙 리스트 */
-.trackList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 1rem;
-}
-
-.trackRow {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem;
-  border-radius: 1.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.trackRow:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(10px);
-}
-
-.trackArt {
-  position: relative;
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: 1rem;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.trackInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.trackName {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.3rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.trackMeta {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.5);
-}
-
 /* 앨범 그리드 */
 .albumGrid {
   display: grid;
@@ -266,7 +212,7 @@
   height: 100vh;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .title {
     font-size: 4rem;
   }
@@ -284,17 +230,5 @@
   }
   .trackList {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .title {
-    font-size: 3rem;
-  }
-  .content {
-    padding: 2rem 1rem;
-  }
-  .hero {
-    padding: 2rem;
   }
 }

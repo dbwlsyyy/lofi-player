@@ -16,6 +16,8 @@ import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
 import { SpotifyAlbumSimplified, SpotifyArtistDetailed } from "@/types/spotify";
+import { mapTrackToSearchResult } from "@/lib/spotifyMapper";
+import TrackList from "@/app/digging/components/TrackList/TrackList";
 
 export default function ArtistDetailPage() {
   const { id } = useParams();
@@ -74,6 +76,8 @@ export default function ArtistDetailPage() {
 
   const followerCount = data.artist?.followers?.total.toLocaleString() || "0";
 
+  const popularSearchResultTracks = data.topTracks.slice(0, 6).map(mapTrackToSearchResult);
+
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -111,15 +115,11 @@ export default function ArtistDetailPage() {
                   />
                 </div>
                 <div className={styles.heroText}>
-                  <span className={styles.label}>
-                    <FaMicrophone style={{ marginRight: "0.5rem" }} />
-                    Artist
-                  </span>
                   <h1 className={styles.title}>{data.artist.name}</h1>
                   <div className={styles.metaRow}>
                     <span>{followerCount} followers</span>
                     <span className={styles.dot}>•</span>
-                    <span>{data.artist.genres?.slice(0, 2).join(" / ")}</span>
+                    <span>{data.artist.genres?.slice(0, 2).join(" / ") || "장르 없음"}</span>
                   </div>
                   <div className={styles.actionRow}>
                     <button
@@ -133,32 +133,10 @@ export default function ArtistDetailPage() {
               </div>
             </header>
 
-            {/* 인기 트랙 섹션 - 새로운 레이아웃 */}
+            {/* 인기 트랙 섹션 */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Popular Tracks</h2>
-              <div className={styles.trackList}>
-                {data.topTracks.slice(0, 6).map((t, i) => (
-                  <div
-                    key={t.uniqueKey}
-                    className={styles.trackRow}
-                    onClick={() => playSingleTrack(t)}
-                  >
-                    <div className={styles.trackArt}>
-                      <Image
-                        src={t.image || "/default_album.png"}
-                        alt={t.name}
-                        fill
-                        sizes="4.5rem"
-                        className={styles.art}
-                      />
-                    </div>
-                    <div className={styles.trackInfo}>
-                      <p className={styles.trackName}>{t.name}</p>
-                      <p className={styles.trackMeta}>{formatTime(t.durationMs)}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <TrackList tracks={popularSearchResultTracks} />
             </section>
 
             {/* 앨범 섹션 추가 */}

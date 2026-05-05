@@ -2,8 +2,9 @@
 import Image from "next/image";
 import styles from "./ArtistGrid.module.css";
 import Link from "next/link";
+import { SpotifyArtistDetailed } from "@/types/spotify";
 
-export default function ArtistGrid({ artists }: { artists: any[]; onClick?: any }) {
+export default function ArtistGrid({ artists }: { artists: SpotifyArtistDetailed[] }) {
   return (
     <div className={styles.gridContainer}>
       {artists.map((item) => (
@@ -14,7 +15,7 @@ export default function ArtistGrid({ artists }: { artists: any[]; onClick?: any 
         >
           <div className={styles.artistImgWrapper}>
             <Image
-              src={item.image}
+              src={item.images[0]?.url || "/default_artist.png"}
               alt={item.name}
               fill
               sizes="15rem"
