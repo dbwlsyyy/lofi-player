@@ -302,3 +302,44 @@ export async function fetchArtistAlbums(
     throw e;
   }
 }
+
+/**
+ * [앨범 상세 정보 가져오기]
+ */
+export async function fetchAlbum(
+  accessToken: string,
+  albumId: string,
+  signal?: AbortSignal,
+): Promise<SpotifyAlbumDetailed> {
+  try {
+    const api = createSpotifyClient(accessToken);
+    const { data } = await api.get(`/albums/${albumId}`, {
+      ...(signal ? { signal } : {}),
+    });
+
+    return {
+      id: data.id,
+      name: data.name,
+      image: data.images?.[0]?.url || "/default_album.png",
+      releaseDate: data.release_date,
+      type: data.album_type,
+      artists: data.artists.map((a: any) => a.name),
+      label: data.label,
+      copyrights: data.copyrights,
+      tracks: data.tracks.items.map((t: any) => ({
+        id: t.id,
+        name: t.name,
+        artists: t.artists.map((a: any) => a.name),
+        image: data.images?.[0]?.url || "/default_album.png",
+        durationMs: t.duration_ms,
+        uri: t.uri,
+        previewUrl: t.preview_url ?? undefined,
+      })),
+    };
+  } catch (e: any) {
+    if (axios.isCancel(e)) throw e;
+    console.error(`fetchAlbum(${albumId}) 에러:`, e.response?.status, e.message);
+    throw e;
+  }
+}
+

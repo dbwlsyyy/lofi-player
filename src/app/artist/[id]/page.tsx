@@ -6,12 +6,12 @@ import styles from "./ArtistDetail.module.css";
 import { fetchArtist, fetchArtistTopTracks, fetchArtistAlbums } from "@/apis/userApi";
 import { useSession } from "next-auth/react";
 import { useUiStore } from "@/store/useUiStore";
-import { FaPlay, FaMicrophone } from "react-icons/fa";
+import { FaPlay } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
-import { formatTime } from "@/lib/formatTime";
 import { Track } from "@/types/player";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
+import Link from "next/link";
 import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
@@ -144,7 +144,8 @@ export default function ArtistDetailPage() {
               <h2 className={styles.sectionTitle}>Discography</h2>
               <div className={styles.albumGrid}>
                 {data.albums.map((album) => (
-                  <div
+                  <Link
+                    href={`/album/${album.id}`}
                     key={album.id}
                     className={styles.albumCard}
                   >
@@ -163,7 +164,7 @@ export default function ArtistDetailPage() {
                         {album.releaseDate.split("-")[0]} • {album.type}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </section>
