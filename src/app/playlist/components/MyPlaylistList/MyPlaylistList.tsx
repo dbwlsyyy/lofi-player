@@ -10,7 +10,7 @@ import { removeTrackFromPlaylist } from "@/apis/userApi";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { uiToast } from "@/lib/toasts";
 import ConfirmModal from "@/components/modal/ConfirmModal/ConfirmModal";
-import styles from "../../PlaylistDetail.module.css";
+import styles from "./MyPlaylistList.module.css";
 
 interface MyPlaylistListProps {
   playlistId: string;
