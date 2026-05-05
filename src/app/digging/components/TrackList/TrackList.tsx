@@ -63,7 +63,7 @@ export default function TrackList({ tracks }: { tracks: SearchResult[] }) {
           <div className={styles.trackLeading}>
             <div className={styles.trackImgWrapper}>
               <Image
-                src={item.image}
+                src={item.image || "/default_album.png"}
                 alt={item.name}
                 fill
                 sizes="5.2rem"

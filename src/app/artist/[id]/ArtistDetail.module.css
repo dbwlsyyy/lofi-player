@@ -16,6 +16,21 @@
   padding: 4rem 2rem;
 }
 
+.fadeContent {
+  animation: smoothAppear 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes smoothAppear {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .hero {
   position: relative;
   display: flex;
@@ -133,6 +148,17 @@
 .playBtn:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+.playBtn:disabled,
+.playBtn[disabled] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #4a5568 !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none;
 }
 
 /* 섹션 공통 */

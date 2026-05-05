@@ -118,16 +118,26 @@
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .titleText {
   font-size: 1.4rem;
   color: #f5f5f5;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .artistText {
   font-size: 1.2rem;
   color: #aaa;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .active {
