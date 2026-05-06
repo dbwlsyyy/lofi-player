@@ -1,17 +1,14 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styles from "./ArtistDetail.module.css";
 import { fetchArtist, fetchArtistTopTracks, fetchArtistAlbums } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
 import { FaPlay } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
-import { Artist, Track, Album } from "@/types/domainTypes";
-import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
 import Link from "next/link";
-import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
@@ -85,7 +82,10 @@ export default function ArtistDetailPage() {
     (item, index, self) => index === self.findIndex((t) => t.id === item.id),
   );
 
-  const isLoading = isArtistLoading || isTracksLoading || isAlbumsLoading;
+  const isLoading =
+    (isArtistLoading && !artist) ||
+    (isTracksLoading && topTracks.length === 0) ||
+    (isAlbumsLoading && albums.length === 0);
   if (isLoading) {
     return (
       <div className={styles.loading}>

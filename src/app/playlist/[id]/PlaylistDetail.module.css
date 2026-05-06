@@ -184,7 +184,10 @@
 }
 
 .loading {
-  padding: 8rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 @keyframes fadeIn {

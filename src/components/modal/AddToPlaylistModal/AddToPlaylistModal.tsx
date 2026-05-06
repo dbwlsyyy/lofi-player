@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchPlaylists } from "@/apis/userApi";
+import { fetchMyPlaylistList } from "@/apis/userApi";
 import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
 import { Playlist } from "@/types/domainTypes";
@@ -29,7 +29,7 @@ export default function AddToPlaylistModal({
 
     const refreshPlaylists = async () => {
       try {
-        const list = await fetchPlaylists(accessToken, controller.signal);
+        const list = await fetchMyPlaylistList(accessToken, controller.signal);
 
         setPlaylists(list);
       } catch (error) {

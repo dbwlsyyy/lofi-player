@@ -142,7 +142,7 @@ export async function fetchAlbum(
   }
 }
 
-export async function fetchPlaylist(
+export async function fetchPlaylistMetadata(
   accessToken: string,
   playlistId: string,
   signal?: AbortSignal,
@@ -155,7 +155,7 @@ export async function fetchPlaylist(
     return mapSpotifyApiPlaylistToPlaylist(data);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
-    console.error(`fetchPlaylist(${playlistId}) 에러:`, error);
+    console.error(`fetchPlaylistMetadata(${playlistId}) 에러:`, error);
     throw error;
   }
 }

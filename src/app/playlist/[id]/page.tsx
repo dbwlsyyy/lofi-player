@@ -1,27 +1,30 @@
 "use client";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent } from "react";
 import styles from "./PlaylistDetail.module.css";
-import { fetchPlaylistTracks, updatePlaylistName, fetchMe } from "@/apis/userApi";
-import { fetchPlaylist } from "@/apis/diggingApi";
+import { updatePlaylistName, fetchMe, fetchAllTracksInPlaylist } from "@/apis/userApi";
+import { fetchPlaylistMetadata } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
-import { FaPlay, FaRegEdit, FaCheck, FaTimes, FaExclamationTriangle } from "react-icons/fa";
+import { FaPlay, FaRegEdit, FaCheck, FaTimes } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { formatTotalDuration } from "@/lib/formatTime";
-import { Track, Playlist } from "@/types/domainTypes";
 import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
-import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
 import MyPlaylistList from "../components/MyPlaylistList/MyPlaylistList";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import ErrorUi from "@/components/common/ErrorUi/ErrorUi";
+
 export default function PlaylistDetailPage() {
   const { id } = useParams();
+  const playlistId = id as string;
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const { isRelaxMode } = useUiStore();
   const { token, playAllTracks } = usePlayerStore(
@@ -31,108 +34,105 @@ export default function PlaylistDetailPage() {
     })),
   );
 
-  const [tracks, setTracks] = useState<Track[]>([]);
-  const [playlistInfo, setPlaylistInfo] = useState<Playlist | null>(null);
-  const [isMine, setIsMine] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const playlistImgFromUrl = searchParams.get("img");
 
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("");
 
-  useEffect(() => {
-    if (!token || !id) return;
+  //  내 정보 가져오기 (캐시를 무한대로 설정해서 통신 낭비 방지)
+  const { data: me } = useQuery({
+    queryKey: ["me"],
+    queryFn: ({ signal }) => fetchMe(token!, signal),
+    enabled: !!token,
+    staleTime: Infinity,
+  });
 
-    const controller = new AbortController();
+  // 플레이리스트 기본 정보 가져오기
+  const {
+    data: playlistInfo,
+    isLoading: isPlaylistLoading,
+    error,
+  } = useQuery({
+    queryKey: ["playlist", playlistId],
+    queryFn: ({ signal }) => fetchPlaylistMetadata(token!, playlistId, signal),
+    enabled: !!token && !!playlistId,
+  });
 
-    const loadData = async () => {
-      setLoading(true);
-      setError(null);
+  // 내 플레이리스트인지 판별
 
-      try {
-        const [me, playlist] = await Promise.all([
-          fetchMe(token, controller.signal),
-          fetchPlaylist(token, id as string, controller.signal),
-        ]);
+  // 내 플리/남의 플리 따지지 말고 무조건 '전체 트랙' API 호출
+  const {
+    data: allTracks,
+    isLoading: isTracksLoading,
+    status,
+    fetchStatus,
+  } = useQuery({
+    queryKey: ["playlistTracks", playlistId],
+    queryFn: ({ signal }) => fetchAllTracksInPlaylist(token!, playlistId, signal), // 여기서 while 루프가 돌아가며 다 긁어옴
+    enabled: !!token && !!playlistId,
+  });
 
-        const mine = playlist.ownerId === me.id;
-        setIsMine(mine);
-        setPlaylistInfo(playlist);
-        setTitle(playlist.name);
+  // 내 플레이리스트인지 판별
+  const isMine = !!me && !!playlistInfo && me.id === playlistInfo.ownerId;
 
-        if (mine) {
-          const lists = await fetchPlaylistTracks(token, id as string, controller.signal);
-          setTracks(lists);
-        } else {
-          setTracks(playlist.tracks || []);
-        }
-        setLoading(false);
-      } catch (err) {
-        if (axios.isCancel(err)) return;
-        console.error("데이터 로드 실패:", err);
-        setError("플레이리스트 정보를 불러오지 못했습니다.");
-        uiToast.error("정보를 불러오지 못했습니다.");
-        setLoading(false);
-      }
-    };
+  // 화면에 뿌려줄 트랙은 allTracks 사용
+  const tracks = allTracks || [];
 
-    loadData();
+  // 이름 변경 기능 (Mutation + 캐시 직접 수정)
+  const updateNameMutation = useMutation({
+    mutationFn: (newName: string) => updatePlaylistName(token!, playlistId, newName),
+    onSuccess: (_, newName) => {
+      uiToast.success("플레이리스트 이름이 변경되었습니다.");
 
-    return () => controller.abort();
-  }, [id, token]);
+      // 서버에서 데이터를 다시 안 받아와도 캐시를 덮어씌워서 화면을 즉시 바꿈
+      queryClient.setQueryData(["playlist", playlistId], (old: any) =>
+        old ? { ...old, name: newName } : old,
+      );
 
-  const handleUpdateName = async () => {
+      setIsEditing(false);
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.set("name", newName);
+      router.replace(`/playlist/${playlistId}?${newParams.toString()}`, { scroll: false });
+    },
+    onError: () => {
+      setIsEditing(false);
+    },
+  });
+
+  // --- 이벤트 핸들러 ---
+  const handleEditStart = () => {
+    setTitle(playlistInfo?.name || "");
+    setIsEditing(true);
+  };
+
+  const handleUpdateName = () => {
     if (!title.trim() || title === playlistInfo?.name) {
-      setTitle(playlistInfo?.name || "");
       setIsEditing(false);
       return;
     }
-
-    const previousTitle = title;
-    try {
-      setIsEditing(false);
-      await updatePlaylistName(token!, id as string, title);
-      uiToast.success("플레이리스트 이름이 변경되었습니다.");
-
-      if (playlistInfo) {
-        setPlaylistInfo({ ...playlistInfo, name: title });
-      }
-
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.set("name", title);
-      router.replace(`/playlist/${id}?${newParams.toString()}`, { scroll: false });
-    } catch (err: unknown) {
-      setTitle(previousTitle);
-      uiToast.error("이름 수정 중 오류가 발생했습니다.");
-    }
+    updateNameMutation.mutate(title);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleUpdateName();
-    else if (e.key === "Escape") {
-      setTitle(playlistInfo?.name || "");
-      setIsEditing(false);
-    }
+    else if (e.key === "Escape") setIsEditing(false);
   };
 
-  if (loading)
+  // --- 렌더링 준비 ---
+  const isLoading = isPlaylistLoading || (isMine && isTracksLoading);
+  const isInitialLoading = status === "pending" && fetchStatus === "fetching";
+  if (isLoading || isInitialLoading) {
     return (
       <div className={styles.loading}>
         <LoadingDots />
       </div>
     );
+  }
+
   if (error || !playlistInfo) {
     return (
       <div className={styles.loading}>
-        <div style={{ textAlign: "center", color: "#a7b3d1" }}>
-          <FaExclamationTriangle
-            size={40}
-            style={{ marginBottom: "1.5rem", color: "#4f7df3" }}
-          />
-          <p style={{ fontSize: "1.6rem" }}>{error || "정보를 표시할 수 없습니다."}</p>
-        </div>
+        <ErrorUi error={error} />
       </div>
     );
   }
@@ -179,10 +179,7 @@ export default function PlaylistDetailPage() {
                           <FaCheck />
                         </button>
                         <button
-                          onMouseDown={() => {
-                            setTitle(playlistInfo.name);
-                            setIsEditing(false);
-                          }}
+                          onMouseDown={() => setIsEditing(false)}
                           className={`${styles.editActionBtn} ${styles.cancel}`}
                         >
                           <FaTimes />
@@ -195,7 +192,7 @@ export default function PlaylistDetailPage() {
                       {isMine && (
                         <FaRegEdit
                           className={styles.editIcon}
-                          onClick={() => setIsEditing(true)}
+                          onClick={handleEditStart}
                         />
                       )}
                     </h2>
@@ -219,7 +216,7 @@ export default function PlaylistDetailPage() {
 
             {isMine ? (
               <MyPlaylistList
-                playlistId={id as string}
+                playlistId={playlistId}
                 initialTracks={tracks}
               />
             ) : (

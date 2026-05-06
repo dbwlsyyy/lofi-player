@@ -1,8 +1,8 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { fetchMe, fetchPlaylists } from "@/apis/userApi";
+import { fetchMe, fetchMyPlaylistList } from "@/apis/userApi";
 import styles from "./Home.module.css";
 import Image from "next/image";
 import { useUiStore } from "@/store/useUiStore";
@@ -35,7 +35,7 @@ export default function HomePage() {
       try {
         const [profile, list] = await Promise.all([
           fetchMe(accessToken, controller.signal),
-          fetchPlaylists(accessToken, controller.signal),
+          fetchMyPlaylistList(accessToken, controller.signal),
         ]);
 
         setMe(profile);

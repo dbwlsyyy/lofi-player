@@ -30,6 +30,8 @@ export default function AlbumDetailPage() {
   const {
     data: album,
     error,
+    status,
+    fetchStatus,
     isLoading: isAlbumLoding,
   } = useQuery({
     queryKey: ["album", albumId],
@@ -37,7 +39,9 @@ export default function AlbumDetailPage() {
     enabled: !!token && !!albumId,
   });
 
-  if (isAlbumLoding) {
+  const isInitialLoading = status === "pending" && fetchStatus === "fetching";
+
+  if (isAlbumLoding || isInitialLoading) {
     return (
       <div className={styles.loading}>
         <LoadingDots />
