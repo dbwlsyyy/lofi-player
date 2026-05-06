@@ -1,14 +1,15 @@
 import PlayerBar from "../components/layout/PlayerBar/PlayerBar";
 import "./globals.css";
-import SDKProvider from "./SDKProvider";
-import { GlobalProviders } from "./globalProviders";
+import SDKProvider from "../components/providers/SDKProvider";
 import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import ToggleBtn from "@/components/layout/ToggleBtn/ToggleBtn";
 import GlobalBackground from "@/components/layout/GlobalBackground/GlobalBackground";
 import TopNav from "@/components/layout/TopNav/TopNav";
-import PageWrapper from "@/components/layout/PageWrapper";
+import PageWrapper from "@/components/layout/wrapper/PageWrapper";
 import QueueSidebar from "@/components/layout/QueueSidebar/QueueSidebar";
+import ReactQueryProvider from "@/components/providers/QueryProvider";
+import { GlobalProviders } from "@/components/providers/GlobalProviders";
 
 export const metadata = {
   title: "Lofi Player",
@@ -27,15 +28,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <GlobalProviders>
-          <GlobalBackground />
+          <ReactQueryProvider>
+            <GlobalBackground />
 
-          <SDKProvider />
-          <TopNav />
-          <PageWrapper>{children}</PageWrapper>
-          <ToggleBtn />
-          <Toaster position="top-center" />
-          <QueueSidebar />
-          <PlayerBar />
+            <SDKProvider />
+            <TopNav />
+            <PageWrapper>{children}</PageWrapper>
+            <ToggleBtn />
+            <Toaster position="top-center" />
+            <QueueSidebar />
+            <PlayerBar />
+          </ReactQueryProvider>
         </GlobalProviders>
       </body>
     </html>

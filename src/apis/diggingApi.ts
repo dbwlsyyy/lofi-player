@@ -24,6 +24,7 @@ export async function searchSpotify(
   accessToken: string,
   query: string,
   filter: SearchFilter,
+  offset: number = 0,
   signal?: AbortSignal,
 ): Promise<Track[] | Artist[] | Album[] | Playlist[]> {
   if (!query.trim()) return [];
@@ -32,7 +33,7 @@ export async function searchSpotify(
 
   try {
     const { data } = await api.get<SpotifyApiSearchResponse>("/search", {
-      params: { q: query, type: filter, limit: 30 },
+      params: { q: query, type: filter, limit: 30, offset },
       ...(signal ? { signal } : {}),
     });
 

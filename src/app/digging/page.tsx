@@ -16,7 +16,8 @@ import AlbumGrid from "./components/AlbumGrid/AlbumGrid";
 import PlaylistList from "./components/PlaylistList/PlaylistList";
 
 import { useDebounce } from "@/hooks/useDebounce";
-import axios from "axios";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 
 export default function DiggingPage() {
   const { data: session } = useSession();
@@ -25,46 +26,35 @@ export default function DiggingPage() {
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<SearchFilter>("track"); // 기본값 '곡'
-  const [results, setResults] = useState<Track[] | Artist[] | Album[] | Playlist[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const debouncedSearchTerm = useDebounce(query, 500);
 
-  // 검색 로직
+  // 💡 2. 스크롤 바닥 감지 센서 (ref를 박아둔 곳이 화면에 보이면 inView가 true가 됨)
+  const { ref, inView } = useInView();
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
+    queryKey: ["search", debouncedSearchTerm, filter],
+    queryFn: ({ pageParam, signal }) =>
+      searchSpotify(accessToken!, debouncedSearchTerm, filter, pageParam as number, signal),
+
+    initialPageParam: 0,
+
+    getNextPageParam: (lastPage, allPages) => {
+      // 배열로 반환된 lastPage의 길이가 30개라면 다음 페이지가 있다고 판단
+      return lastPage.length === 30 ? allPages.length * 30 : undefined;
+    },
+    enabled: !!debouncedSearchTerm && !!accessToken,
+  });
+
+  // 💡 4. 센서가 화면에 보이고, 다음 페이지가 있으면 fetchNextPage 함수 실행!
   useEffect(() => {
-    if (!debouncedSearchTerm.trim() || !accessToken) {
-      setIsLoading(false);
-      return;
+    if (inView && hasNextPage) {
+      fetchNextPage();
     }
+  }, [inView, hasNextPage, fetchNextPage]);
 
-    const controller = new AbortController();
-    setIsLoading(true);
-
-    const fetchSearchResults = async () => {
-      try {
-        const data = await searchSpotify(
-          accessToken,
-          debouncedSearchTerm,
-          filter,
-          controller.signal,
-        );
-        setResults(data);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSearchResults();
-
-    return () => {
-      controller.abort();
-    };
-  }, [debouncedSearchTerm, filter, accessToken]);
+  // 💡 5. 페이지별로 나뉜 배열( [[1~30], [31~60]] )을 하나의 배열로 납작하게(flat) 펴주기
+  const results = data?.pages.flat() || [];
 
   return (
     <main className={styles.container}>
@@ -95,6 +85,14 @@ export default function DiggingPage() {
                 {filter === "artist" && <ArtistGrid artists={results as Artist[]} />}
                 {filter === "album" && <AlbumGrid albums={results as Album[]} />}
                 {filter === "playlist" && <PlaylistList playlists={results as Playlist[]} />}
+
+                {/* 💡 6. 바닥 감지용 투명 센서 장착! */}
+                <div
+                  ref={ref}
+                  style={{ height: "40px", width: "100%" }}
+                >
+                  {isFetchingNextPage && <p className={styles.statusMsg}>더 불러오는 중...</p>}
+                </div>
               </>
             ) : (
               query && (
