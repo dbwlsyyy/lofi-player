@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { fetchMyPlaylistList } from "@/apis/userApi";
 import styles from "./AddToPlaylistModal.module.css";
 import Image from "next/image";
-import { Playlist } from "@/types/domainTypes";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 interface AddModalProps {
   isOpen: boolean;
@@ -20,30 +18,12 @@ export default function AddToPlaylistModal({
   onSelect,
   accessToken,
 }: AddModalProps) {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-
-  useEffect(() => {
-    if (!isOpen || !accessToken) return;
-
-    const controller = new AbortController();
-
-    const refreshPlaylists = async () => {
-      try {
-        const list = await fetchMyPlaylistList(accessToken, controller.signal);
-
-        setPlaylists(list);
-      } catch (error) {
-        if (axios.isCancel(error)) return;
-        console.error(error);
-      }
-    };
-
-    refreshPlaylists();
-
-    return () => {
-      controller.abort();
-    };
-  }, [isOpen, accessToken]);
+  const { data: playlists } = useQuery({
+    queryKey: ["myPlaylists"],
+    queryFn: ({ signal }) => fetchMyPlaylistList(accessToken!, signal),
+    enabled: isOpen && !!accessToken, // 모달이 열려있을 때만 체크
+    staleTime: 1000 * 60 * 5,
+  });
 
   if (!isOpen) return null;
 
@@ -62,7 +42,7 @@ export default function AddToPlaylistModal({
         </div>
 
         <div className={styles.list}>
-          {playlists.map((pl) => (
+          {playlists?.map((pl) => (
             <button
               key={pl.id}
               className={styles.item}

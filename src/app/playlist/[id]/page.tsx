@@ -82,6 +82,7 @@ export default function PlaylistDetailPage() {
   const updateNameMutation = useMutation({
     mutationFn: (newName: string) => updatePlaylistName(token!, playlistId, newName),
     onSuccess: (_, newName) => {
+      queryClient.invalidateQueries({ queryKey: ["myPlaylists"] });
       uiToast.success("플레이리스트 이름이 변경되었습니다.");
 
       // 서버에서 데이터를 다시 안 받아와도 캐시를 덮어씌워서 화면을 즉시 바꿈

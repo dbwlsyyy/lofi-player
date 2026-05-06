@@ -74,13 +74,10 @@
 }
 
 .loading {
-  height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: #000000;
-  font-size: 1.8rem;
+  height: 100vh;
 }
 
 .spinner {
@@ -97,14 +94,4 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-.error {
-  background: rgba(255, 71, 87, 0.1);
-  border: 0.1rem solid rgba(255, 71, 87, 0.3);
-  color: #ff6b6b;
-  padding: 1.5rem 2rem;
-  border-radius: 1.2rem;
-  font-size: 1.4rem;
-  margin-bottom: 2.4rem;
 }

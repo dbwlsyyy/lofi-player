@@ -20,10 +20,10 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useDiggingStore } from "@/store/useDiggingStore";
 import { useShallow } from "zustand/shallow";
+import { usePlayerStore } from "@/store/usePlayerStore";
 
 export default function DiggingPage() {
-  const { data: session } = useSession();
-  const accessToken = session?.accessToken as string | undefined;
+  const accessToken = usePlayerStore((state) => state.accessToken);
   const { isRelaxMode } = useUiStore();
 
   const { query, filter, setQuery, setFilter, clearSearch } = useDiggingStore(

@@ -13,6 +13,7 @@ import ConfirmModal from "@/components/modal/ConfirmModal/ConfirmModal";
 import styles from "./MyPlaylistList.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { useShallow } from "zustand/shallow";
 
 interface MyPlaylistListProps {
   playlistId: string;
@@ -20,8 +21,13 @@ interface MyPlaylistListProps {
 }
 
 export default function MyPlaylistList({ playlistId, initialTracks: tracks }: MyPlaylistListProps) {
-  const token = usePlayerStore((state) => state.accessToken);
-  const playSingleTrack = usePlayerStore((state) => state.playSingleTrack);
+  const { token, playSingleTrack } = usePlayerStore(
+    useShallow((state) => ({
+      token: state.accessToken,
+      playSingleTrack: state.playSingleTrack,
+    })),
+  );
+
   const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,6 +77,7 @@ export default function MyPlaylistList({ playlistId, initialTracks: tracks }: My
       uiToast.error("곡 삭제에 실패했습니다.");
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myPlaylists"] });
       uiToast.success("곡이 삭제되었습니다.");
     },
     onSettled: () => {

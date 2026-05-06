@@ -12,54 +12,56 @@ import LoginHero from "./components/LoginHero/LoginHero";
 import { User, Playlist } from "@/types/domainTypes";
 import Link from "next/link";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { usePlayerStore } from "@/store/usePlayerStore";
+import ErrorUi from "@/components/common/ErrorUi/ErrorUi";
+import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 
 export default function HomePage() {
-  const { data: session, status } = useSession();
-  const accessToken = session?.accessToken;
-
+  const accessToken = usePlayerStore((state) => state.accessToken);
   const { isRelaxMode } = useUiStore();
 
-  const [me, setMe] = useState<User | null>(null);
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [error, setError] = useState("");
+  const { data: me } = useQuery({
+    queryKey: ["me"],
+    queryFn: ({ signal }) => fetchMe(accessToken!, signal),
+    enabled: !!accessToken,
+    staleTime: Infinity,
+  });
+
+  const {
+    data: playlists,
+    status,
+    error,
+    fetchStatus,
+  } = useQuery({
+    queryKey: ["myPlaylists"],
+    queryFn: ({ signal }) => fetchMyPlaylistList(accessToken!, signal),
+    enabled: !!accessToken,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const handleLogin = () => {
     signIn("spotify", { callbackUrl: "/home" });
   };
 
-  useEffect(() => {
-    if (!accessToken) return;
-    const controller = new AbortController();
+  const isInitialLoading = status === "pending" && fetchStatus === "fetching";
+  const isAuthLoading = !!accessToken && !me;
 
-    const initUserData = async () => {
-      try {
-        const [profile, list] = await Promise.all([
-          fetchMe(accessToken, controller.signal),
-          fetchMyPlaylistList(accessToken, controller.signal),
-        ]);
-
-        setMe(profile);
-        setPlaylists(list);
-      } catch (e: unknown) {
-        if (axios.isCancel(e)) return;
-        if (axios.isAxiosError(e) && e.response?.status === 401) {
-          handleLogin();
-        } else {
-          setError("Spotify 데이터를 불러오는 중 오류가 발생했습니다.");
-        }
-      }
-    };
-
-    initUserData();
-    return () => {
-      controller.abort();
-    };
-  }, [accessToken]);
-
-  if (status === "loading" || (status === "authenticated" && !me)) {
-    return <LoadingSpinner />;
+  if (isInitialLoading || (!!accessToken && isAuthLoading && !isRelaxMode)) {
+    return (
+      <div className={styles.loading}>
+        <LoadingDots />
+      </div>
+    );
   }
 
+  if (error || !playlists) {
+    return (
+      <div className={styles.loading}>
+        <ErrorUi error={error} />
+      </div>
+    );
+  }
   return (
     <main className={styles.container}>
       <div className={styles.contentWrapper}>
@@ -68,10 +70,7 @@ export default function HomePage() {
             <NavToggle />
 
             <div className={styles.section}>
-              {error && <p className={styles.error}>{error}</p>}
-
-              <div className={styles.loginHero}>{!me && <LoginHero onLogin={handleLogin} />}</div>
-
+              \<div className={styles.loginHero}>{!me && <LoginHero onLogin={handleLogin} />}</div>
               {me && (
                 <>
                   <div className={styles.playlistGrid}>

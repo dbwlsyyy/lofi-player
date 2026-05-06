@@ -56,9 +56,6 @@ const DetailProgressBar = () => {
 };
 
 export default function SongDetailPage() {
-  const { data: session } = useSession();
-  const token = session?.accessToken;
-
   const router = useRouter();
   const [isClosing, setIsClosing] = useState(false);
   const {

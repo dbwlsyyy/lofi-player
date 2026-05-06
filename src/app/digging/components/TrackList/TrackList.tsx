@@ -5,7 +5,6 @@ import Image from "next/image";
 import { FiHeart, FiPlay } from "react-icons/fi";
 import { Track } from "@/types/domainTypes";
 import styles from "./TrackList.module.css";
-import { useSession } from "next-auth/react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
 import { formatTime } from "@/lib/formatTime";
@@ -15,6 +14,7 @@ import dynamic from "next/dynamic";
 import { addTrackToPlaylist } from "@/apis/userApi";
 import { uiToast } from "@/lib/toasts";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const AddToPlaylistModal = dynamic(
   () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
@@ -22,7 +22,7 @@ const AddToPlaylistModal = dynamic(
 );
 
 export default function TrackList({ tracks }: { tracks: Track[] }) {
-  const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [targetTrackUri, setTargetTrackUri] = useState("");
@@ -46,8 +46,9 @@ export default function TrackList({ tracks }: { tracks: Track[] }) {
     scrollMargin: listOffset,
   });
 
-  const { playSingleTrack, addTrackToNext } = usePlayerStore(
+  const { accessToken, playSingleTrack, addTrackToNext } = usePlayerStore(
     useShallow((state) => ({
+      accessToken: state.accessToken,
       playSingleTrack: state.playSingleTrack,
       addTrackToNext: state.addTrackToNext,
     })),
@@ -67,15 +68,23 @@ export default function TrackList({ tracks }: { tracks: Track[] }) {
   };
 
   const handleSelectPlaylist = async (playlistId: string) => {
-    if (!session?.accessToken) return;
-    try {
-      await addTrackToPlaylist(session.accessToken, playlistId, targetTrackUri);
+    if (accessToken) return;
+    mutate(playlistId);
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: (playlistId: string) =>
+      addTrackToPlaylist(accessToken!, playlistId, targetTrackUri),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myPlaylists"] });
       setIsModalOpen(false);
       uiToast.success("내 플리에 추가 완료");
-    } catch (error) {
+    },
+    onError: () => {
       uiToast.error("곡 추가 실패");
-    }
-  };
+    },
+  });
 
   return (
     <div
@@ -166,7 +175,7 @@ export default function TrackList({ tracks }: { tracks: Track[] }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelect={handleSelectPlaylist}
-        accessToken={session?.accessToken || ""}
+        accessToken={accessToken || ""}
       />
     </div>
   );
