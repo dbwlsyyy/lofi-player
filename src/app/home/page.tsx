@@ -70,7 +70,7 @@ export default function HomePage() {
             <NavToggle />
 
             <div className={styles.section}>
-              \<div className={styles.loginHero}>{!me && <LoginHero onLogin={handleLogin} />}</div>
+              <div className={styles.loginHero}>{!me && <LoginHero onLogin={handleLogin} />}</div>
               {me && (
                 <>
                   <div className={styles.playlistGrid}>
