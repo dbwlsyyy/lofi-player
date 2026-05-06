@@ -3,17 +3,15 @@
 import { usePlayerStore } from "@/store/usePlayerStore";
 import styles from "./PlayerBar.module.css";
 import Image from "next/image";
-import {
-  FaPlay,
-  FaPause,
-  FaStepForward,
-  FaStepBackward,
-  FaRandom,
-  FaRedo,
-  FaVolumeMute,
-  FaVolumeUp,
-} from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { FaPlay } from "react-icons/fa";
+import { FaPause } from "react-icons/fa";
+import { FaStepForward } from "react-icons/fa";
+import { FaStepBackward } from "react-icons/fa";
+import { FaRandom } from "react-icons/fa";
+import { FaRedo } from "react-icons/fa";
+import { FaVolumeMute } from "react-icons/fa";
+import { FaVolumeUp } from "react-icons/fa";
+import { m, AnimatePresence } from "framer-motion";
 import { FiMenu } from "react-icons/fi";
 import { useSession } from "next-auth/react";
 import { formatTime } from "@/lib/formatTime";
@@ -121,7 +119,7 @@ export default function PlayerBar() {
           <>
             <div className={styles.leftArea}>
               <AnimatePresence>
-                <motion.div
+                <m.div
                   //같은 곡이 연속으로 나와도 무조건 슬라이드 되도록 uniqueKey 우선 적용
                   key={currentTrack.uniqueKey || currentTrack.id}
                   initial={{ opacity: 0, x: 60 }}
@@ -153,7 +151,7 @@ export default function PlayerBar() {
                     <p className={styles.trackName}>{currentTrack.name}</p>
                     <p className={styles.trackArtist}>{currentTrack.artists.join(", ")}</p>
                   </div>
-                </motion.div>
+                </m.div>
               </AnimatePresence>
             </div>
 
@@ -239,7 +237,7 @@ export default function PlayerBar() {
             </div>
           </>
         ) : (
-          <motion.div
+          <m.div
             key="player-empty"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.6 }}
@@ -249,7 +247,7 @@ export default function PlayerBar() {
           >
             <p>현재 재생 중인 곡이 없습니다.</p>
             <p className={styles.hint}>플레이리스트에서 곡을 선택하세요.</p>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </footer>

@@ -9,9 +9,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useShallow } from "zustand/shallow";
 import TrackDropdown from "@/components/common/TrackDropdown/TrackDropdown";
-import AddToPlaylistModal from "@/components/modal/AddToPlaylistModal/AddToPlaylistModal";
+import dynamic from "next/dynamic";
 import { uiToast } from "@/lib/toasts";
 import { addTrackToPlaylist } from "@/apis/userApi";
+
+const AddToPlaylistModal = dynamic(
+  () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
+  { ssr: false },
+);
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
