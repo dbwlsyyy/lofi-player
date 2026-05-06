@@ -3,7 +3,6 @@ import "./globals.css";
 import SDKProvider from "./SDKProvider";
 import { NextAuthProvider } from "./providers";
 import { ReactNode } from "react";
-import dynamic from "next/dynamic";
 import { Toaster } from "react-hot-toast";
 import ToggleBtn from "@/components/layout/ToggleBtn/ToggleBtn";
 import GlobalBackground from "@/components/layout/GlobalBackground/GlobalBackground";
