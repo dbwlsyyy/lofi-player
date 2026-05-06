@@ -1,7 +1,7 @@
 import PlayerBar from "../components/layout/PlayerBar/PlayerBar";
 import "./globals.css";
 import SDKProvider from "./SDKProvider";
-import { NextAuthProvider } from "./providers";
+import { GlobalProviders } from "./globalProviders";
 import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import ToggleBtn from "@/components/layout/ToggleBtn/ToggleBtn";
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <NextAuthProvider>
+        <GlobalProviders>
           <GlobalBackground />
 
           <SDKProvider />
@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Toaster position="top-center" />
           <QueueSidebar />
           <PlayerBar />
-        </NextAuthProvider>
+        </GlobalProviders>
       </body>
     </html>
   );
