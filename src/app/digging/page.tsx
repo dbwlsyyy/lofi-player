@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { searchSpotify } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
-import { Album, Artist, Playlist, SearchFilter, Track } from "@/types/domainTypes";
+import { Album, Artist, Playlist, Track } from "@/types/domainTypes";
 import styles from "./Digging.module.css";
 import NavBar from "../../components/common/NavToggle/NavToggle";
 

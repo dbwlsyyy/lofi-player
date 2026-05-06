@@ -107,12 +107,13 @@ export async function fetchArtistAlbums(
   accessToken: string,
   artistId: string,
   limit: number = 20,
+  offset: number = 0,
   signal?: AbortSignal,
 ): Promise<Album[]> {
   const api = createSpotifyClient(accessToken);
   try {
     const { data } = await api.get<{ items: SpotifyApiAlbum[] }>(`/artists/${artistId}/albums`, {
-      params: { limit, include_groups: "album,single" },
+      params: { limit, offset, include_groups: "album,single" },
       ...(signal ? { signal } : {}),
     });
     return data.items.map(mapSpotifyApiAlbumToAlbum);
