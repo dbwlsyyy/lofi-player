@@ -1,18 +1,10 @@
 import { createSpotifyClient } from "@/lib/spotifyClient";
-import { 
-  SpotifyApiUser, 
-  SpotifyApiPlaylist, 
-  SpotifyApiTrack 
-} from "@/types/spotifyApiTypes";
-import { 
-  User, 
-  Playlist, 
-  Track 
-} from "@/types/domainTypes";
-import { 
-  mapSpotifyApiUserToUser, 
-  mapSpotifyApiPlaylistToPlaylist, 
-  mapSpotifyApiTrackToTrack 
+import { SpotifyApiUser, SpotifyApiPlaylist, SpotifyApiTrack } from "@/types/spotifyApiTypes";
+import { User, Playlist, Track } from "@/types/domainTypes";
+import {
+  mapSpotifyApiUserToUser,
+  mapSpotifyApiPlaylistToPlaylist,
+  mapSpotifyApiTrackToTrack,
 } from "@/lib/spotifyMapper";
 import axios, { AxiosError } from "axios";
 
@@ -34,7 +26,7 @@ export async function fetchMe(accessToken: string, signal?: AbortSignal): Promis
   }
 }
 
-export async function fetchPlaylists(
+export async function fetchMyPlaylistList(
   accessToken: string,
   signal?: AbortSignal,
 ): Promise<Playlist[]> {
@@ -46,36 +38,65 @@ export async function fetchPlaylists(
     return data.items.map(mapSpotifyApiPlaylistToPlaylist);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
-    console.error("fetchPlaylists API 에러:", error);
+    console.error("fetchMyPlaylistList API 에러:", error);
     throw error;
   }
 }
 
-export async function fetchPlaylistTracks(
+export async function fetchAllTracksInPlaylist(
   accessToken: string,
   playlistId: string,
   signal?: AbortSignal,
 ): Promise<Track[]> {
   const api = createSpotifyClient(accessToken);
-  try {
-    const { data } = await api.get<{ items: { track: SpotifyApiTrack }[] }>(`/playlists/${playlistId}/tracks`, {
-      ...(signal ? { signal } : {}),
-    });
+  const MAX_TRACKS = 1000; // 안전장치 (최대 1000곡)
+  const limit = 100; // 스포티파이 최대 리밋
 
-    return data.items
-      .filter(item => !!item.track)
-      .map(item => mapSpotifyApiTrackToTrack(item.track));
+  let allTracks: Track[] = [];
+  let offset = 0;
+  let hasNext = true;
+
+  try {
+    // 다음 페이지가 없을 때까지(hasNext === false) 계속 요청
+    while (hasNext && allTracks.length < MAX_TRACKS) {
+      const { data } = await api.get<{
+        items: { track: SpotifyApiTrack }[];
+        total: number; // 플레이리스트의 총 곡 수
+      }>(`/playlists/${playlistId}/tracks`, {
+        params: { limit, offset }, // 건너뛰기
+        ...(signal ? { signal } : {}),
+      });
+
+      // 받은 100곡을 도메인 타입으로 맵핑
+      const validTracks = data.items
+        .filter((item) => !!item.track)
+        .map((item) => mapSpotifyApiTrackToTrack(item.track));
+
+      allTracks = [...allTracks, ...validTracks];
+
+      if (
+        allTracks.length >= data.total ||
+        data.items.length === 0 ||
+        allTracks.length >= MAX_TRACKS
+      ) {
+        hasNext = false;
+      } else {
+        offset += limit;
+      }
+    }
+
+    return allTracks;
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
-    console.error(`fetchPlaylistTracks(${playlistId}) 에러:`, error);
+    console.error(`fetchAllTracksInPlaylist(${playlistId}) 에러:`, error);
     throw error;
   }
 }
 
 export async function updatePlaylistName(
-  accessToken: string, 
-  playlistId: string, 
-  newName: string
+  accessToken: string,
+  playlistId: string,
+  newName: string,
 ): Promise<boolean> {
   const api = createSpotifyClient(accessToken);
   try {

@@ -24,6 +24,7 @@ export async function searchSpotify(
   accessToken: string,
   query: string,
   filter: SearchFilter,
+  offset: number = 0,
   signal?: AbortSignal,
 ): Promise<Track[] | Artist[] | Album[] | Playlist[]> {
   if (!query.trim()) return [];
@@ -32,7 +33,7 @@ export async function searchSpotify(
 
   try {
     const { data } = await api.get<SpotifyApiSearchResponse>("/search", {
-      params: { q: query, type: filter, limit: 30 },
+      params: { q: query, type: filter, limit: 30, offset },
       ...(signal ? { signal } : {}),
     });
 
@@ -106,12 +107,13 @@ export async function fetchArtistAlbums(
   accessToken: string,
   artistId: string,
   limit: number = 20,
+  offset: number = 0,
   signal?: AbortSignal,
 ): Promise<Album[]> {
   const api = createSpotifyClient(accessToken);
   try {
     const { data } = await api.get<{ items: SpotifyApiAlbum[] }>(`/artists/${artistId}/albums`, {
-      params: { limit, include_groups: "album,single" },
+      params: { limit, offset, include_groups: "album,single" },
       ...(signal ? { signal } : {}),
     });
     return data.items.map(mapSpotifyApiAlbumToAlbum);
@@ -140,7 +142,7 @@ export async function fetchAlbum(
   }
 }
 
-export async function fetchPlaylist(
+export async function fetchPlaylistMetadata(
   accessToken: string,
   playlistId: string,
   signal?: AbortSignal,
@@ -153,7 +155,7 @@ export async function fetchPlaylist(
     return mapSpotifyApiPlaylistToPlaylist(data);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
-    console.error(`fetchPlaylist(${playlistId}) 에러:`, error);
+    console.error(`fetchPlaylistMetadata(${playlistId}) 에러:`, error);
     throw error;
   }
 }

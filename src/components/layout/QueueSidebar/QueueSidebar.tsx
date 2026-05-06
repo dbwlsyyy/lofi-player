@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import { uiToast } from "@/lib/toasts";
 import { addTrackToPlaylist } from "@/apis/userApi";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const AddToPlaylistModal = dynamic(
   () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
@@ -20,8 +21,10 @@ const AddToPlaylistModal = dynamic(
 );
 
 export default function QueueSidebar() {
-  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+
   const { isSidebarOpen } = useUiStore();
+  const accessToken = usePlayerStore((state) => state.accessToken);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [targetTrackUri, setTargetTrackUri] = useState("");
@@ -69,15 +72,22 @@ export default function QueueSidebar() {
     setIsModalOpen(true);
   };
 
-  const handleSelectPlaylist = async (playlistId: string) => {
-    if (!session?.accessToken) return;
-    try {
-      await addTrackToPlaylist(session.accessToken, playlistId, targetTrackUri);
+  const { mutate: addTrackMutation } = useMutation({
+    mutationFn: (playlistId: string) =>
+      addTrackToPlaylist(accessToken || "", playlistId, targetTrackUri),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myPlaylists"] });
       setIsModalOpen(false);
       uiToast.success("내 플리에 추가 완료");
-    } catch (error) {
+    },
+    onError: () => {
       uiToast.error("곡 추가 실패");
-    }
+    },
+  });
+
+  const handleSelectPlaylist = (playlistId: string) => {
+    if (accessToken) return;
+    addTrackMutation(playlistId);
   };
 
   return (
@@ -202,7 +212,7 @@ export default function QueueSidebar() {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onSelect={handleSelectPlaylist}
-            accessToken={session?.accessToken || ""}
+            accessToken={accessToken || ""}
           />,
           document.body,
         )}

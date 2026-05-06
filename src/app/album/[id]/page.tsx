@@ -1,7 +1,6 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import styles from "./AlbumDetail.module.css";
 import { fetchAlbum } from "@/apis/diggingApi";
 import { useUiStore } from "@/store/useUiStore";
@@ -10,16 +9,16 @@ import { FaInfoCircle } from "react-icons/fa";
 import { FaMusic } from "react-icons/fa";
 import { FaExclamationTriangle } from "react-icons/fa";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
-import { Album } from "@/types/domainTypes";
 import TrackList from "@/app/digging/components/TrackList/TrackList";
-import { uiToast } from "@/lib/toasts";
 import Image from "next/image";
-import axios from "axios";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/shallow";
+import { useQuery } from "@tanstack/react-query";
+import ErrorUi from "@/components/common/ErrorUi/ErrorUi";
 
 export default function AlbumDetailPage() {
   const { id } = useParams();
+  const albumId = id as string;
   const { isRelaxMode } = useUiStore();
   const { token, playAllTracks } = usePlayerStore(
     useShallow((state) => ({
@@ -28,39 +27,21 @@ export default function AlbumDetailPage() {
     })),
   );
 
-  const [album, setAlbum] = useState<Album | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: album,
+    error,
+    status,
+    fetchStatus,
+    isLoading: isAlbumLoding,
+  } = useQuery({
+    queryKey: ["album", albumId],
+    queryFn: ({ signal }) => fetchAlbum(token!, albumId, signal),
+    enabled: !!token && !!albumId,
+  });
 
-  useEffect(() => {
-    if (!token || !id) return;
+  const isInitialLoading = status === "pending" && fetchStatus === "fetching";
 
-    const controller = new AbortController();
-
-    const loadAlbumData = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await fetchAlbum(token, id as string, controller.signal);
-        setAlbum(data);
-        setLoading(false);
-      } catch (err) {
-        if (axios.isCancel(err)) return;
-        console.error("앨범 데이터 로드 실패:", err);
-        const message = "앨범 정보를 불러오는 중 오류가 발생했습니다.";
-        setError(message);
-        uiToast.error(message);
-        setLoading(false);
-      }
-    };
-
-    loadAlbumData();
-
-    return () => controller.abort();
-  }, [id, token]);
-
-  if (loading) {
+  if (isAlbumLoding || isInitialLoading) {
     return (
       <div className={styles.loading}>
         <LoadingDots />
@@ -71,13 +52,7 @@ export default function AlbumDetailPage() {
   if (error || !album) {
     return (
       <div className={styles.loading}>
-        <div style={{ textAlign: "center", color: "#a7b3d1" }}>
-          <FaExclamationTriangle
-            size={40}
-            style={{ marginBottom: "1.5rem", color: "#4f7df3" }}
-          />
-          <p style={{ fontSize: "1.6rem" }}>{error || "앨범 정보를 표시할 수 없습니다."}</p>
-        </div>
+        <ErrorUi error={error} />
       </div>
     );
   }
