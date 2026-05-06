@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import styles from "./not-found.module.css";
-import { FaMusic, FaHome } from "react-icons/fa";
+import { FaMusic } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 
 export default function NotFound() {
   return (
