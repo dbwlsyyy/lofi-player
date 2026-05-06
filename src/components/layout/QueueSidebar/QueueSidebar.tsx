@@ -12,6 +12,7 @@ import TrackDropdown from "@/components/common/TrackDropdown/TrackDropdown";
 import dynamic from "next/dynamic";
 import { uiToast } from "@/lib/toasts";
 import { addTrackToPlaylist } from "@/apis/userApi";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 const AddToPlaylistModal = dynamic(
   () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
@@ -20,12 +21,13 @@ const AddToPlaylistModal = dynamic(
 
 export default function QueueSidebar() {
   const { data: session } = useSession();
+  const { isSidebarOpen } = useUiStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [targetTrackUri, setTargetTrackUri] = useState("");
 
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const { isSidebarOpen } = useUiStore();
+  const parentRef = useRef<HTMLDivElement>(null);
+
   const {
     queue,
     currentIndex,
@@ -46,13 +48,21 @@ export default function QueueSidebar() {
     })),
   );
 
+  const virtualizer = useVirtualizer({
+    count: queue.length, // 전체 곡 개수
+    getScrollElement: () => parentRef.current, // 스크롤바가 생기는 껍데기 박스
+    estimateSize: () => 64, // 곡 1줄의 대략적인 높이 (4rem 썸네일 + 패딩 고려 = 약 64px)
+    overscan: 5, // 위아래로 5개씩 여유분 렌더링 (스크롤 시 하얀 화면 방지)
+  });
+
   useEffect(() => {
-    itemRefs.current[currentIndex] &&
-      itemRefs.current[currentIndex].scrollIntoView({
+    if (currentIndex >= 0 && currentIndex < queue.length) {
+      virtualizer.scrollToIndex(currentIndex, {
         behavior: "smooth",
-        block: "center",
+        align: "center",
       });
-  }, [currentIndex]);
+    }
+  }, [currentIndex, queue.length, virtualizer]);
 
   const handleAddClick = (uri: string) => {
     setTargetTrackUri(uri);
@@ -117,44 +127,73 @@ export default function QueueSidebar() {
           </button>
         </div>
 
-        <div className={styles.list}>
-          {queue.map((track, index) => {
-            const isActive = track.uniqueKey === activeUniqueKey;
+        {/* 💡 5. 가상화 렌더링 3중 구조 적용 */}
+        <div
+          className={styles.list}
+          ref={parentRef}
+        >
+          {/* 가상 높이를 잡아주는 투명 기둥 */}
+          <div
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            {/* 눈에 보이는 아이템만 쏙쏙 뽑아서 렌더링 */}
+            {virtualizer.getVirtualItems().map((virtualItem) => {
+              const track = queue[virtualItem.index]!;
+              const isActive = track?.uniqueKey === activeUniqueKey;
 
-            return (
-              <div
-                key={track.uniqueKey}
-                ref={(el) => {
-                  itemRefs.current[index] = el;
-                }}
-                onClick={() => jumpTo(index)}
-                className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
-              >
-                <div className={styles.thumbWrapper}>
-                  <Image
-                    src={track.image || "/default_album.png"}
-                    alt={track.name}
-                    fill
-                    sizes="4rem"
-                    className={styles.thumb}
-                  />
-                </div>
+              return (
+                <div
+                  key={virtualItem.key}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: `${virtualItem.size}px`,
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
+                  <div
+                    onClick={() => jumpTo(virtualItem.index)}
+                    className={`${styles.item} ${isActive ? styles.activeBlack : ""}`}
+                  >
+                    <div className={styles.thumbWrapper}>
+                      <Image
+                        src={track.image || "/default_album.png"}
+                        alt={track.name}
+                        fill
+                        sizes="4rem"
+                        className={styles.thumb}
+                      />
+                    </div>
 
-                <div className={styles.textGroup}>
-                  <div className={styles.titleText}>{track.name}</div>
-                  <div className={styles.artistText}>{track.artists.join(", ")}</div>
-                </div>
+                    <div className={styles.textGroup}>
+                      <div className={styles.titleText}>{track.name}</div>
+                      <div className={styles.artistText}>{track.artists.join(", ")}</div>
+                    </div>
 
-                <div className={styles.dropdownWrapper}>
-                  <TrackDropdown
-                    type="queue"
-                    onRemove={() => removeTrackFromQueue(index)}
-                    onSavePlaylist={() => handleAddClick(track.uri)}
-                  />
+                    <div className={styles.dropdownWrapper}>
+                      <TrackDropdown
+                        type="queue"
+                        onRemove={(e) => {
+                          e.stopPropagation(); // 💡 아이템 클릭(jumpTo) 이벤트 전파 방지
+                          removeTrackFromQueue(virtualItem.index);
+                        }}
+                        onSavePlaylist={(e) => {
+                          e.stopPropagation();
+                          handleAddClick(track.uri);
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </aside>
       {typeof window !== "undefined" &&
@@ -166,7 +205,7 @@ export default function QueueSidebar() {
             onSelect={handleSelectPlaylist}
             accessToken={session?.accessToken || ""}
           />,
-          document.body, // body 태그 바로 아래에 렌더링
+          document.body,
         )}
     </>
   );

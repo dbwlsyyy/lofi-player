@@ -4,8 +4,8 @@ import styles from "./TrackDropdown.module.css";
 
 interface TrackDropdownProps {
   onPlayNext?: () => void;
-  onRemove?: () => void;
-  onSavePlaylist?: () => void;
+  onRemove?: (e: React.MouseEvent) => void;
+  onSavePlaylist?: (e: React.MouseEvent) => void;
   type: "digging" | "queue";
 }
 
@@ -34,10 +34,13 @@ export default function TrackDropdown({
     setIsOpen((prev) => !prev);
   };
 
-  const handleAction = (e: React.MouseEvent, action?: () => void) => {
+  const handleAction = (
+    e: React.MouseEvent,
+    action: ((e: React.MouseEvent) => void) | undefined,
+  ) => {
     e.stopPropagation();
     setIsOpen(false);
-    if (action) action(); // 전달받은 함수 실행
+    if (action) action(e); // 전달받은 함수 실행
   };
 
   return (
