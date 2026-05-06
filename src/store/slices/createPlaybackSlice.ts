@@ -473,7 +473,7 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
       let nextIdx = prevState.queue.findIndex(
         (t: Track, i: number) => t.id === sdkTrack.id && i >= prevState.currentIndex,
       );
-      if (nextIdx === -1) nextIdx = prevState.queue.findIndex((t: any) => t.id === sdkTrack.id);
+      if (nextIdx === -1) nextIdx = prevState.queue.findIndex((t: Track) => t.id === sdkTrack.id);
 
       const foundInQueue = nextIdx !== -1 ? prevState.queue[nextIdx] : null;
       const finalTrack = foundInQueue ?? mapSpotifySdkTrackToTrack(sdkTrack); // 기존 유틸 함수 유지

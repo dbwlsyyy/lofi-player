@@ -78,9 +78,13 @@ export default function ArtistDetailPage() {
   }, [inView, hasNextPage, fetchNextPage]);
 
   const rawAlbums = albumsData?.pages.flat() || [];
-  const albums = rawAlbums.filter(
-    (item, index, self) => index === self.findIndex((t) => t.id === item.id),
-  );
+  const seenAlbumIds = new Set();
+
+  const albums = rawAlbums.filter((item) => {
+    if (seenAlbumIds.has(item.id)) return false; // 이미 있으면 탈락
+    seenAlbumIds.add(item.id); // 없으면 넣고 통과
+    return true;
+  });
 
   const isLoading =
     (isArtistLoading && !artist) ||

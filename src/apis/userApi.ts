@@ -49,15 +49,16 @@ export async function fetchAllTracksInPlaylist(
   signal?: AbortSignal,
 ): Promise<Track[]> {
   const api = createSpotifyClient(accessToken);
+  const MAX_TRACKS = 1000; // 안전장치 (최대 1000곡)
+  const limit = 100; // 스포티파이 최대 리밋
 
   let allTracks: Track[] = [];
   let offset = 0;
-  const limit = 100; // 스포티파이 최대 리밋
   let hasNext = true;
 
   try {
     // 다음 페이지가 없을 때까지(hasNext === false) 계속 요청
-    while (hasNext) {
+    while (hasNext && allTracks.length < MAX_TRACKS) {
       const { data } = await api.get<{
         items: { track: SpotifyApiTrack }[];
         total: number; // 플레이리스트의 총 곡 수
@@ -73,7 +74,11 @@ export async function fetchAllTracksInPlaylist(
 
       allTracks = [...allTracks, ...validTracks];
 
-      if (allTracks.length >= data.total || data.items.length === 0) {
+      if (
+        allTracks.length >= data.total ||
+        data.items.length === 0 ||
+        allTracks.length >= MAX_TRACKS
+      ) {
         hasNext = false;
       } else {
         offset += limit;

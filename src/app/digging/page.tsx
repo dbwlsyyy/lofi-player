@@ -63,9 +63,14 @@ export default function DiggingPage() {
 
   // 페이지별로 나뉜 배열( [[1~30], [31~60]] )을 하나의 배열로 flat 펴주기
   const rawResults = data?.pages.flat() || [];
-  const results = rawResults.filter(
-    (item, index, self) => index === self.findIndex((t) => t.id === item.id), // ID가 처음 등장한 위치(findIndex)일 때만 살아남음
-  );
+  const seenResultIds = new Set();
+
+  const results = rawResults.filter((item) => {
+    if (seenResultIds.has(item.id)) return false;
+    seenResultIds.add(item.id);
+    return true;
+  });
+
   return (
     <main className={styles.container}>
       {!isRelaxMode && (
