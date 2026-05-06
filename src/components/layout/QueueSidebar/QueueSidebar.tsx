@@ -127,7 +127,6 @@ export default function QueueSidebar() {
           </button>
         </div>
 
-        {/* 💡 5. 가상화 렌더링 3중 구조 적용 */}
         <div
           className={styles.list}
           ref={parentRef}
@@ -140,7 +139,7 @@ export default function QueueSidebar() {
               position: "relative",
             }}
           >
-            {/* 눈에 보이는 아이템만 쏙쏙 뽑아서 렌더링 */}
+            {/* 눈에 보이는 아이템만 뽑아서 렌더링 */}
             {virtualizer.getVirtualItems().map((virtualItem) => {
               const track = queue[virtualItem.index]!;
               const isActive = track?.uniqueKey === activeUniqueKey;
@@ -180,7 +179,7 @@ export default function QueueSidebar() {
                       <TrackDropdown
                         type="queue"
                         onRemove={(e) => {
-                          e.stopPropagation(); // 💡 아이템 클릭(jumpTo) 이벤트 전파 방지
+                          e.stopPropagation(); //  아이템 클릭(jumpTo) 이벤트 전파 방지
                           removeTrackFromQueue(virtualItem.index);
                         }}
                         onSavePlaylist={(e) => {
