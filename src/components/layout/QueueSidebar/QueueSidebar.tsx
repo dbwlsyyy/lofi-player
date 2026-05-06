@@ -15,9 +15,7 @@ import { addTrackToPlaylist } from "@/apis/userApi";
 
 const AddToPlaylistModal = dynamic(
   () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
-  {
-    ssr: false,
-  },
+  { ssr: false },
 );
 
 export default function QueueSidebar() {

@@ -17,9 +17,7 @@ import { useState } from "react";
 
 const AddToPlaylistModal = dynamic(
   () => import("@/components/modal/AddToPlaylistModal/AddToPlaylistModal"),
-  {
-    ssr: false,
-  },
+  { ssr: false },
 );
 
 export default function TrackList({ tracks }: { tracks: Track[] }) {
