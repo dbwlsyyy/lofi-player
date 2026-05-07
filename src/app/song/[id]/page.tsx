@@ -15,6 +15,7 @@ import {
   FaStepBackward,
   FaRandom,
   FaRetweet,
+  FaRegStickyNote,
 } from "react-icons/fa";
 import { formatTime } from "@/lib/formatTime";
 import { useShallow } from "zustand/shallow";
@@ -57,7 +58,7 @@ const DetailProgressBar = () => {
 export default function SongDetailPage() {
   const router = useRouter();
   const [isClosing, setIsClosing] = useState(false);
-  const [showLyrics, setShowLyrics] = useState(true); // 기본적으로 가사 뷰 활성화
+  const [showLyrics, setShowLyrics] = useState(false); // 기본적으로 가사 뷰 비활성화
   
   const {
     currentTrack,
@@ -169,6 +170,13 @@ export default function SongDetailPage() {
             <div className={styles.playerInfo} style={{ marginTop: '2rem' }}>
               <DetailProgressBar />
               <div className={styles.controls}>
+                <button 
+                  className={`${styles.subBtn} ${showLyrics ? styles.active : ""}`} 
+                  onClick={() => setShowLyrics(!showLyrics)}
+                  title="가사 토글"
+                >
+                  <FaRegStickyNote />
+                </button>
                 <button className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`} onClick={toggleShuffle}>
                   <FaRandom />
                 </button>
@@ -190,7 +198,7 @@ export default function SongDetailPage() {
           </div>
 
           {/* 우측: 가사 섹션 */}
-          <div className={lyricsStyles.lyricsSection}>
+          <div className={`${lyricsStyles.lyricsSection} ${showLyrics ? lyricsStyles.visible : ""}`}>
             {isLoading ? (
               <div className={lyricsStyles.noLyrics}>
                 <LoadingDots />
@@ -223,6 +231,13 @@ export default function SongDetailPage() {
             <div className={`${styles.playerInfo} ${lyricsStyles.mobileControls}`} style={{ marginTop: 'auto', paddingTop: '2rem' }}>
               <DetailProgressBar />
               <div className={styles.controls}>
+                <button 
+                  className={`${styles.subBtn} ${showLyrics ? styles.active : ""}`} 
+                  onClick={() => setShowLyrics(!showLyrics)}
+                  title="가사 토글"
+                >
+                  <FaRegStickyNote />
+                </button>
                 <button className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`} onClick={toggleShuffle}>
                   <FaRandom />
                 </button>

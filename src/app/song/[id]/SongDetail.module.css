@@ -68,7 +68,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 1.8rem 3.6rem;
+  padding: 1.8rem 3.6rem 5.4rem; /* 하단 패딩 추가 */
   box-sizing: border-box;
 }
 

@@ -8,7 +8,7 @@ import { FaPause } from "react-icons/fa";
 import { FaStepForward } from "react-icons/fa";
 import { FaStepBackward } from "react-icons/fa";
 import { FaRandom } from "react-icons/fa";
-import { FaRedo, FaVolumeMute, FaVolumeUp, FaMusic } from "react-icons/fa";
+import { FaRedo, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { m, AnimatePresence } from "framer-motion";
 import { FiMenu } from "react-icons/fi";
 import { useSession } from "next-auth/react";
@@ -159,13 +159,7 @@ export default function PlayerBar() {
                   <LoadingDots />
                 ) : (
                   <>
-                    <Link
-                      href={`/song/${currentTrack.id}`}
-                      className={styles.controlBtn}
-                      title="가사 보기"
-                    >
-                      <FaMusic size={17} />
-                    </Link>
+
                     <button
                       onClick={toggleShuffle}
                       className={`${styles.controlBtn}  ${isShuffled ? styles.activeBtn : ""}`}

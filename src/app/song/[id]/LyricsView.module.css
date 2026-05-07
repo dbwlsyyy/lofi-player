@@ -51,6 +51,10 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(20px);
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
@@ -58,6 +62,12 @@
     black 85%,
     transparent 100%
   );
+}
+
+.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
 }
 
 .lyricsList {
@@ -76,11 +86,12 @@
   font-size: 2.8rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.3);
-  padding: 1.5rem 0;
+  padding: 1.5rem 2rem; /* 좌우 패딩 추가 */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   text-align: left;
   line-height: 1.4;
+  transform-origin: left center;
 }
 
 .lyricLine:hover {
@@ -90,7 +101,7 @@
 .activeLine {
   color: #fff;
   transform: scale(1.05);
-  text-shadow: 0 0 20px rgba(79, 125, 243, 0.5);
+  /* 푸른빛 그림자 효과 제거 */
 }
 
 .plainLyrics {
