@@ -58,3 +58,22 @@ export interface User {
   image: string;
   product?: string;
 }
+
+/**
+ * 가사 데이터 타입
+ */
+export interface LyricLine {
+  time: number; // 밀리초 단위 시간
+  text: string; // 가사 텍스트
+}
+
+export interface LyricsData {
+  id: number;
+  trackName: string;
+  artistName: string;
+  albumName: string;
+  duration: number;
+  plainLyrics?: string;
+  syncedLyrics?: string;
+  lines: LyricLine[]; // 파싱된 가사 줄 목록
+}

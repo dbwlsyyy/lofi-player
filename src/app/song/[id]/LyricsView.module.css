@@ -1,0 +1,141 @@
+.container {
+  width: 100%;
+  height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: row;
+  padding: 2rem;
+  gap: 4rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.albumSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 500px;
+}
+
+.albumArtWrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.trackInfo {
+  margin-top: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
+.trackName {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.artistName {
+  font-size: 1.6rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lyricsSection {
+  flex: 1.5;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 15%,
+    black 85%,
+    transparent 100%
+  );
+}
+
+.lyricsList {
+  height: 100%;
+  overflow-y: auto;
+  padding: 15vh 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.lyricsList::-webkit-scrollbar {
+  display: none;
+}
+
+.lyricLine {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 1.5rem 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.lyricLine:hover {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.activeLine {
+  color: #fff;
+  transform: scale(1.05);
+  text-shadow: 0 0 20px rgba(79, 125, 243, 0.5);
+}
+
+.plainLyrics {
+  font-size: 1.8rem;
+  line-height: 2;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.noLyrics {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.mobileControls {
+  display: none;
+}
+
+/* 반응형 레이아웃 (1024px 미만) */
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    padding: 1rem;
+    height: calc(100vh - 120px);
+  }
+
+  .albumSection {
+    display: none; /* 모바일에서는 앨범 아트 숨김 */
+  }
+
+  .lyricsSection {
+    flex: 1;
+    width: 100%;
+  }
+
+  .lyricLine {
+    font-size: 2.2rem;
+  }
+
+  .mobileControls {
+    display: block;
+  }
+}
