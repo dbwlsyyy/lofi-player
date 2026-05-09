@@ -135,6 +135,7 @@ export function useSpotifyPlayerSync(accessToken: string | null | undefined) {
         player.addListener("ready", async ({ device_id }) => {
           setDeviceId(device_id);
           setIsReady(true);
+          setIsPlaying(false);
           if (accessToken) {
             await transferToDevice(device_id, accessToken);
           }

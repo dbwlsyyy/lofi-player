@@ -15,7 +15,7 @@ export const createPlayerStatusSlice: PlayerSliceCreator<PlayerStatusSlice> = (s
 
   // 방어막 및 UI 로딩 상태
   isTransitioning: false,
-  stopAtEntry: false,
+  stopAtEntry: true,
   isLoadingTrack: false,
 
   // 재생 진행도

@@ -449,12 +449,19 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
           // [버그 1 수정] 삭제된 곡(유령 트랙) 재생 시도 감지
           console.log("👻 유령 트랙 감지: 즉시 오디오를 차단하고 다음 곡으로 스킵");
 
-          // 서버 통신(nextTrack)하는 동안 소리가 새어나오지 않게 즉시 pause로 입을 틀어막습니다.
+          // 서버 통신(nextTrack)하는 동안 소리가 새어나오지 않게 즉시 pause
           store.playerInstance?.pause();
 
-          set({ stopAtEntry: true, isTransitioning: true });
-          await store.nextTrack(true);
-          set({ stopAtEntry: false, isTransitioning: false });
+          set({ stopAtEntry: true });
+          try {
+            await store.nextTrack(true);
+          } catch (error) {
+            console.error("유령 트랙 스킵 중 에러 발생:", error);
+            // 에러가 났을 때 필요한 예외 처리
+          } finally {
+            // isTransitioning은 nextTrack의 setTimeout에 맡김
+            set({ stopAtEntry: false });
+          }
           return;
         }
       }
