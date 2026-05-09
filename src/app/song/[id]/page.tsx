@@ -15,11 +15,11 @@ import {
   FaStepBackward,
   FaRandom,
   FaRetweet,
-  FaRegStickyNote,
 } from "react-icons/fa";
+import { BsMusicNoteList } from "react-icons/bs";
 import { formatTime } from "@/lib/formatTime";
 import { useShallow } from "zustand/shallow";
-import LoadingDots from "@/components/common/LoadingDots/LoadingDots";
+import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 
 const DetailProgressBar = () => {
   const position = usePlayerStore((state) => state.position);
@@ -37,7 +37,10 @@ const DetailProgressBar = () => {
 
   return (
     <div className={styles.progressSection}>
-      <div className={styles.progressBar} onClick={handleSeek}>
+      <div
+        className={styles.progressBar}
+        onClick={handleSeek}
+      >
         <div
           className={styles.progressFill}
           style={{ width: `${progressPercent}%` }}
@@ -58,7 +61,6 @@ const DetailProgressBar = () => {
 export default function SongDetailPage() {
   const router = useRouter();
   const [isClosing, setIsClosing] = useState(false);
-  const [showLyrics, setShowLyrics] = useState(false); // 기본적으로 가사 뷰 비활성화
   
   const {
     currentTrack,
@@ -86,19 +88,14 @@ export default function SongDetailPage() {
     })),
   );
 
-  const { lyrics, isLoading, error, getLyrics, clearLyrics } = useLyricsStore();
+  const { lyrics, isLoading, error, isLyricsOpen, getLyrics, clearLyrics, toggleLyrics } = useLyricsStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeLineRef = useRef<HTMLDivElement>(null);
 
   // 1. 가사 데이터 로드
   useEffect(() => {
     if (currentTrack) {
-      getLyrics(
-        currentTrack.name,
-        currentTrack.artists[0],
-        "",
-        currentTrack.durationMs
-      );
+      getLyrics(currentTrack.name, currentTrack.artists[0] ?? "", "", currentTrack.durationMs);
     }
     return () => clearLyrics();
   }, [currentTrack, getLyrics, clearLyrics]);
@@ -142,13 +139,16 @@ export default function SongDetailPage() {
 
       <div className={styles.content}>
         <header className={styles.header}>
-          <button className={styles.closeBtn} onClick={handleClose}>
+          <button
+            className={styles.closeBtn}
+            onClick={handleClose}
+          >
             <FaChevronDown />
           </button>
         </header>
 
-        <div className={lyricsStyles.container}>
-          {/* 좌측: 앨범 아트 섹션 (데스크탑 전용) */}
+        <div className={`${lyricsStyles.container} ${isLyricsOpen ? lyricsStyles.lyricsOpen : ""}`}>
+          {/* 앨범 섹션 (데스크탑/모바일 공통) */}
           <div className={lyricsStyles.albumSection}>
             <div className={lyricsStyles.albumArtWrapper}>
               <Image
@@ -157,7 +157,7 @@ export default function SongDetailPage() {
                 alt={currentTrack.name}
                 fill
                 priority
-                sizes="(max-width: 1024px) 0vw, 500px"
+                sizes="(max-width: 1024px) 80vw, 500px"
                 className={`${styles.albumArt} ${isPlaying ? styles.playing : ""}`}
               />
             </div>
@@ -165,40 +165,10 @@ export default function SongDetailPage() {
               <h1 className={lyricsStyles.trackName}>{currentTrack.name}</h1>
               <p className={lyricsStyles.artistName}>{currentTrack.artists.join(", ")}</p>
             </div>
-            
-            {/* 데스크탑용 컨트롤러 */}
-            <div className={styles.playerInfo} style={{ marginTop: '2rem' }}>
-              <DetailProgressBar />
-              <div className={styles.controls}>
-                <button 
-                  className={`${styles.subBtn} ${showLyrics ? styles.active : ""}`} 
-                  onClick={() => setShowLyrics(!showLyrics)}
-                  title="가사 토글"
-                >
-                  <FaRegStickyNote />
-                </button>
-                <button className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`} onClick={toggleShuffle}>
-                  <FaRandom />
-                </button>
-                <button className={styles.mainBtn} onClick={prevTrack}>
-                  <FaStepBackward />
-                </button>
-                <button className={styles.playToggle} onClick={togglePlay}>
-                  {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
-                </button>
-                <button className={styles.mainBtn} onClick={() => nextTrack()}>
-                  <FaStepForward />
-                </button>
-                <button className={`${styles.subBtn} ${repeatMode !== "off" ? styles.active : ""}`} onClick={cycleRepeatMode}>
-                  <FaRetweet size={25} />
-                  {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}
-                </button>
-              </div>
-            </div>
           </div>
 
-          {/* 우측: 가사 섹션 */}
-          <div className={`${lyricsStyles.lyricsSection} ${showLyrics ? lyricsStyles.visible : ""}`}>
+          {/* 가사 섹션 */}
+          <div className={`${lyricsStyles.lyricsSection} ${isLyricsOpen ? lyricsStyles.visible : ""}`}>
             {isLoading ? (
               <div className={lyricsStyles.noLyrics}>
                 <LoadingDots />
@@ -206,7 +176,10 @@ export default function SongDetailPage() {
             ) : error ? (
               <div className={lyricsStyles.noLyrics}>{error}</div>
             ) : lyrics && lyrics.lines.length > 0 ? (
-              <div className={lyricsStyles.lyricsList} ref={scrollRef}>
+              <div
+                className={lyricsStyles.lyricsList}
+                ref={scrollRef}
+              >
                 {lyrics.lines.map((line, index) => (
                   <div
                     key={`${line.time}-${index}`}
@@ -226,35 +199,49 @@ export default function SongDetailPage() {
             ) : (
               <div className={lyricsStyles.noLyrics}>가사 정보가 없습니다.</div>
             )}
+          </div>
+        </div>
 
-            {/* 모바일용 컨트롤러 (가사 하단에 배치) */}
-            <div className={`${styles.playerInfo} ${lyricsStyles.mobileControls}`} style={{ marginTop: 'auto', paddingTop: '2rem' }}>
-              <DetailProgressBar />
-              <div className={styles.controls}>
-                <button 
-                  className={`${styles.subBtn} ${showLyrics ? styles.active : ""}`} 
-                  onClick={() => setShowLyrics(!showLyrics)}
-                  title="가사 토글"
-                >
-                  <FaRegStickyNote />
-                </button>
-                <button className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`} onClick={toggleShuffle}>
-                  <FaRandom />
-                </button>
-                <button className={styles.mainBtn} onClick={prevTrack}>
-                  <FaStepBackward />
-                </button>
-                <button className={styles.playToggle} onClick={togglePlay}>
-                  {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
-                </button>
-                <button className={styles.mainBtn} onClick={() => nextTrack()}>
-                  <FaStepForward />
-                </button>
-                <button className={`${styles.subBtn} ${repeatMode !== "off" ? styles.active : ""}`} onClick={cycleRepeatMode}>
-                  <FaRetweet size={25} />
-                  {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}
-                </button>
-              </div>
+        {/* 통합 컨트롤러 섹션 (하단 고정) */}
+        <div className={lyricsStyles.controllerSection}>
+          <div className={styles.playerInfo}>
+            <DetailProgressBar />
+            <div className={styles.controls}>
+              <button 
+                className={`${styles.subBtn} ${isLyricsOpen ? styles.active : ""}`} 
+                onClick={toggleLyrics}
+                title="가사 토글"
+              >
+                <BsMusicNoteList size={22} />
+              </button>
+              <button className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`} onClick={toggleShuffle}>
+                <FaRandom />
+              </button>
+              <button
+                className={styles.mainBtn}
+                onClick={prevTrack}
+              >
+                <FaStepBackward />
+              </button>
+              <button
+                className={styles.playToggle}
+                onClick={togglePlay}
+              >
+                {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
+              </button>
+              <button
+                className={styles.mainBtn}
+                onClick={() => nextTrack()}
+              >
+                <FaStepForward />
+              </button>
+              <button
+                className={`${styles.subBtn} ${repeatMode !== "off" ? styles.active : ""}`}
+                onClick={cycleRepeatMode}
+              >
+                <FaRetweet size={25} />
+                {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}
+              </button>
             </div>
           </div>
         </div>
