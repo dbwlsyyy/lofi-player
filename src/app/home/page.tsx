@@ -18,6 +18,7 @@ import ErrorUi from "@/components/common/ErrorUi/ErrorUi";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 
 export default function HomePage() {
+  const { status: sessionStatus } = useSession();
   const accessToken = usePlayerStore((state) => state.accessToken);
   const { isRelaxMode } = useUiStore();
 
@@ -44,10 +45,11 @@ export default function HomePage() {
     signIn("spotify", { callbackUrl: "/home" });
   };
 
+  const isSessionLoading = sessionStatus === "loading";
   const isInitialLoading = status === "pending" && fetchStatus === "fetching";
   const isAuthLoading = !!accessToken && !me;
 
-  if (isInitialLoading || (!!accessToken && isAuthLoading && !isRelaxMode)) {
+  if (isSessionLoading || isInitialLoading || (!!accessToken && isAuthLoading && !isRelaxMode)) {
     return (
       <div className={styles.loading}>
         <LoadingDots />
@@ -55,7 +57,7 @@ export default function HomePage() {
     );
   }
 
-  if (error || !playlists) {
+  if (error) {
     return (
       <div className={styles.loading}>
         <ErrorUi error={error} />
@@ -74,7 +76,7 @@ export default function HomePage() {
               {me && (
                 <>
                   <div className={styles.playlistGrid}>
-                    {playlists.map((pl) => (
+                    {playlists?.map((pl) => (
                       <Link
                         key={pl.id}
                         href={`/playlist/${pl.id}?name=${encodeURIComponent(pl.name)}&img=${pl.image}`}

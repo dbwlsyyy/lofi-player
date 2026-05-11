@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useLyricsStore } from "@/store/useLyricsStore";
 import styles from "./SongDetail.module.css";
+import lyricsStyles from "./LyricsView.module.css";
 import {
   FaChevronDown,
   FaPlay,
@@ -13,10 +16,14 @@ import {
   FaRandom,
   FaRetweet,
 } from "react-icons/fa";
+import { BsMusicNoteList } from "react-icons/bs";
 import { formatTime } from "@/lib/formatTime";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { useShallow } from "zustand/shallow";
+import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
+import { FiMenu } from "react-icons/fi";
+import { useUiStore } from "@/store/useUiStore";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLyrics } from "@/apis/lyricsApi";
 
 const DetailProgressBar = () => {
   const position = usePlayerStore((state) => state.position);
@@ -57,10 +64,14 @@ const DetailProgressBar = () => {
 
 export default function SongDetailPage() {
   const router = useRouter();
+  const { toggleSidebar } = useUiStore();
+
   const [isClosing, setIsClosing] = useState(false);
+
   const {
     currentTrack,
     isPlaying,
+    position,
     togglePlay,
     nextTrack,
     prevTrack,
@@ -72,6 +83,7 @@ export default function SongDetailPage() {
     useShallow((state) => ({
       currentTrack: state.currentTrack,
       isPlaying: state.isPlaying,
+      position: state.position,
       togglePlay: state.togglePlay,
       nextTrack: state.nextTrack,
       prevTrack: state.prevTrack,
@@ -81,6 +93,59 @@ export default function SongDetailPage() {
       cycleRepeatMode: state.cycleRepeatMode,
     })),
   );
+
+  const { isLyricsOpen, toggleLyrics } = useLyricsStore();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const activeLineRef = useRef<HTMLDivElement>(null);
+
+  // 1. 가사 데이터 로드
+  const {
+    data: lyrics,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["lyrics", currentTrack?.id],
+    queryFn: () =>
+      fetchLyrics(currentTrack!.name, currentTrack!.artists[0] ?? "", "", currentTrack!.durationMs),
+    enabled: !!currentTrack,
+    staleTime: Infinity,
+  });
+
+  // 2. 현재 시간에 맞는 가사 인덱스 계산
+  const activeIndex =
+    !lyrics || lyrics.lines.length === 0
+      ? -1
+      : lyrics.lines.findIndex((line, i) => {
+          const nextLine = lyrics.lines[i + 1];
+          return position >= line.time && (!nextLine || position < nextLine.time);
+        });
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      // 곡이 바뀌면 즉시 맨 위(0)로 스크롤 위치를 초기화
+      scrollRef.current.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [currentTrack?.id]);
+
+  // 3. 활성화된 가사로 자동 스크롤
+  useEffect(() => {
+    if (!scrollRef.current) return;
+
+    // 첫 번째 가사이거나 인덱스가 없을 때 (-1)
+    if (activeIndex === 0 || activeIndex === -1) {
+      scrollRef.current.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+    // 그 외 일반적인 가사 진행 시
+    else if (activeLineRef.current) {
+      activeLineRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [activeIndex]);
 
   if (!currentTrack) return null;
 
@@ -109,62 +174,111 @@ export default function SongDetailPage() {
           </button>
         </header>
 
-        <div className={styles.mainVisual}>
-          <div className={styles.albumWrapper}>
-            <Image
-              key={currentTrack.id}
-              src={currentTrack.image || "/default-playlist.jpg"}
-              alt={currentTrack.name}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 37.8rem"
-              className={`${styles.albumArt} ${isPlaying ? styles.playing : ""}`}
-            />
+        <div className={`${lyricsStyles.container} ${isLyricsOpen ? lyricsStyles.lyricsOpen : ""}`}>
+          {/* 앨범 섹션 (데스크탑/모바일 공통) */}
+          <div className={lyricsStyles.albumSection}>
+            <div className={lyricsStyles.albumArtWrapper}>
+              <Image
+                key={currentTrack.id}
+                src={currentTrack.image || "/default-playlist.jpg"}
+                alt={currentTrack.name}
+                fill
+                priority
+                sizes="(max-width: 1024px) 80vw, 500px"
+                className={`${styles.albumArt} ${isPlaying ? styles.playing : ""}`}
+              />
+            </div>
+            <div className={lyricsStyles.trackInfo}>
+              <h1 className={lyricsStyles.trackName}>{currentTrack.name}</h1>
+              <p className={lyricsStyles.artistName}>{currentTrack.artists.join(", ")}</p>
+            </div>
           </div>
 
+          {/* 가사 섹션 */}
+          <div
+            className={`${lyricsStyles.lyricsSection} ${isLyricsOpen ? lyricsStyles.visible : ""}`}
+          >
+            {isLoading ? (
+              <div className={lyricsStyles.noLyrics}>
+                <LoadingDots />
+              </div>
+            ) : error ? (
+              <div className={lyricsStyles.noLyrics}>{error.message}</div>
+            ) : lyrics && lyrics.lines.length > 0 ? (
+              <div
+                className={lyricsStyles.lyricsList}
+                ref={scrollRef}
+              >
+                {lyrics.lines.map((line, index) => (
+                  <div
+                    key={`${line.time}-${index}`}
+                    ref={index === activeIndex ? activeLineRef : null}
+                    className={`${lyricsStyles.lyricLine} ${
+                      index === activeIndex ? lyricsStyles.activeLine : ""
+                    }`}
+                  >
+                    {line.text}
+                  </div>
+                ))}
+              </div>
+            ) : lyrics?.plainLyrics ? (
+              <div className={lyricsStyles.lyricsList}>
+                <div className={lyricsStyles.plainLyrics}>{lyrics.plainLyrics}</div>
+              </div>
+            ) : (
+              <div className={lyricsStyles.noLyrics}>가사 정보가 없습니다.</div>
+            )}
+          </div>
+        </div>
+
+        {/* 통합 컨트롤러 섹션 (하단 고정) */}
+        <div className={lyricsStyles.controllerSection}>
           <div className={styles.playerInfo}>
-            <div className={styles.songMeta}>
-              <h1 className={styles.title}>{currentTrack.name}</h1>
-              <p className={styles.artist}>{currentTrack.artists.join(", ")}</p>
-            </div>
-
             <DetailProgressBar />
-
             <div className={styles.controls}>
+              <button
+                className={`${styles.subBtn} ${isLyricsOpen ? styles.active : ""}`}
+                onClick={toggleLyrics}
+                title="가사 토글"
+              >
+                <BsMusicNoteList size={22} />
+              </button>
               <button
                 className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`}
                 onClick={toggleShuffle}
               >
                 <FaRandom />
               </button>
-
               <button
                 className={styles.mainBtn}
                 onClick={prevTrack}
               >
                 <FaStepBackward />
               </button>
-
               <button
                 className={styles.playToggle}
                 onClick={togglePlay}
               >
                 {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: "4px" }} />}
               </button>
-
               <button
                 className={styles.mainBtn}
                 onClick={() => nextTrack()}
               >
                 <FaStepForward />
               </button>
-
               <button
                 className={`${styles.subBtn} ${repeatMode !== "off" ? styles.active : ""}`}
                 onClick={cycleRepeatMode}
               >
                 <FaRetweet size={25} />
                 {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}
+              </button>
+              <button
+                className={styles.subBtn}
+                onClick={toggleSidebar}
+              >
+                <FiMenu size={22} />
               </button>
             </div>
           </div>

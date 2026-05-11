@@ -8,9 +8,7 @@ import { FaPause } from "react-icons/fa";
 import { FaStepForward } from "react-icons/fa";
 import { FaStepBackward } from "react-icons/fa";
 import { FaRandom } from "react-icons/fa";
-import { FaRedo } from "react-icons/fa";
-import { FaVolumeMute } from "react-icons/fa";
-import { FaVolumeUp } from "react-icons/fa";
+import { FaRedo, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { m, AnimatePresence } from "framer-motion";
 import { FiMenu } from "react-icons/fi";
 import { useSession } from "next-auth/react";
@@ -161,6 +159,7 @@ export default function PlayerBar() {
                   <LoadingDots />
                 ) : (
                   <>
+
                     <button
                       onClick={toggleShuffle}
                       className={`${styles.controlBtn}  ${isShuffled ? styles.activeBtn : ""}`}
