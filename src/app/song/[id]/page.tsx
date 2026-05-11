@@ -22,6 +22,8 @@ import { useShallow } from "zustand/shallow";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
 import { FiMenu } from "react-icons/fi";
 import { useUiStore } from "@/store/useUiStore";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLyrics } from "@/apis/lyricsApi";
 
 const DetailProgressBar = () => {
   const position = usePlayerStore((state) => state.position);
@@ -92,32 +94,52 @@ export default function SongDetailPage() {
     })),
   );
 
-  const { lyrics, isLoading, error, isLyricsOpen, getLyrics, clearLyrics, toggleLyrics } =
-    useLyricsStore();
+  const { isLyricsOpen, toggleLyrics } = useLyricsStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeLineRef = useRef<HTMLDivElement>(null);
 
   // 1. 가사 데이터 로드
-  useEffect(() => {
-    if (currentTrack) {
-      getLyrics(currentTrack.name, currentTrack.artists[0] ?? "", "", currentTrack.durationMs);
-    }
-    return () => clearLyrics();
-  }, [currentTrack, getLyrics, clearLyrics]);
+  const {
+    data: lyrics,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["lyrics", currentTrack?.id],
+    queryFn: () =>
+      fetchLyrics(currentTrack!.name, currentTrack!.artists[0] ?? "", "", currentTrack!.durationMs),
+    enabled: !!currentTrack,
+    staleTime: Infinity,
+  });
 
   // 2. 현재 시간에 맞는 가사 인덱스 계산
-  const activeIndex = useMemo(() => {
-    if (!lyrics || lyrics.lines.length === 0) return -1;
-    const index = lyrics.lines.findIndex((line, i) => {
-      const nextLine = lyrics.lines[i + 1];
-      return position >= line.time && (!nextLine || position < nextLine.time);
-    });
-    return index;
-  }, [lyrics, position]);
+  const activeIndex =
+    !lyrics || lyrics.lines.length === 0
+      ? -1
+      : lyrics.lines.findIndex((line, i) => {
+          const nextLine = lyrics.lines[i + 1];
+          return position >= line.time && (!nextLine || position < nextLine.time);
+        });
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      // 곡이 바뀌면 즉시 맨 위(0)로 스크롤 위치를 초기화
+      scrollRef.current.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [currentTrack?.id]);
 
   // 3. 활성화된 가사로 자동 스크롤
   useEffect(() => {
-    if (activeLineRef.current && scrollRef.current) {
+    if (!scrollRef.current) return;
+
+    // 첫 번째 가사이거나 인덱스가 없을 때 (-1)
+    if (activeIndex === 0 || activeIndex === -1) {
+      scrollRef.current.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+    // 그 외 일반적인 가사 진행 시
+    else if (activeLineRef.current) {
       activeLineRef.current.scrollIntoView({
         behavior: "smooth",
         block: "center",
@@ -181,7 +203,7 @@ export default function SongDetailPage() {
                 <LoadingDots />
               </div>
             ) : error ? (
-              <div className={lyricsStyles.noLyrics}>{error}</div>
+              <div className={lyricsStyles.noLyrics}>{error.message}</div>
             ) : lyrics && lyrics.lines.length > 0 ? (
               <div
                 className={lyricsStyles.lyricsList}

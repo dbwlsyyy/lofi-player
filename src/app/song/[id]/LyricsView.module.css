@@ -120,7 +120,7 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  padding: 30vh 0;
+  padding: 5vh 0 30vh;
   mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
   scrollbar-width: none;
 }
