@@ -164,6 +164,7 @@ export default function QueueSidebar() {
                     width: "100%",
                     height: `${virtualItem.size}px`,
                     transform: `translateY(${virtualItem.start}px)`,
+                    zIndex: queue.length - virtualItem.index,
                   }}
                 >
                   <div

@@ -20,6 +20,8 @@ import { BsMusicNoteList } from "react-icons/bs";
 import { formatTime } from "@/lib/formatTime";
 import { useShallow } from "zustand/shallow";
 import LoadingDots from "@/components/loading/LoadingDots/LoadingDots";
+import { FiMenu } from "react-icons/fi";
+import { useUiStore } from "@/store/useUiStore";
 
 const DetailProgressBar = () => {
   const position = usePlayerStore((state) => state.position);
@@ -60,8 +62,10 @@ const DetailProgressBar = () => {
 
 export default function SongDetailPage() {
   const router = useRouter();
+  const { toggleSidebar } = useUiStore();
+
   const [isClosing, setIsClosing] = useState(false);
-  
+
   const {
     currentTrack,
     isPlaying,
@@ -88,7 +92,8 @@ export default function SongDetailPage() {
     })),
   );
 
-  const { lyrics, isLoading, error, isLyricsOpen, getLyrics, clearLyrics, toggleLyrics } = useLyricsStore();
+  const { lyrics, isLoading, error, isLyricsOpen, getLyrics, clearLyrics, toggleLyrics } =
+    useLyricsStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeLineRef = useRef<HTMLDivElement>(null);
 
@@ -168,7 +173,9 @@ export default function SongDetailPage() {
           </div>
 
           {/* 가사 섹션 */}
-          <div className={`${lyricsStyles.lyricsSection} ${isLyricsOpen ? lyricsStyles.visible : ""}`}>
+          <div
+            className={`${lyricsStyles.lyricsSection} ${isLyricsOpen ? lyricsStyles.visible : ""}`}
+          >
             {isLoading ? (
               <div className={lyricsStyles.noLyrics}>
                 <LoadingDots />
@@ -207,14 +214,17 @@ export default function SongDetailPage() {
           <div className={styles.playerInfo}>
             <DetailProgressBar />
             <div className={styles.controls}>
-              <button 
-                className={`${styles.subBtn} ${isLyricsOpen ? styles.active : ""}`} 
+              <button
+                className={`${styles.subBtn} ${isLyricsOpen ? styles.active : ""}`}
                 onClick={toggleLyrics}
                 title="가사 토글"
               >
                 <BsMusicNoteList size={22} />
               </button>
-              <button className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`} onClick={toggleShuffle}>
+              <button
+                className={`${styles.subBtn} ${isShuffled ? styles.active : ""}`}
+                onClick={toggleShuffle}
+              >
                 <FaRandom />
               </button>
               <button
@@ -241,6 +251,12 @@ export default function SongDetailPage() {
               >
                 <FaRetweet size={25} />
                 {repeatMode === "track" && <span className={styles.repeatOne}>1</span>}
+              </button>
+              <button
+                className={styles.subBtn}
+                onClick={toggleSidebar}
+              >
+                <FiMenu size={22} />
               </button>
             </div>
           </div>
