@@ -5,7 +5,9 @@ import { LyricsData, LyricLine } from "@/types/domainTypes";
  * LRC 포맷 가사를 파싱하여 LyricLine 배열로 변환
  * [mm:ss.xx] 가사 텍스트 -> { time: ms, text: string }
  */
-const parseSyncedLyrics = (lrc: string): LyricLine[] => {
+const parseSyncedLyrics = (lrc: string | null | undefined): LyricLine[] => {
+  if (!lrc) return [];
+
   const lines = lrc.split("\n");
   const result: LyricLine[] = [];
   const timeRegex = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
@@ -13,12 +15,12 @@ const parseSyncedLyrics = (lrc: string): LyricLine[] => {
   lines.forEach((line) => {
     const match = timeRegex.exec(line);
     if (match) {
-      const minutes = parseInt(match[1], 10);
-      const seconds = parseInt(match[2], 10);
-      const milliseconds = parseInt(match[3].padEnd(3, "0"), 10);
+      const minutes = parseInt(match[1]!, 10);
+      const seconds = parseInt(match[2]!, 10);
+      const milliseconds = parseInt(match[3]!.padEnd(3, "0"), 10);
       const time = minutes * 60 * 1000 + seconds * 1000 + milliseconds;
       const text = line.replace(timeRegex, "").trim();
-      
+
       if (text) {
         result.push({ time, text });
       }
@@ -35,7 +37,7 @@ export const fetchLyrics = async (
   trackName: string,
   artistName: string,
   albumName: string,
-  duration: number
+  duration: number,
 ): Promise<LyricsData | null> => {
   try {
     const response = await axios.get("https://lrclib.net/api/get", {
@@ -48,7 +50,7 @@ export const fetchLyrics = async (
     });
 
     const data = response.data;
-    
+
     return {
       id: data.id,
       trackName: data.trackName,
