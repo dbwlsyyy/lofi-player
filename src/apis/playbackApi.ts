@@ -1,16 +1,22 @@
 // 재생 상태 관련 Web API (JSDoc 포함)
 import { createSpotifyClient } from "@/lib/spotifyClient";
 import { RepeatMode } from "@/types/player";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * [기기 등록] 내 웹 브라우저의 SDK(스피커)를 스포티파이 서버의 '현재 재생 기기'로 등록
  */
 export async function transferToDevice(deviceId: string, accessToken: string) {
   const client = createSpotifyClient(accessToken);
-  return client.put("me/player", {
-    device_ids: [deviceId],
-    play: false,
-  });
+  try {
+    return await client.put("me/player", {
+      device_ids: [deviceId],
+      play: false,
+    });
+  } catch (error) {
+    Sentry.captureException(error, { extra: { deviceId } });
+    throw error;
+  }
 }
 
 /**
@@ -27,7 +33,12 @@ export async function startPlayback(
     offsetIndex !== undefined
       ? { uris, offset: { position: offsetIndex } }
       : { uris };
-  return client.put(`me/player/play?device_id=${deviceId}`, body);
+  try {
+    return await client.put(`me/player/play?device_id=${deviceId}`, body);
+  } catch (error) {
+    Sentry.captureException(error, { extra: { deviceId, offsetIndex, urisCount: uris.length } });
+    throw error;
+  }
 }
 
 /**
@@ -40,7 +51,12 @@ export async function setShuffle(
   accessToken: string,
 ) {
   const client = createSpotifyClient(accessToken);
-  return client.put(`me/player/shuffle?state=${state}&device_id=${deviceId}`);
+  try {
+    return await client.put(`me/player/shuffle?state=${state}&device_id=${deviceId}`);
+  } catch (error) {
+    Sentry.captureException(error, { extra: { state, deviceId } });
+    throw error;
+  }
 }
 
 /**
@@ -53,5 +69,10 @@ export async function setRepeatMode(
   accessToken: string,
 ) {
   const client = createSpotifyClient(accessToken);
-  return client.put(`me/player/repeat?state=${state}&device_id=${deviceId}`);
+  try {
+    return await client.put(`me/player/repeat?state=${state}&device_id=${deviceId}`);
+  } catch (error) {
+    Sentry.captureException(error, { extra: { state, deviceId } });
+    throw error;
+  }
 }

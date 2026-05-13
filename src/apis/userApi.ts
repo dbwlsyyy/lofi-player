@@ -7,6 +7,7 @@ import {
   mapSpotifyApiTrackToTrack,
 } from "@/lib/spotifyMapper";
 import axios, { AxiosError } from "axios";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * 유저(User) 관련 API
@@ -21,6 +22,7 @@ export async function fetchMe(accessToken: string, signal?: AbortSignal): Promis
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
     const axiosError = error as AxiosError;
+    Sentry.captureException(error, { extra: { status: axiosError.response?.status } });
     console.error("fetchMe API 에러:", axiosError.response?.status, axiosError.message);
     throw error;
   }
@@ -38,6 +40,7 @@ export async function fetchMyPlaylistList(
     return data.items.map(mapSpotifyApiPlaylistToPlaylist);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
+    Sentry.captureException(error);
     console.error("fetchMyPlaylistList API 에러:", error);
     throw error;
   }
@@ -88,6 +91,7 @@ export async function fetchAllTracksInPlaylist(
     return allTracks;
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
+    Sentry.captureException(error, { extra: { playlistId } });
     console.error(`fetchAllTracksInPlaylist(${playlistId}) 에러:`, error);
     throw error;
   }
@@ -103,6 +107,7 @@ export async function updatePlaylistName(
     await api.put(`/playlists/${playlistId}`, { name: newName });
     return true;
   } catch (error: unknown) {
+    Sentry.captureException(error, { extra: { playlistId, newName } });
     console.error("updatePlaylistName 에러:", error);
     throw error;
   }
@@ -120,6 +125,7 @@ export async function removeTrackFromPlaylist(
     });
     return true;
   } catch (error: unknown) {
+    Sentry.captureException(error, { extra: { playlistId, trackUri } });
     console.error("removeTrackFromPlaylist 에러:", error);
     throw error;
   }
@@ -135,6 +141,7 @@ export async function addTrackToPlaylist(
     await api.post(`/playlists/${playlistId}/tracks`, { uris: [trackUri] });
     return true;
   } catch (error: unknown) {
+    Sentry.captureException(error, { extra: { playlistId, trackUri } });
     console.error("addTrackToPlaylist 에러:", error);
     throw error;
   }

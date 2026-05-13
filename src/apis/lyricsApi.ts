@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as Sentry from "@sentry/nextjs";
 import { LyricsData, LyricLine } from "@/types/domainTypes";
 
 /**
@@ -62,6 +63,7 @@ export const fetchLyrics = async (
       lines: data.syncedLyrics ? parseSyncedLyrics(data.syncedLyrics) : [],
     };
   } catch (error) {
+    Sentry.captureException(error, { extra: { trackName, artistName, albumName, duration } });
     console.error("가사 조회 실패:", error);
     return null;
   }
