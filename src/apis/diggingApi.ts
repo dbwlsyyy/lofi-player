@@ -14,6 +14,7 @@ import {
   mapSpotifyApiPlaylistToPlaylist,
 } from "@/lib/spotifyMapper";
 import axios, { AxiosError } from "axios";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * 탐색(Digging) 관련 API
@@ -57,6 +58,9 @@ export async function searchSpotify(
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
     const axiosError = error as AxiosError;
+    Sentry.captureException(error, {
+      extra: { query, filter, offset, status: axiosError.response?.status },
+    });
     console.error("searchSpotify API 에러:", axiosError.response?.status, axiosError.message);
     throw error;
   }
@@ -75,6 +79,7 @@ export async function fetchArtist(
     return mapSpotifyApiArtistToArtist(data);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
+    Sentry.captureException(error, { extra: { artistId } });
     console.error(`fetchArtist(${artistId}) 에러:`, error);
     throw error;
   }
@@ -98,6 +103,7 @@ export async function fetchArtistTopTracks(
     return data.tracks.map(mapSpotifyApiTrackToTrack);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
+    Sentry.captureException(error, { extra: { artistId, market } });
     console.error(`fetchArtistTopTracks(${artistId}) 에러:`, error);
     throw error;
   }
@@ -119,6 +125,7 @@ export async function fetchArtistAlbums(
     return data.items.map(mapSpotifyApiAlbumToAlbum);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
+    Sentry.captureException(error, { extra: { artistId, limit, offset } });
     console.error(`fetchArtistAlbums(${artistId}) 에러:`, error);
     throw error;
   }
@@ -137,6 +144,7 @@ export async function fetchAlbum(
     return mapSpotifyApiAlbumToAlbum(data);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
+    Sentry.captureException(error, { extra: { albumId } });
     console.error(`fetchAlbum(${albumId}) 에러:`, error);
     throw error;
   }
@@ -155,6 +163,7 @@ export async function fetchPlaylistMetadata(
     return mapSpotifyApiPlaylistToPlaylist(data);
   } catch (error: unknown) {
     if (axios.isCancel(error)) throw error;
+    Sentry.captureException(error, { extra: { playlistId } });
     console.error(`fetchPlaylistMetadata(${playlistId}) 에러:`, error);
     throw error;
   }

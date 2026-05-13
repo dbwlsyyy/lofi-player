@@ -1,5 +1,6 @@
 import { uiToast } from "@/lib/toasts";
 import axios from "axios";
+import * as Sentry from "@sentry/nextjs";
 import { FiExternalLink, FiLock, FiWifiOff } from "react-icons/fi";
 import { Track } from "@/types/domainTypes";
 
@@ -11,6 +12,13 @@ export const handlePlaybackError = (
   setPosition: (pos: number) => void,
   setDuration: (dur: number) => void,
 ) => {
+  Sentry.captureException(error, {
+    extra: {
+      currentIndex: rollbackState.currentIndex,
+      queueLength: rollbackState.queue.length,
+      currentTrackId: rollbackState.queue[rollbackState.currentIndex]?.id,
+    },
+  });
   console.error("재생 요청 실패:", error);
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;

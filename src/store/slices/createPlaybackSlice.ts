@@ -3,6 +3,7 @@ import { PlayerSliceCreator, PlaybackSlice, RepeatMode } from "@/types/player";
 import { Track } from "@/types/domainTypes";
 import { handlePlaybackError } from "../utils/errorHandlers";
 import { mapSpotifySdkTrackToTrack } from "@/lib/spotifyMapper";
+import * as Sentry from "@sentry/nextjs";
 
 export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get) => ({
   // ---------------------------------------------------------
@@ -86,6 +87,9 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
       // [일반 상황] 평소에는 그냥 resume
       await playerInstance.resume();
     } catch (error) {
+      Sentry.captureException(error, {
+        extra: { isPlaying, currentTrackId: currentTrack?.id, position },
+      });
       console.error("재생 토글 에러:", error);
       // 에러 나면 UI 원상복구 (낙관적 업데이트 롤백)
       set({ isPlaying });
@@ -156,6 +160,9 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
         await playerInstance.nextTrack();
       }
     } catch (e) {
+      Sentry.captureException(e, {
+        extra: { currentIndex, queueLength: queue.length, isShuffled },
+      });
       console.error("다음 곡 넘기기 실패:", e);
       set({ isLoadingTrack: false, isTransitioning: false });
     }
@@ -195,6 +202,9 @@ export const createPlaybackSlice: PlayerSliceCreator<PlaybackSlice> = (set, get)
         await playerInstance.previousTrack();
       }
     } catch (e) {
+      Sentry.captureException(e, {
+        extra: { currentIndex, queueLength: queue.length, isShuffled },
+      });
       console.error("이전 곡 넘기기 실패:", e);
       set({ isLoadingTrack: false });
     }
